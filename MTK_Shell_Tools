@@ -1,0 +1,31 @@
+#!/bin/bash
+clear
+#######
+###
+### Made by Stephane HUC - <devs@stephane-huc.net>
+###  alias ATP, ATP:MIUI...
+###
+### thanks for explains :
+#### http://www.chinaphonearena.com/forum/
+###
+
+INC="$(pwd)/inc"
+DIR_LANG="$(pwd)/lang" #&& echo $DIR_LANG
+lang="${LANG:0:2}" #&& echo $LANG
+
+# link texts and titles variables
+[[ -f "${DIR_LANG}/titles.${lang}" ]] && source "${DIR_LANG}/titles.${lang}" || source "${DIR_LANG}/titles.en"
+[[ -f "${DIR_LANG}/texts.${lang}" ]] && source "${DIR_LANG}/texts.${lang}" || source "${DIR_LANG}/texts.en"
+
+# link files needed
+source "${INC}/config"
+source "${INC}/colors"
+
+# link functions needed
+#source "${INC}/dialog"
+source "${INC}/zenity"
+source "${INC}/display"
+source "${INC}/functions"
+
+# Launcher
+MTKZenyTux

@@ -1,0 +1,63 @@
+#!/bin/bash
+
+# Packages names
+SuperSU="Superuser.apk"
+SU="su"
+version="v2.02"
+SSUD="99SuperSUDaemon"
+
+# others vars - DONT TOUCH!
+PWD=$(pwd)
+
+# URL app
+DL_SUPERSU="http://download.chainfire.eu/452/SuperSU/UPDATE-SuperSU-${version}.zip?retrieve_file=1"
+URL_SUPERSU="http://download.chainfire.eu/supersu"
+
+# Directories where are packages needed into your computer
+DIR_Tools="${PWD}/tools/"
+DIR_ARM="${DIR_Tools}UPDATE-SuperSU-${version}/arm/"
+DIR_CMN="${DIR_Tools}UPDATE-SuperSU-${version}/common/"
+DIR_SSU="${DIR_CMN}${SuperSU}"
+DIR_SSUD="${DIR_CMN}${SSUD}"
+DIR_SU="${DIR_ARM}${SU}"
+
+# Directories where are packages into device system
+SYS_APP="/system/app/"
+SYS_BIN="/system/xbin/"
+SYS_ETC="/system/etc/"
+
+# VendorIDs
+VID[0]="0bb4" # recognized as HTC (High Tech Computer Corp.)
+VID[1]="2717" # Xiaomi
+VID[2]="2717" # Xiaomi
+VID[3]="2717" # Xiaomi
+
+# ProductIDs
+PID[0]="0c03" # recognized as Android Phone [Fairphone First Edition (FP1)]
+PID[1]="1218" # Redmi PTP with USB Debug
+PID[2]="1228" # Redmi UMS with USB Debug
+PID[3]="1248" # Redmi MTP with USB Debug
+
+# Partitions
+PART_NAME[0]="android"
+PART_NAME[1]="usrdata"
+
+PART_TEXT[0]="system"
+PART_TEXT[1]="data"
+
+# Others
+declare -a info_map
+count["name"]=${#text_menu_name[@]}
+
+config="config.ini" # file to save some variables
+FILE_PARAM="${PWD}/dumchar.info"
+FILE_SSU_ZIP="${DIR_Tools}UPDATE-SuperSU-${version}.zip"
+
+day=$(date +"%d-%m-%Y")
+now=$(date +"%d-%m-%Y_%H-%M-%S")
+
+choice=0
+CFG=0
+DIALOG=0
+LOG=0
+ZENITY=0

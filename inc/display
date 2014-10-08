@@ -1,0 +1,101 @@
+#!/bin/bash
+
+function display_detected() {
+
+    printf "${green}$1${neutral}\n" "$2"
+
+    write_file "log" "### Detected: $1"
+
+}
+
+function display_error() {
+
+    if [[ "${ZENITY}" -ne 0 ]]; then
+        zenity_error "<span color=\"red\">$1</span>" "$2"
+    else
+        printf "${red}$1${neutral}" "$2"
+    fi
+
+    write_file "log" "### Error: $1"
+
+}
+
+function display_menu() {
+
+    while true; do
+        choice=""
+
+        if [[ "${ZENITY}" -ne 0 ]]; then
+
+            choice=$( echos_menu | zenity_list "${text_welcome}" "${title_welcome}" "${count['name']}")
+
+        else
+
+            printf "\n${title_menu}\n"
+
+            PS3="${text_welcome} "
+            select menu in "${text_menu_description[@]}"; do
+                if [[ "$REPLY" == "q" || "$REPLY" == "Q" ]]; then
+                    choice="${text_menu_name[${#text_menu_name[*]}]}"
+                else
+                    choice="${text_menu_name[$REPLY]}"
+                fi
+                break
+            done
+
+            unset menu
+
+        fi
+
+        # if choice exists, then run-it!
+        #[[ "$choice" ]] && "$choice"
+        if [[ "$choice" ]]; then
+            array=("${text_menu_name[@]}")
+            key=$(get_key "${choice}");
+
+            [[ -z "$key" ]] && unset choice || "$choice";
+            unset array key
+        fi
+
+    done
+
+    [[ $? -ne 0 ]] && EXIT
+
+}
+
+function display_mssg() {
+
+    if [[ "${ZENITY}" -ne 0 ]]; then
+
+        case "$1" in
+            i) zenity_info "$2" "$3" ;;
+            n) zenity_notify "$2" "$3" ;;
+            q) zenity_question "$2" "$3" ;;
+        esac
+
+    else
+
+        case "$1" in
+            q) echo -e "$2" "${text_yes_no}"; read ;;
+            *) echo -e "$2" ;;
+        esac
+
+    fi
+
+    write_file "log" "### Message: $2"
+
+}
+
+function echos_menu() {
+
+    i=1
+
+    while [ $i -le ${#text_menu_name[@]} ]; do
+        echo "${text_menu_name[$i]}";
+        echo "${text_menu_description[$i]}";
+        let "i = $i + 1";
+    done
+
+	unset i;
+
+}

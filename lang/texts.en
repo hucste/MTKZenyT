@@ -1,0 +1,90 @@
+#!/bin/bash
+
+text_app_dl="Download %s: %s"
+text_app_inexistant="It seems the app %s not exists under your filesystem!"
+
+text_ask_dl="=> Do you want download now for you?"
+text_ask_restart="=> Do you wan't to restart-it for you?"
+text_ask_reboot_system="Now, do you wan't reboot into system to finalize install?"
+
+text_choice_invalid="This choice isn't valid. By 'y' or 'n'..."
+
+text_column_description="Description"
+text_column_name="Name"
+text_column_offset="Offset"
+
+text_datas_remove="All datas relatived at root into /%s will be deleted"
+text_datas_removed="*** all datas into /%s are deleted!"
+
+text_detect_dev="*** Detect your device: "
+
+text_dev_mode="Your mount is into %s mode..."
+text_dev_not_recovery="Your device isn't into needed recovery mode!"
+text_dev_unrecognized="It seems your device isn't recognized by your OS! Please, search reason..."
+
+text_dl_supersu="URL to curl: %s"
+text_dl_yourself="Download yourself the app %s!"
+
+text_error_dl="!!! Error during download %s !!!"
+text_error_not_adb="ADB isn't install. Do the needful!"
+
+text_exit="The script will exit..."
+text_exit_reboot="The script exit... Relaunch after rebooting!"
+text_exit_relaunch="The script exit... Relaunch after!"
+
+text_goodbye="Bye..."
+text_goodbye_info="When you are into Android session, please tap onto SuperSU app...\nand Install su binary when it's ask."
+
+text_into_recovery="You're into recovery! Yeahh..."
+
+text_label_cancel="Quit"
+text_label_ok="Validate"
+
+text_menu_description[1]="To root your device"
+text_menu_description[2]="To unroot your device"
+text_menu_description[3]="Exit the programe!"
+
+text_menu_name[1]="ROOT"
+text_menu_name[2]="UNROOT"
+text_menu_name[3]="EXIT"
+
+text_mount="mount "
+text_mount_error="It seems problem: Your device can't be into root mode! Bye..."
+text_mount_try="Attempt to mount your device..."
+text_mount_ro="Mount %s to read-only into your device!"
+text_mount_rw="Mount %s to read'n write into your device!"
+
+text_ok_tools="%s is installed!"
+
+text_press_key="Press any key when it's rebooted..."
+text_ProductID="ProductID: %s"
+
+text_reboot_recovery="Your device reboot into recovery in 1 second. Needed!"
+text_reboot_yourself="Reboot yourself the device!"
+
+text_remove="Remove %s"
+
+text_see_phone="Please, see your phone to accept ADB shell by SuperSU!"
+
+text_su_cp="cp SU binary into "
+text_su_inactive="It seems SU is inactive... may-be isn't installed?"
+
+text_supersu_cp="cp Superuser app into "
+text_supersu_chmod="chmod and chown Superuser app into "
+
+text_ssu_exists="The archive SuperSu is into your computer! Well..."
+text_SSU_installed="SuperSU %s is installed!"
+
+text_system_info="System is into: "
+
+text_unroot_end="UNROOT step ENDING... "
+text_unroot_stop="UNROOT step is stopped!"
+text_unzip="Unzip the archive: % "
+
+text_VendorID="VendorID: %s"
+text_verify_errors="Please, verify there are no errors messages!"
+text_verify_installed="The programme will verify all tools needed are installed!"
+
+text_welcome="What action, do you want: "
+
+text_yes_no=" (Y:yes ; N:no) "

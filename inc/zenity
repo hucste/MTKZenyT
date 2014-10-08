@@ -1,0 +1,66 @@
+#!/bin/bash
+
+
+function zenity_directory() {
+
+    if [[ "$1" == "d" ]]; then
+        zenity --directory --file-selection --title="$2"
+    else
+        zenity --file-selection --title="$2"
+    fi
+
+}
+
+function zenity_error() {
+
+    zenity --error --timeout=7 --text "$1" --title "$2"
+
+}
+
+function zenity_info() {
+
+    zenity --info --text="$1" --title="$2"
+
+}
+
+function zenity_list() {
+
+    #height=$(bc <<< "$3 * 45 + 5")
+    height=250
+
+    zenity --column="${text_column_name}" --column="${text_column_description}" \
+        --list --height="${height}" --width=500 \
+        --text "$1" --title "$2"
+
+}
+
+function zenity_list_files() {
+
+    #height=$(bc <<< "$3 * 40 + 5")
+    height=250
+
+    zenity --checklist \
+        --column="###" --column="${text_column_name}" --column="${text_column_offset}" \
+        --list --height="${height}" --width=500 --separator=' '\
+        --text "$1" --title "$2"
+
+}
+
+function zenity_notify() {
+
+	zenity --notification --text="$1" --title="$2" --timeout=3
+
+}
+
+function zenity_progress() {
+
+    zenity --auto-close --no-cancel --percentage=0 --progress  --pulsate \
+        --text="$1" --title="$2"
+
+}
+
+function zenity_question() {
+
+    zenity --question --text="$1" --title="$2"
+
+}

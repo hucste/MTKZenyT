@@ -1,0 +1,35 @@
+#!/bin/bash
+
+
+
+function dialog_list_files() {
+
+    height=$(bc <<< "$3 * 10 + 5")
+
+    dialog --backtitle "$2" --title "$2" \
+        --ok-label "${text_label_ok}" --cancel-label "${text_label_cancel}" \
+        --checklist "$1" "$height" 250 "$3" \
+        $(echos_files_to_save) 2> "${FILE_TMP}"
+
+}
+
+function dialog_menu() {
+
+    height=$(bc <<< "$3 * 10 + 5")
+
+    dialog --backtitle "$2" --title "$2" \
+        --menu "$1" ${height} 250 ${height} "${menu[@]}" 2> "${FILE_TMP}"
+
+}
+
+function dialog_select_dir() {
+
+    dialog --dselect  --title="$1"
+
+}
+
+function dialog_select_file() {
+
+    dialog --fselect  --title="$1"
+
+}

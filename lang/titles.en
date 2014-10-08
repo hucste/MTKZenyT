@@ -1,0 +1,5 @@
+#!/bin/bash
+
+title_goodbye="*** GoodBye! ***"
+title_menu="*** Menu ***"
+title_welcome="MTKZenyTools :: Welcome"

@@ -1,0 +1,92 @@
+#!/bin/bash
+
+text_app_dl="Téléchargement de %s depuis %s"
+text_app_inexistant="Il semble que l'application %s n'existe pas dans votre système de fichiers !"
+
+text_ask_dl="=> Voulez-vous que je le télécharge maintenant ?"
+text_ask_restart="=> Voulez-vous que je le redémarre pour vous maintenant ?"
+text_ask_reboot_system="Maintenant, voulez-vous redémarrer le système pour finaliser l'installation ?"
+
+text_choice_invalid="Ce choix n'est pas valide. Par 'o' ou 'n'..."
+
+text_column_description="Description"
+text_column_name="Nom"
+text_column_offset="Offset"
+
+text_datas_remove="Toutes les données relatives au root dans /%s vont être supprimées"
+text_datas_removed="*** Toutes les données dans /%s ont été supprimées !"
+
+text_detect_dev="*** Detection de votre appareil : "
+
+text_dev_mode="Votre montage est en mode %s ..."
+text_dev_not_recovery="Votre appareil n'est pas dans le mode recovery nécessaire !"
+text_dev_unrecognized="Il semble que votre appareil ne soit pas reconnu par votre système d'exploitation !\nCherchez la raison ..."
+
+text_dl_supersu="URL pour curl: %s"
+text_dl_yourself="Téléchargez vous-même l'application %s !"
+
+text_error_dl="!!! Erreur pendant le téléchargement %s !!!"
+text_error_not_tools="L'outil %s n'est pas installé. Veuillez faire le nécessaire !"
+
+text_exit="Le script va s'arrêter ..."
+text_exit_reboot="Le script va s'arrêter ... Relancez-le après le redémarrage de l'appareil !"
+text_exit_relaunch="Le script va s'arrêter ... Relancez-le après !"
+
+text_goodbye="Au-revoir ..."
+text_goodbye_info="Quand vous serez dans la session Android, veuillez taper sur l'app SuperSU ...\net installer le binaire su quand cela vous sera demandé."
+
+text_into_recovery="Vous êtes dans le mode recovery ! Très bien..."
+
+text_label_cancel="Quitter"
+text_label_ok="Valider"
+
+text_menu_description[1]="Rooter votre appareil"
+text_menu_description[2]="Enlever le root de votre appareil"
+text_menu_description[3]="Quitter le programme !"
+
+text_menu_name[1]="ROOT"
+text_menu_name[2]="UNROOT"
+text_menu_name[3]="EXIT"
+
+text_mount="montage "
+text_mount_error="Il semble y avoir un problème : votre appareil n'est pas en mode root. Au-revoir ..."
+text_mount_try="Tentative de montage de votre appareil ..."
+text_mount_ro="Montage en lecture seule de %s !"
+text_mount_rw="Montage en écriture de %s !"
+
+text_error_not_adb="L'outil ADB n'est pas installé. Veuillez faire le nécessaire !"
+
+text_ok_tools="L'outil %s est bien installé !"
+
+text_press_key="Appuyez sur n'importe quelle touche, quand l'appareil a redemarré ..."
+text_ProductID="ProductID: %s"
+
+text_reboot_recovery="Votre appareil redémarre dans une seconde dans le mode recovery.\nC'est nécessaire !"
+text_reboot_yourself="Redémarrez-vous-même l'appareil !"
+
+text_remove="Suppression de %s"
+
+text_see_phone="SVP, regardez votre téléphone pour accepter l'accès à ADB Shell par SuperSU !"
+
+text_ssu_exists="L'archive de SuperSu est bien sur votre ordinateur ! Bonne chose..."
+text_SSU_installed="SuperSU %s est installé !"
+
+text_su_cp="Copie du binaire SU dans "
+text_su_inactive="Il semble que SU ne soit pas actif ... Peut-être n'est-il pas installé ?"
+
+text_supersu_cp="Copie Superuser dans "
+text_supersu_chmod="chmod et chown Superuser "
+
+text_system_info="Vous êtes dans : "
+
+text_unroot_end="Étape UNROOT terminée ... "
+text_unroot_stop="Étape UNROOT est arrêtée !"
+text_unzip="Décompression de l'archive : % "
+
+text_VendorID="VendorID: %s"
+text_verify_errors="SVP, vérifiez qu'il n'y ait pas de messages d'erreurs !"
+text_verify_installed="Le programme va vérifier que vous ayez bien les différents outils !"
+
+text_welcome="Que voulez-vous faire : "
+
+text_yes_no=" (O:oui ; N:non) "
