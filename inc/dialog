@@ -4,39 +4,57 @@ function dialog_list_files() {
 
     # call: display_files text title count
     #local height=$(bc <<< "${#mtd_name[@]} * 10 + 5")
-    local items="$3"
+    local IFS=" " texte="$1" title="$2" items="$3"
 
-    ${dialog} --stdout --backtitle "$2" --title "$2" \
+    ${dialog} --stdout --backtitle "${title}" --title "${title}" \
         --ok-label "${text_label_ok}" --cancel-label "${text_label_cancel}" \
-        --checklist "$1" 0 0 ${#mtd_name[@]} ${items}
+        --checklist "${texte}" 0 0 ${#mtd_name[@]} ${items}
+
+    unset texte title items
 
 }
 
 function dialog_menu() {
 
     # call: dialog menu text title
-    local texte="1" title="2"
-    local height=$(bc <<< "$3 * 10 + 5")
-    local IFS=" "; shift; read -a menu <<< "$@"
+    local IFS=" " texte="$1" title="$2" height=$(bc <<< "$3 * 10 + 5")
 
     ${dialog} --backtitle "${title}" --title "${title}" \
-        --menu "${texte}" 0 0 ${height} ${menu[@]}
-        #--menu "$1" 0 0 ${height} "${menu[@]}" 2> "${FILE_TMP}"
+        --menu "${texte}" 0 0 ${height} "${menu[@]}" 2> "${FILE_TMP}"
+
+    unset texte title height
 
 }
 
 function dialog_select_dir() {
 
     # call: dialog_select_dir title
+    local title="$1"
 
-    ${dialog} --stdout --title "$1" --dselect "${HOME}" 0 50
+    ${dialog} --stdout --title "${title}" --dselect "${HOME}" 0 50
+
+    unset title
 
 }
 
 function dialog_select_file() {
 
     # call: dialog_select_file title
+    local title="$1"
 
-    ${dialog} --stdout --title="$1" --fselect "${HOME}" 0 50
+    ${dialog} --stdout --title="${title}" --fselect "${HOME}" 0 50
+
+    unset title
+
+}
+
+function dialog_yesno() {
+
+    # call: dialog_yesno
+    local texte="$1" title="$2"
+
+    ${dialog} --stdout --title="${title}" --clear --yesno "${texte}" 10 30
+
+    unset texte title
 
 }

@@ -646,8 +646,9 @@ function unroot_to_recovery() {
 function unroot_to_system() {
 
     ##id=$(${adb} shell su -c busybox id -un | sed 's/\r$//'); display_detected "${id}"
+    whoami="$(adb_whoami)"; display_detected "id: ${whoami}"
 
-    if [[ "$(adb_whoami)" == "root" ]]; then
+    if [[ "${whoami}" == "root" ]]; then
 
         adb_mount_partition "w"
 

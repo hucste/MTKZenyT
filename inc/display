@@ -67,10 +67,25 @@ function display_menu() {
             trap 'rm -f "${FILE_TMP}"' 0 1 2 3 5 15
 
             echos_menu
-            dialog_menu "${text_welcome}" "${title_welcome}" "${#text_menu_name[@]}"
-            if [[ $? -eq 0 ]]; then choice=$(<"${FILE_TMP}"); fi
+            dialog_menu "${text_welcome}" "${title_welcome}" "$(count ${text_menu_name[@]})"
 
-            if [[ -f "${FILE_TMP}_menu.tmp" ]]; then rm "${FILE_TMP}_menu.tmp"; fi
+            case $? in
+                0) choice=$(<"${FILE_TMP}");;
+                1|255)
+                    if [[ -f "${FILE_TMP}_menu.tmp" ]]; then rm -f "${FILE_TMP}_menu.tmp"; fi
+                    if [[ -f "${FILE_TMP}" ]]; then rm -f "${FILE_TMP}"; fi
+
+                    choice=""; menu=""
+
+                    display_menu
+
+                ;;
+            esac
+
+            if [[ -f "${FILE_TMP}_menu.tmp" ]]; then rm -f "${FILE_TMP}_menu.tmp"; fi
+            if [[ -f "${FILE_TMP}" ]]; then rm -f "${FILE_TMP}"; fi
+
+            unset menu
 
         else
 
@@ -190,42 +205,42 @@ function echos_menu() {
     write_file "log" "$now ### $FUNCNAME: Attempt ones echos to choose menu..."
 
     local IFS
+    local list=""
     local -i i=1
 
     if [[ "${DIALOG}" -eq 1 ]]; then
 
-        #while [ $i -le $(count "${text_menu_name[@]}") ]; do
-
-            #list="${text_menu_name[$i]}|${text_menu_description[$i]}"
-            #echo "${list}" >> "${FILE_TMP}_menu.tmp"
-            #display_mssg "n" "${list}"
-
-            #let "i = $i + 1";
-            #unset list
-
-        #done
-
-        #while IFS="|"; shift; read col1 col2 || [ -n "${col1}" ]; do
-
-            #menu+=("${col1}" "${col2}")
-
-        #done < "${FILE_TMP}_menu.tmp"
-
-
         while [ $i -le $(count "${text_menu_name[@]}") ]; do
 
-            menu+=("${text_menu_name[$i]}" "${text_menu_description[$i]}")
-            #echo "${list}"
+            list="${text_menu_name[$i]}|${text_menu_description[$i]}"
+            echo "${list}" >> "${FILE_TMP}_menu.tmp"
+            display_mssg "n" "${list}"
 
             let "i = $i + 1";
             unset list
 
         done
 
-        echo "menu: ${menu}"
+        while IFS="|"; shift; read col1 col2 || [ -n "${col1}" ]; do
 
-        #files=$(dialog_list_files "${text_menu_files}" "${title_menu_files}" "${menu}")
-        files=$(dialog_menu "${text_welcome}" "${title_welcome}" "${#text_menu_name[@]}" "${menu[@]}")
+            menu+=("${col1}" "${col2}")
+
+        done < "${FILE_TMP}_menu.tmp"
+
+
+        #while [ $i -le $(count "${text_menu_name[@]}") ]; do
+
+            #menu+=("${text_menu_name[$i]}" "${text_menu_description[$i]}")
+            ##echo "${list}"
+
+            #let "i = $i + 1";
+            ##unset list
+
+        #done
+
+        #echo "menu: ${menu[@]}"
+        #EXIT
+        #choice=$(dialog_menu "${text_welcome}" "${title_welcome}" "${#text_menu_name[@]}" "${menu[@]}")
 
         display_detected "menu: ${menu}"
         unset items

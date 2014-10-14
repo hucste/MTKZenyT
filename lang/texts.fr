@@ -45,6 +45,8 @@ text_into_recovery="Vous êtes dans le mode recovery ! Très bien..."
 text_label_cancel="Quitter"
 text_label_ok="Valider"
 
+text_menu_cancel="Êtes-vous sûr de vouloir annuler ?"
+
 text_menu_files="Quels fichiers désirez-vous flasher ?"
 
 text_menu_description[1]="Rooter votre appareil"

@@ -5,6 +5,7 @@ title_dir_svg="Dans quel répertoire, désirez-vous sauvegarder votre appareil ?
 title_goodbye="*** Au revoir ! ***"
 
 title_menu="*** Menu ***"
+title_menu_cancel="*** Menu :: Annulez ? ***"
 title_menu_files="Menu Flash :: Fichiers"
 
 title_welcome="MTKZenyTools :: Bienvenue"
