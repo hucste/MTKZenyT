@@ -2,13 +2,18 @@
 
 function display_detected() {
 
-    printf "${green}$1${neutral}\n" "$2"
+    # call: display_detected mssg
 
-    write_file "log" "### Detected: $1"
+    mssg=$(printf "$1\n" "$2");
+    echo -e "${green}${mssg}${neutral}"
+
+    write_file "log" "### Detected: ${mssg}"
 
 }
 
 function display_error() {
+
+    # call: display_error mssg
 
     if [[ "${ZENITY}" -ne 0 ]]; then
         zenity_error "<span color=\"red\">$1</span>" "$2"
@@ -20,7 +25,33 @@ function display_error() {
 
 }
 
+function display_files() {
+
+    write_file "log" "$now ### $FUNCNAME: attempt to display files for choosing..."
+
+    if [[ "${ZENITY}" -eq 1 ]]; then
+
+        files=$( echos_files | zenity_list_files "${text_menu_files}" "${title_menu_files}" "${#mtd_name[@]}")
+
+    fi
+
+    if [[ "${DIALOG}" -eq 1 ]]; then
+
+        echos_files
+
+        display_detected "files: $files"
+
+    fi
+
+    if [[ "${files}" ]]; then
+        write_file "log" "### $FUNCNAME: Files choosed: ${files[*]}";
+    fi
+
+}
+
 function display_menu() {
+
+    write_file "log" "$now ### $FUNCNAME: attempt to display menu..."
 
     while true; do
         choice=""
@@ -28,6 +59,18 @@ function display_menu() {
         if [[ "${ZENITY}" -ne 0 ]]; then
 
             choice=$( echos_menu | zenity_list "${text_welcome}" "${title_welcome}" "${count['name']}")
+
+        elif  [[ "${DIALOG}" -ne 0 ]]; then
+
+            FILE_TMP="/tmp/MTK_Dialog_menu.tmp"
+            touch "${FILE_TMP}"
+            trap 'rm -f "${FILE_TMP}"' 0 1 2 3 5 15
+
+            echos_menu
+            dialog_menu "${text_welcome}" "${title_welcome}" "${#text_menu_name[@]}"
+            if [[ $? -eq 0 ]]; then choice=$(<"${FILE_TMP}"); fi
+
+            if [[ -f "${FILE_TMP}_menu.tmp" ]]; then rm "${FILE_TMP}_menu.tmp"; fi
 
         else
 
@@ -37,6 +80,8 @@ function display_menu() {
             select menu in "${text_menu_description[@]}"; do
                 if [[ "$REPLY" == "q" || "$REPLY" == "Q" ]]; then
                     choice="${text_menu_name[${#text_menu_name[*]}]}"
+                elif [[ -z "${text_menu_name[$REPLY]}" ]]; then
+                    choice=""
                 else
                     choice="${text_menu_name[$REPLY]}"
                 fi
@@ -48,13 +93,14 @@ function display_menu() {
         fi
 
         # if choice exists, then run-it!
-        #[[ "$choice" ]] && "$choice"
         if [[ "$choice" ]]; then
-            array=("${text_menu_name[@]}")
-            key=$(get_key "${choice}");
 
-            [[ -z "$key" ]] && unset choice || "$choice";
+            key=$(array_search "${choice}" "${text_menu_name[@]}");
+
+            if [[ -z "${key}" ]]; then unset choice; else "${choice}"; fi
             unset array key
+
+            write_file "log" "### $FUNCNAME: choice: ${choice}"
         fi
 
     done
@@ -64,6 +110,8 @@ function display_menu() {
 }
 
 function display_mssg() {
+
+    # call: display_mssg option title texte
 
     if [[ "${ZENITY}" -ne 0 ]]; then
 
@@ -86,16 +134,112 @@ function display_mssg() {
 
 }
 
-function echos_menu() {
+function echos_files() {
+
+    write_file "log" "$now ### $FUNCNAME: Attempt ones echos to choose files..."
 
     i=1
 
-    while [ $i -le ${#text_menu_name[@]} ]; do
-        echo "${text_menu_name[$i]}";
-        echo "${text_menu_description[$i]}";
-        let "i = $i + 1";
-    done
+    if [[ "${DIALOG}" -eq 1 ]]; then
 
-	unset i;
+        items=""
+        for name in "${mtd_name[@]}"; do
+
+            key=$(array_search "${mtd_name[$i]}" "${FILES[@]}")
+            if [[ -n "$key" ]] ; then key="on"; else key="off"; fi
+
+            items="${items} $i ${name} ${key}"
+
+            let "i = $i + 1";
+            unset key
+
+        done
+
+        files=$(dialog_list_files "${text_menu_files}" "${title_menu_files}" "${items}")
+
+        display_detected "items: ${items}"
+        unset items
+
+    fi
+
+    if [[ "${ZENITY}" -eq 1 ]]; then
+
+        while [ $i -le $(count "${mtd_name[@]}") ]; do
+
+            key=$(array_search "${mtd_name[$i]}" "${FILES[@]}");
+            if [[ -n "${key}" ]]; then echo TRUE; else echo FALSE; fi
+
+            echo "${mtd_name[$i]}"
+            echo "${mtd_size[$i]}"
+            echo "${mtd_addr[$i]}"
+            echo "${mtd_map[$i]}"
+
+            let "i = $i + 1";
+            unset key
+
+        done
+
+    fi
+
+    unset array i
+
+}
+
+function echos_menu() {
+
+    write_file "log" "$now ### $FUNCNAME: Attempt ones echos to choose menu..."
+
+    local IFS
+    local -i i=1
+
+    if [[ "${DIALOG}" -eq 1 ]]; then
+
+        #while [ $i -le $(count "${text_menu_name[@]}") ]; do
+
+            #list="${text_menu_name[$i]}|${text_menu_description[$i]}"
+            #echo "${list}" >> "${FILE_TMP}_menu.tmp"
+            #display_mssg "n" "${list}"
+
+            #let "i = $i + 1";
+            #unset list
+
+        #done
+
+        #while IFS="|"; shift; read col1 col2 || [ -n "${col1}" ]; do
+
+            #menu+=("${col1}" "${col2}")
+
+        #done < "${FILE_TMP}_menu.tmp"
+
+
+        while [ $i -le $(count "${text_menu_name[@]}") ]; do
+
+            menu+=("${text_menu_name[$i]}" "${text_menu_description[$i]}")
+            #echo "${list}"
+
+            let "i = $i + 1";
+            unset list
+
+        done
+
+        echo "menu: ${menu}"
+
+        #files=$(dialog_list_files "${text_menu_files}" "${title_menu_files}" "${menu}")
+        files=$(dialog_menu "${text_welcome}" "${title_welcome}" "${#text_menu_name[@]}" "${menu[@]}")
+
+        display_detected "menu: ${menu}"
+        unset items
+
+    else
+
+        while [ $i -le $(count "${text_menu_name[@]}") ]; do
+            echo "${text_menu_name[$i]}";
+            echo "${text_menu_description[$i]}";
+            let "i = $i + 1";
+        done
+
+    fi
+
+	unset i IFS
 
 }

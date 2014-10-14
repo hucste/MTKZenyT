@@ -1,0 +1,370 @@
+#!/bin/bash
+
+function adb_delete_su_datas() {
+
+    adb_su
+
+    mssg=$(printf "${text_datas_remove}\n" "data")
+    display_mssg "n" "${mssg}"
+
+    ${adb} shell "${adb_su}find ./data/app/ -name com.noshufou.android.su-* -exec rm -f {} \;"
+    ${adb} shell "${adb_su}find ./data/app/ -name com.koushikdutta.superuser-* -exec rm -f {} \;"
+    ${adb} shell "${adb_su}find ./data/app/ -name com.mgyun.shua.su-* -exec rm -f {} \;"
+    ${adb} shell "${adb_su}find ./data/app/ -name *eu.chainfire.supersu* -exec rm -f {} \;"
+
+    ${adb} shell "${adb_su}find ./data/app-lib/ -name *eu.chainfire.supersu* -exec rm -rf {} \;"
+
+    ${adb} shell "${adb_su}find ./data/data/ -name *eu.chainfire.supersu* -exec rm -rf {} \;"
+
+    ${adb} shell "${adb_su}find ./data/dalvik-cache/ -name *com.noshufou.android.su* -exec rm -f {} \;"
+    ${adb} shell "${adb_su}find ./data/dalvik-cache/ -name *com.koushikdutta.superuser* -exec rm -f {} \;"
+    ${adb} shell "${adb_su}find ./data/dalvik-cache/ -name *com.mgyun.shua.su* -exec rm -f {} \;"
+    ${adb} shell "${adb_su}find ./data/dalvik-cache/ -name *eu.chainfire.supersu* -exec rm -f {} \;"
+    ${adb} shell "${adb_su}find ./data/dalvik-cache/ -name *[Ss]uper[Uu]ser.apk* -exec rm -f {} \;"
+    ${adb} shell "${adb_su}find ./data/dalvik-cache/ -name *.oat -exec rm -f {} \;"
+
+    mssg=$(printf "${text_datas_removed}\n" "data")
+    display_mssg "n" "${mssg}"
+
+}
+
+function adb_delete_su_system() {
+
+    adb_su
+
+    mssg=$(printf "${text_remove}\n" "${SU}")
+    display_mssg "n" "${mssg}"
+
+    ${adb} shell "${adb_su}find ./system/bin/ -name .ext -exec rm -rf {} \;"
+    ${adb} shell "${adb_su}find .${SYS_BIN} -name sugote* -exec rm -f {} \;"
+    ${adb} shell "${adb_su}if [[ -f '${SYS_BIN}${SSUD}' ]]; then rm -f '${SYS_BIN}${SSUD}'; fi"
+    ${adb} shell "${adb_su}find .${SYS_ETC} -name init.d -exec rm -rf {} \;"
+    ${adb} shell "${adb_su}if [[ -f '${SYS_ETC}.installed_su_daemon' ]]; then rm -f '${SYS_ETC}.installed_su_daemon'; fi"
+    ${adb} shell "${adb_su}if [[ -f /system/bin/su || -h /system/bin/su ]]; then rm -f /system/bin/su; fi"
+    ${adb} shell "${adb_su}if [[ -f '${SYS_BIN}${SU}' ]]; then rm -f '${SYS_BIN}${SU}'; fi"
+
+    mssg=$(printf "${text_datas_removed}\n" "system")
+    display_mssg "n" "${mssg}"
+
+}
+
+function adb_delete_supersu() {
+
+    adb_su
+
+    mssg=$(printf "${text_remove}\n" "${SuperSU}")
+    display_mssg "n" "${mssg}"
+
+    ${adb} shell "${adb_su}find .${SYS_APP} -name [Ss]uper[Uu]ser* -exec rm -f {} \;"
+    ${adb} shell "${adb_su}find .${SYS_APP} -name [Ss]uper[Ss][Uu]* -exec rm -f {} \;"
+
+}
+
+function adb_mount_partition() {
+
+    if [[ "${vid}" != "${VID[0]}" ]]; then
+
+        display_mssg "i" "\n${text_mount_try}\n${text_see_phone}\n"; sleep 1
+
+        case "$1" in
+            "r") printf "${text_mount_ro}\n" "system"; io="ro" ;;
+            "w") printf "${text_mount_rw}\n" "system"; io="rw" ;;
+        esac
+
+        ${adb} shell su -c "mount -o remount,${io} /system"
+
+        if [[ $? -eq 0 ]]; then
+
+            case "${io}" in
+                "ro") mode="read-only" ;;
+                "rw") mode="read and write" ;;
+            esac
+
+            printf "${text_device_mode}\n" "${mode}"; sleep 1
+            unset mode
+
+        else
+
+            display_error "${text_mount_error}"
+            exit 1;
+
+        fi
+
+        unset io
+
+    else
+
+        display_mssg "i" "\n${text_mount_try}\n"; sleep 1
+
+        ${adb} shell busybox mount "$1"
+        #key=$(array_search "$1")
+        #${adb} shell mount "${info_map[$1]}" "/${PART_TEXT[$key]}"
+        #unset key
+
+    fi
+
+}
+
+function adb_read_partitions() {
+
+    ${adb} shell cat /proc/dumchar_info > "${FILE_PARAM}";
+
+}
+
+function adb_reboot() {
+
+    display_mssg "i" "${text_reboot_now}"; sleep 1
+    ${adb} reboot
+
+}
+
+function adb_reboot_recovery() {
+
+    display_mssg "i" "${text_reboot_recovery}"; sleep 1
+    ${adb} reboot recovery
+
+}
+
+function adb_reboot_system() {
+
+    mssg=$(printf "${text_goodbye_info}\n${text_goodbye}")
+    display_mssg "i" "${mssg}"
+    ${adb} reboot
+
+}
+
+function adb_root_system() {
+
+    mssg=$(printf "${text_mount_rw}" "system")
+    display_mssg "i" "${mssg}"
+
+    #${adb} shell mount "${info_map['android']}" /system
+    if [[ -z $(${adb} shell mount | busybox egrep system) ]]; then mount "system"; fi
+
+    #display_mssg "n" "cp busybox into /tmp"
+    #${adb} shell cp "${SYS_BIN}busybox" /tmp/busybox
+    #${adb} shell chmod 0755 /tmp/busybox
+    #${adb} shell chown 0:0 /tmp/busybox
+    #${adb} shell busybox umount /system
+
+    #display_mssg "n" "mount system by /tmp/busybox"
+    #${adb} shell /tmp/busybox mount /system
+
+    #${adb} shell "if [[ ! -d /system/bin/.ext ]]; then mkdir /system/bin/.ext; fi"
+    #${adb} shell chmod 0777 /system/bin/.ext
+    #${adb} shell chown 0:0 /system/bin/.ext
+    sleep 1
+
+    display_mssg "i" "${text_supersu_cp}${SYS_APP}"
+    ${adb} push "${DIR_SSU}" "${SYS_APP}"
+    display_mssg "i" "${text_supersu_chmod}${SYS_APP}"
+    ${adb} shell chmod 0644 "${SYS_APP}${SuperSU}"
+    ${adb} shell chown 0:0 "${SYS_APP}${SuperSU}"
+    sleep 1
+
+    display_mssg "i" "${text_su_cp}${SYS_BIN}"
+    ${adb} push "${DIR_SU}" "${SYS_BIN}"
+    #${adb} shell cp "${SYS_BIN}${SU}" "${SYS_BIN}daemonsu"
+    #${adb} shell cp "${SYS_BIN}${SU}" "/system/bin/.ext/.${SU}"
+    sleep 1
+
+    #display_mssg "i" "Verify ${SYS_ETC}init.d and create if not exists!"
+    #${adb} shell "if [[ ! -d '${SYS_ETC}init.d' ]]; then mkdir '${SYS_ETC}init.d'; fi"
+    #${adb} push "${DIR_SSUD}" "${SYS_ETC}init.d"
+
+    #${adb} shell chmod 0755 "${SYS_ETC}init.d/${SSUD}"
+    #${adb} shell chown 0:0 "${SYS_ETC}init.d/${SSUD}"
+
+    #${adb} shell "if [[ ! -f '${SYS_ETC}.installed_su_daemon' ]]; then touch '${SYS_ETC}.installed_su_daemon'; fi"
+    #${adb} shell "echo 1 > ${SYS_ETC}.installed_su_daemon"
+
+    #${adb} shell chmod 0644 "${SYS_ETC}.installed_su_daemon"
+    #${adb} shell chown 0:0 "${SYS_ETC}.installed_su_daemon"
+
+    display_mssg "i" "chmod and chown ${SYS_BIN}${SU}"
+    #API=$(${adb} shell egrep ro.build.version.sdk /system/build.prop | dd bs=1 skip=21 count=2)
+    SDK=$(${adb} shell egrep ro.build.version.sdk /system/build.prop); SDK="${SDK#$=}"
+    echo "SDK: ${SDK}"
+    if [[ "${SDK}" -gt 17 ]]; then
+        echo "SDK > 17"
+        ${adb} shell chmod 0755 "${SYS_BIN}${SU}"
+        #${adb} shell chmod 0755 "/system/bin/.ext/.${SU}"
+    else
+        echo "SDK <= 17"
+        #${adb} shell chmod 06755 "${SYS_BIN}${SU}"
+        ${adb} shell chmod 06755 "/system/xbin/su"
+        #${adb} shell chmod 06755 "/system/bin/.ext/.${SU}"
+    fi
+    unset SDK
+    #${adb} shell chmod 0755 "${SYS_BIN}daemonsu"
+
+    ${adb} shell chown 0:0 "${SYS_BIN}${SU}"
+    #${adb} shell chown 0:0 "/system/bin/.ext/.${SU}"
+
+    ${adb} shell "if [[ ! -h '/system/bin/${SU}' ]]; then ln -s ${SYS_BIN}${SU} /system/bin/${SU}; fi"
+
+    #${adb} shell "${SYS_BIN}${SU} --install"
+
+    #${adb} shell chmod 04755 /system/xbin/busybox
+    #${adb} shell chown 0:0 /system/xbin/busybox
+    #${adb} shell /system/xbin/busybox --install -s /system/xbin
+
+    #display_mssg "n" "rm /tmp/busybox"
+    #${adb} shell /tmp/busybox umount /system
+    #${adb} shell rm -f /tmp/busybox
+    ${adb} shell busybox umount /system
+    sleep 1
+
+    mssg=$(printf "${text_SSU_installed}" "${version}")
+    display_mssg "i" "${mssg}"
+
+}
+
+function adb_save_partitions() {
+
+    write_file "log" "*** $FUNCNAME: Call ADB to save partitions "
+
+    if [[ -d "${DIR_SVG_DATED}" ]]; then
+
+        adb_su
+
+        ${adb} shell "if [[ ! -d "${BCKP_PHONE}BACKUP/" ]]; then mkdir ${BCKP_PHONE}BACKUP; fi"
+
+        for (( x=0 ; x < $(count "${files[@]}"); x++ )); do
+
+            if [[ "${ZENITY}" -ne 0 ]]; then
+                key=$(bc <<< "$(array_search "${files[$x]}" "${mtd_name[@]}") + 1"); display_detected "key: ${key}"
+            fi
+
+            if [[ "${DIALOG}" -ne 0 ]]; then
+                key="${files[$x]}"; display_detected "key: ${key}"
+            fi
+
+            ddname="${mtd_name[$key]}"; display_detected "dd_name: $ddname"
+
+            ddof="${BCKP_PHONE}BACKUP/${mtd_name[$key]}.img"; display_detected "dd_of: $ddof"
+
+            case "${ddname}" in
+                "ebr1")
+                    ddif="/dev/${ddname}"; display_detected "dd_if: $ddif"
+                    ddbs="${mtd_size_dec[$key]}"; display_detected "dd_bs: $ddbs"
+                    ddskip="${mtd_addr_dec[$key]}"; display_detected "dd_skip: $ddskip"
+                ;;
+                "nvram"|"recovery")
+                    ddif="/dev/${ddname}"; display_detected "dd_if: $ddif"
+                    ddbs="${mtd_size_dec[$key]}"; display_detected "dd_bs: $ddbs"
+
+                    if [[ "${ddname}" == "ebr1" ]]; then
+                        ddskip="${mtd_addr_dec[$key]}"; display_detected "dd_skip: $ddskip"
+                    fi
+                ;;
+                *)
+                    ddif="${mtd_map[$key]}"; display_detected "dd_if: $ddif"
+                    ddbs="$(bc <<< "${mtd_size_dec[$key]} / ${INODE}")"; display_detected "dd_bs: $ddbs"
+                    ddskip="$(bc <<< "${mtd_addr_dec[$key]} / ${INODE}")"; display_detected "dd_skip: $ddskip"
+                ;;
+            esac
+
+            adb_write_img "${ddname}" "${ddif}" "${ddof}" "${ddbs}" "${ddskip}"
+
+            if [[ -z "$(adb_test "-f ${ddof}")" ]]; then
+                ${adb} pull "${ddof}" "${DIR_SVG_DATED}"
+                ${adb} shell rm -f "${ddof}"
+            else
+                display_error "!!! It seems Backup failed: ${ddof} not exists !!!"
+            fi
+
+            if [[ -z "$(adb_test "-f ${BCKP_PHONE}BACKUP/nvram.tgz")" ]]; then
+                if [[ "${ddname}" == "nvram" ]]; then
+                    ${adb} pull "${BCKP_PHONE}BACKUP/nvram.tgz" "${DIR_SVG_DATED}"
+                    ${adb} shell rm -r "${BCKP_PHONE}BACKUP/nvram.tgz"
+                fi
+            fi
+
+            write_file "log" "### $FUNCNAME: Partition saved: ${DIR_SVG_DATED}/${mtd_name[$key]}.img"
+            display_mssg "n" "ADB saved partition: ${DIR_SVG_DATED}/${mtd_name[$key]}.img"
+            sleep 1
+
+            unset ddif ddof ddbs ddskip key
+
+        done
+        unset x
+
+    fi
+
+    unset array
+
+}
+
+function adb_write_img() {
+
+    adb_su
+
+    local ddname="$1" ddif="$2" ddof="$3" ddbs="$4" ddskip="$5"
+
+    case "${ddname}" in
+        "ebr1")
+            ${adb} shell "${adb_su}dd if=${ddif} of=${ddof} bs=${ddbs} count=1"
+
+            display_detected "dd if=${ddif} of=${ddof} bs=${ddbs} count=1"
+        ;;
+        "nvram"|"recovery")
+            ${adb} shell "${adb_su}dd if=${ddif} of=${ddof} bs=${ddbs} count=1"
+
+            if [[ $? -eq 0 ]]; then
+                display_detected "dd if=${ddif} of=${ddof} bs=${ddbs} count=1"
+            else
+                display_error "!!! Error during write img ${ddif} !!!"
+            fi
+
+            if [[ "${ddname}" == "nvram" ]]; then
+                ${adb} shell "${adb_su}busybox tar -czvf ${BCKP_PHONE}BACKUP/nvram.tgz /data/nvram"
+            fi
+        ;;
+        *)
+            ${adb} shell "${adb_su}dd if=${ddif} of=${ddof} bs=4096 count=${ddbs} skip=${ddskip}"
+            if [[ $? -eq 0 ]]; then
+                display_detected "dd if=${ddif} of=${ddof} bs=4096 count=${ddbs} skip=${ddskip}"
+            else
+                display_error "!!! Error during write img ${ddif} !!!"
+            fi
+        ;;
+    esac
+
+    unset ddname ddif ddof ddbs ddskip
+
+}
+
+function adb_su() {
+
+    if [[ "${vid}" != "${VID[0]}" ]]; then
+        adb_su="su -c "
+    fi
+
+}
+
+function adb_test() {
+
+    $(${adb} shell [[ "$1" ]] && return 0 || return 1)
+
+}
+
+function adb_umount_partition() {
+
+    ${adb} shell busybox umount "/$1"
+
+}
+
+function adb_verify_mount() {
+
+    ${adb} shell mount | busybox egrep "$1"
+
+}
+
+function adb_whoami() {
+
+    adb_su
+    ${adb} shell "${adb_su}"whoami | sed 's/\r$//'
+    #display_detected "${id}"
+
+}

@@ -1,5 +1,10 @@
 #!/bin/bash
 
+title_dir_svg="In which folder, do you want to save your device?"
+
 title_goodbye="*** GoodBye! ***"
+
 title_menu="*** Menu ***"
+title_menu_files="Menu Flash :: Files"
+
 title_welcome="MTKZenyTools :: Welcome"

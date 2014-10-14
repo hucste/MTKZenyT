@@ -3,14 +3,14 @@
 # Packages names
 SuperSU="Superuser.apk"
 SU="su"
-version="v2.02"
+version="v2.13"
 SSUD="99SuperSUDaemon"
 
 # others vars - DONT TOUCH!
 PWD=$(pwd)
 
 # URL app
-DL_SUPERSU="http://download.chainfire.eu/452/SuperSU/UPDATE-SuperSU-${version}.zip?retrieve_file=1"
+DL_SUPERSU="http://download.chainfire.eu/567/SuperSU/UPDATE-SuperSU-${version}.zip?retrieve_file=1"
 URL_SUPERSU="http://download.chainfire.eu/supersu"
 
 # Directories where are packages needed into your computer
@@ -45,13 +45,40 @@ PART_NAME[1]="usrdata"
 PART_TEXT[0]="system"
 PART_TEXT[1]="data"
 
-# Others
-declare -a info_map
-count["name"]=${#text_menu_name[@]}
+# files to saved by default
+FILES[0]="uboot"
+FILES[1]="bootimg"
+FILES[2]="recovery"
+FILES[3]="logo"
+FILES[4]="android"
+FILES[5]="usrdata"
 
+# Others
+count["name"]=${#text_menu_name[@]}
+declare -a guis=('dialog', 'zenity')
+declare -a info_map
+declare -a info_name=('name' 'size' 'addr' 'type' 'map')
+declare -a mtd_addr
+declare -a mtd_map
+declare -a mtd_name
+declare -a mtd_size
+declare -a mtd_type
+declare -a mtd_addr_dec
+declare -a mtd_size_dec
+
+adb_su=""
 config="config.ini" # file to save some variables
-FILE_PARAM="${PWD}/dumchar.info"
+dir=""
+
+BCKP_PHONE="/sdcard/"
+DIR_SVG=""
+DIR_SVG_DATED=""
+FILE_TMP=""
+FILE_TMP2=""
+FILE_PARAM="${DIR_Tools}/dumchar.info"
 FILE_SSU_ZIP="${DIR_Tools}UPDATE-SuperSU-${version}.zip"
+GUI=""
+HOME=~
 
 day=$(date +"%d-%m-%Y")
 now=$(date +"%d-%m-%Y_%H-%M-%S")
@@ -59,5 +86,6 @@ now=$(date +"%d-%m-%Y_%H-%M-%S")
 choice=0
 CFG=0
 DIALOG=0
+INODE=4096
 LOG=0
 ZENITY=0

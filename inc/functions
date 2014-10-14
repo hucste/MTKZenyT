@@ -2,15 +2,77 @@
 
 function MTKZenyTux() {
 
-    echo -e "${title_welcome}\n"
-
-    detect_device
+    echo -e "#################################"
+    echo -e "### ${title_welcome} ###"
+    echo -e "#################################"
 
     test_config_file
 
+    write_file "log" "#################################################"
+    write_file "log" "### ### ### ${title_welcome} ### ### ###"
+    write_file "log" "#################################################"
+
     verify_installed
 
+    detect_device
+
     display_menu
+
+}
+
+function BACKUP() {
+
+    write_file "log" "${now} ### $FUNCNAME: Will try to your backup device !"
+
+    if [[ "$(adb_whoami)" == "root" ]]; then
+
+        # obtain dir to save
+        if [[ -z "${DIR_SVG}" ]]; then
+
+            #DIR_SVG=$(choose_directory "d" "${title_dir_svg}")
+            choose_directory "d" "${title_dir_svg}" && DIR_SVG="${dir}"
+            write_file "cfg" "DIR_SVG" "${DIR_SVG}"
+
+        fi
+
+        write_file "log" "$now *** $FUNCNAME: DIR_SVG=${DIR_SVG}"
+
+        # mkdir dated into DIR_SVG !
+        if [[ -d "${DIR_SVG}" ]]; then
+
+            make_dir_dated
+
+            adb_read_partitions
+
+            if [[ -f "${FILE_PARAM}" ]]; then
+
+                file_to_array_dynamic
+
+                display_files
+
+                #convert_str_to_array
+                if [[ "${files}" ]]; then
+                    files=($(explode " " "${files}"))
+                fi
+
+                adb_save_partitions
+
+            fi
+
+        fi
+
+    else
+
+        mssg=$(printf "%s" "${text_su_inactive}\n${text_unroot_stop}\n")
+        display_error "${mssg}"
+
+    fi
+
+}
+
+function CUSTOM() {
+
+    echo "Will Flash custom!"
 
 }
 
@@ -19,6 +81,19 @@ function EXIT() {
     display_mssg "n" "${text_goodbye}" "${title_goodbye}"
     destruct
     exit 0
+
+}
+
+function FLASH() {
+
+    echo "Will flash";
+
+}
+
+
+function REBOOT() {
+
+    adb_reboot
 
 }
 
@@ -42,50 +117,108 @@ function UNROOT() {
 
 }
 
-function adb_mount_system() {
+function array_key_exists() {
 
-    case "$1" in
-        "r") printf "${text_mount_ro}\n" "system"; io="ro" ;;
-        "w") printf "${text_mount_rw}\n" "system"; io="rw" ;;
-    esac
+    # equivalent to PHP array_key_exists
+    # call: if [[ $(array_key_exists key array) ]]; then echo "key exists!"; fi
 
-    ${adb} shell su -c "mount -o remount,${io} /system"
+    local key="$1" IFS=" "; shift; read -a array <<< "$@"
+    if [[ "${array[$key]}" ]]; then echo 0; return 1; fi
 
-    if [[ $? -eq 0 ]]; then
+    unset array key IFS
 
-        case "${io}" in
-            "ro") mode="read-only" ;;
-            "rw") mode="read and write" ;;
+}
+
+function array_search() {
+
+    # equivalent to PHP array_search
+    # call: array_search needle array
+
+    local needle="$1" IFS=" "; shift; read -a array <<< "$@"
+
+    for (( i=0; i < $(count "${array[*]}"); i++ )); do
+        if [[ "${array[$i]}" == "${needle}" ]]; then echo "$i"; fi
+    done
+    return 1
+
+    unset array needle IFS
+
+}
+
+function choose_directory() {
+
+    #display_mssg "n" "Choose an directory, please:"
+
+    if [[ "${DIALOG}" -ne 0 ]]; then
+
+        case "$1" in
+            "d") dir=$(dialog_select_dir "$2") ;;
+            "f") dir=$(dialog_select_file "$2") ;;
         esac
 
-        printf "${text_device_mode}\n" "${mode}"; sleep 1
-        unset mode
+    elif [[ "${ZENITY}" -ne 0 ]]; then
+
+        dir=$(zenity_directory "$1" "$2");
 
     else
 
-        display_error "${text_mount_error}"
-        exit 1;
+        read -p "$2" dir
 
     fi
 
-    unset io
+    write_file "log" "$now ### $FUNCNAME: ${dir}"
+
+}
+
+function chr() {
+
+    [ "$1" -lt 256 ] || return 1
+    printf "%s" "\\$(printf '%03o' "$1")"
+
+}
+
+function convert_str_to_array() {
+
+    write_file "log" "${now} ### $FUNCNAME: string: ${files}"
+
+    x=0
+    for file in $files; do files[$x]="$file"; let "x = $x + 1"; done
+    unset x
+
+    write_file "log" "${now} ### $FUNCNAME: array: ${files[*]}"
+
+}
+
+function count() {
+
+    # egual PHP count
+    # call: count array
+    local IFS=" "; read -a array <<< "$*"
+
+    if [[ -n "${#array[@]}" ]]; then echo "${#array[*]}"; else return 1; fi
+
+    unset IFS array
 
 }
 
 function destruct() {
-    write_file "log" "$now ### Destruction des variables"
 
-    [[ $DIALOG -eq 1 ]] && rm "${FILE_TMP}"
+    write_file "log" "$now ### $FUNCNAME: Destruct variables"
+
+    if [[ "${DIALOG}" -eq 1 ]]; then rm "${FILE_TMP}"; fi
 
     unset DIALOG FILE_TMP ZENITY
-    unset archive choice
+    unset archive choice mssg
 
-    write_file "log" "### ### ###"
+    write_file "log" "##################################################"
+    write_file "log" "### ### ### $0 ENDED ! ### #### ###"
+    write_file "log" "##################################################"
+
 }
 
 function detect_device() {
 
-    display_detected "${text_detect_dev}"; sleep 1
+    display_mssg "n" "${text_detect_dev}"; sleep 1
 
     for (( x=0; x < ${#VID[@]} ; x++ )); do
         lsusb=$(lsusb | egrep "${VID[$x]}")
@@ -103,7 +236,8 @@ function detect_device() {
 
         display_error "${text_dev_unrecognized}\n"
         display_mssg "i" "${text_exit}"
-        exit 1
+
+        EXIT
 
     else
 
@@ -118,6 +252,55 @@ function detect_device() {
 
     fi
 
+    write_file "log" "$now ### $FUNCNAME: VID:${vid} and PID:${pid} "
+
+}
+
+function dl_file() {
+
+    # call: dl_file URL FILE_NAME
+
+    mssg=$(printf "${text_dl_file}\n" "$1"); display_mssg "i" "${mssg}"
+
+    curl "$1" > "$2"
+    if [[ $? -ne 0 ]]; then
+        mssg=$(printf "${text_error_dl}" "$2")
+        display_error "${mssg}"
+
+        write_file "log" "$now ### $FUNCNAME: Error to download file: $2 - from: $1"
+
+        EXIT
+    fi
+
+}
+
+function dl_yourself() {
+
+    # call: dl_yoursel FILE_NAME
+
+    mssg=$(printf "${text_dl_yourself}\n" "$1")
+    mssg="${mssg} ${text_exit_relaunch}"
+    display_mssg "i" "${mssg}"
+
+    write_file "log" "$now ### $FUNCNAME: Need to download yourself the file: $1"
+
+    EXIT
+
+}
+
+function explode() {
+
+    # call: array=("$(explode $delimiter $string)")
+    # equivalent PHP explode
+    local delimiter="$1" string="$2"
+    write_file "log" "${now} ### $FUNCNAME: string: ${string}"
+
+    local IFS="${delimiter}"; shift; read -a array <<< "${string}"
+
+    if [[ "${array[*]}" ]]; then echo "${array[*]}"; else return 1; fi
+
+    write_file "log" "${now} ### $FUNCNAME: array: ${array[*]}"
+
 }
 
 function extract_archive_zip() {
@@ -129,9 +312,9 @@ function extract_archive_zip() {
         unzip "${DIR_Tools}/UPDATE-SuperSU-${version}" -d "${DIR_Tools}/UPDATE-SuperSU-${version}"
 
         if [[ $? -eq 0 ]]; then
-            write_file "log" "$now ### Unzip OK: ${DIR_Tools}/UPDATE-SuperSU-${version}"
+            write_file "log" "$now ### $FUNCNAME: Unzip OK: ${DIR_Tools}/UPDATE-SuperSU-${version}"
         else
-            write_file "log" "$now ### Unzip KO: ${DIR_Tools}/UPDATE-SuperSU-${version}"
+            write_file "log" "$now ### $FUNCNAME: Unzip KO: ${DIR_Tools}/UPDATE-SuperSU-${version}"
         fi
 
     fi
@@ -144,37 +327,104 @@ function extract_info_system() {
 
         CMDLINE=$(egrep "^$1" "${FILE_PARAM}" | sed 's/\r$//')
 
-        OFS="$IFS"
-        IFS=": " read -a params <<< "${CMDLINE}"
+        local IFS=": "; shift; read -a params <<< "${CMDLINE}"
 
         info_map["$1"]=${params[4]}
-
         mssg=$(printf "%s" "${text_system_info}${info_map[$1]}\n")
         display_mssg "n" "${mssg}"
 
-        write_file "log" "$now ### Info extract system: $1 == ${info_map[$1]}"
-
-        IFS="${OFS}"
-
-        unset OFS
+        write_file "log" "$now ### $FUNCNAME: $1 == ${info_map[$1]}"
 
     fi
 
 }
 
+function file_to_array_dynamic() {
+
+    x=0
+    # read file param into array
+    while read line; do
+
+        if [[ "$x" -ge 1 && "$x" -le 22 ]]; then
+
+            local IFS=" "; shift; read -a mtd <<< "$(echo "${line}" | sed 's/\r$//' | tr -s ' ')"
+
+            ## create arrays dynamic 'mtd_$info_name[value]'
+            #for (( j=0; j < ${#info_name[@]}; j++)) {
+
+                #idx="mtd_${info_name[$j]}[$x]"
+                #declare -a "${idx}"="${mtd[$j]}"
+
+            #}
+
+            mtd_name[$x]="${mtd[0]}"
+            mtd_size[$x]="${mtd[1]}"
+            mtd_addr[$x]="${mtd[2]}"
+            mtd_type[$x]="${mtd[3]}"
+            mtd_map[$x]="${mtd[4]}"
+            mtd_size_dec[$x]=$(hexdec "${mtd_size[$x]}")
+            mtd_addr_dec[$x]=$(hexdec "${mtd_addr[$x]}")
+
+            unset mtd
+
+        fi
+
+        let "x = $x + 1";
+
+    done < "${FILE_PARAM}"
+    unset x
+
+    write_file "log" "$now ### $FUNCNAME: Create mtd array dynamic: mtd_name[ ${mtd_name[*]} ]"
+
+}
+
 function get_info_system() {
 
-    ${adb} shell cat /proc/dumchar_info > "${FILE_PARAM}";
+    # call: get_info_system partition_name
+
+    adb_read_partitions
 
     extract_info_system "$1"
 
 }
 
+function hexdec() {
 
-function get_key() {
-    # egual to PHP array_search
+    #hex="${1#*x}"
+    #echo "ibase=16;obase=A;${hex}" | bc
+    #bc <<< "ibase=16;obase=A;${hex}"
+    #unset hex
+    echo "$(($1))"
 
-    for (( i=0; i < ${#array[*]}; i++ )); { [[ "${array[$i]}" = "$1" ]] && echo $i; }
+}
+
+function in_array() {
+
+    # equivalent to PHP in_array
+    # call: in_array needle array
+
+    local i=0 needle="$1" IFS=" "; shift; read -a array <<< "$@"
+
+    while [ $i -le ${#array[@]} ]; do
+        if [[ "${array[$i]}" == "${needle}" ]]; then echo 0; fi # true
+        let "i = $i + 1"
+    done
+    return 1
+
+    unset i needle IFS array
+
+}
+
+function make_dir_dated() {
+
+    if [[ -d "${DIR_SVG}" ]]; then
+
+        DIR_SVG_DATED="${DIR_SVG}/${vid}:${pid}_$now"
+        mkdir "${DIR_SVG_DATED}" && display_detected "${text_dir_ok}" "${DIR_SVG_DATED}"
+
+        write_file "log" "$now ### $FUNCNAME: DIR_SVG_DATED: ${DIR_SVG_DATED}"
+
+    fi
 
 }
 
@@ -182,106 +432,7 @@ function modify_system() {
 
     if [[ "${vid}" == "${VID[0]}" ]]; then
 
-        mssg=$(printf "${text_mount_rw}" "system")
-        display_mssg "i" "${mssg}"
-
-        #${adb} shell mount "${info_map['android']}" /system
-        if [[ -z $(${adb} shell mount | busybox egrep system) ]]; then mount "system"; fi
-
-        #display_mssg "n" "cp busybox into /tmp"
-        #${adb} shell cp "${SYS_BIN}busybox" /tmp/busybox
-        #${adb} shell chmod 0755 /tmp/busybox
-        #${adb} shell chown 0:0 /tmp/busybox
-        #${adb} shell busybox umount /system
-
-        #display_mssg "n" "mount system by /tmp/busybox"
-        #${adb} shell /tmp/busybox mount /system
-
-        #${adb} shell "if [[ ! -d /system/bin/.ext ]]; then mkdir /system/bin/.ext; fi"
-        #${adb} shell chmod 0777 /system/bin/.ext
-        #${adb} shell chown 0:0 /system/bin/.ext
-        sleep 1
-
-        display_mssg "i" "${text_supersu_cp}${SYS_APP}"
-        ${adb} push "${DIR_SSU}" "${SYS_APP}"
-        display_mssg "i" "${text_supersu_chmod}${SYS_APP}"
-        ${adb} shell chmod 0644 "${SYS_APP}${SuperSU}"
-        ${adb} shell chown 0:0 "${SYS_APP}${SuperSU}"
-        sleep 1
-
-        display_mssg "i" "${text_su_cp}${SYS_BIN}"
-        ${adb} push "${DIR_SU}" "${SYS_BIN}"
-        #${adb} shell cp "${SYS_BIN}${SU}" "${SYS_BIN}daemonsu"
-        #${adb} shell cp "${SYS_BIN}${SU}" "/system/bin/.ext/.${SU}"
-        sleep 1
-
-        #display_mssg "i" "Verify ${SYS_ETC}init.d and create if not exists!"
-        #${adb} shell "if [[ ! -d '${SYS_ETC}init.d' ]]; then mkdir '${SYS_ETC}init.d'; fi"
-        #${adb} push "${DIR_SSUD}" "${SYS_ETC}init.d"
-
-        #${adb} shell chmod 0755 "${SYS_ETC}init.d/${SSUD}"
-        #${adb} shell chown 0:0 "${SYS_ETC}init.d/${SSUD}"
-
-        #${adb} shell "if [[ ! -f '${SYS_ETC}.installed_su_daemon' ]]; then touch '${SYS_ETC}.installed_su_daemon'; fi"
-        #${adb} shell "echo 1 > ${SYS_ETC}.installed_su_daemon"
-
-        #${adb} shell chmod 0644 "${SYS_ETC}.installed_su_daemon"
-        #${adb} shell chown 0:0 "${SYS_ETC}.installed_su_daemon"
-
-        display_mssg "i" "chmod and chown ${SYS_BIN}${SU}"
-        API=$(${adb} shell egrep ro.build.version.sdk /system/build.prop | dd bs=1 skip=21 count=2)
-        echo "API: ${API}"
-        if [[ "${API}" -gt 17 ]]; then
-            echo "API > 17"
-            ${adb} shell chmod 0755 "${SYS_BIN}${SU}"
-            #${adb} shell chmod 0755 "/system/bin/.ext/.${SU}"
-        else
-            echo "API <= 17"
-            #${adb} shell chmod 06755 "${SYS_BIN}${SU}"
-            ${adb} shell chmod 06755 "/system/xbin/su"
-            #${adb} shell chmod 06755 "/system/bin/.ext/.${SU}"
-        fi
-        unset API
-        #${adb} shell chmod 0755 "${SYS_BIN}daemonsu"
-
-        ${adb} shell chown 0:0 "${SYS_BIN}${SU}"
-        #${adb} shell chown 0:0 "/system/bin/.ext/.${SU}"
-
-        ${adb} shell "if [[ ! -h '/system/bin/${SU}' ]]; then ln -s ${SYS_BIN}${SU} /system/bin/${SU}; fi"
-
-        #${adb} shell "${SYS_BIN}${SU} --install"
-
-        #${adb} shell chmod 04755 /system/xbin/busybox
-        #${adb} shell chown 0:0 /system/xbin/busybox
-        #${adb} shell /system/xbin/busybox --install -s /system/xbin
-
-        #display_mssg "n" "rm /tmp/busybox"
-        #${adb} shell /tmp/busybox umount /system
-        #${adb} shell rm -f /tmp/busybox
-        ${adb} shell busybox umount /system
-        sleep 1
-
-        mssg=$(printf "${text_SSU_installed}" "${version}")
-        display_mssg "i" "${mssg}"
-
-    fi
-
-}
-
-function mount() {
-
-    if [[ "${vid}" != "${VID[0]}" ]]; then
-
-        display_mssg "i" "\n${text_mount_try}\n${text_see_phone}\n"; sleep 1
-
-        adb_mount_system "w"
-
-    else
-
-        #key=$(get_key "$1")
-        #${adb} shell mount "${info_map[$1]}" "/${PART_TEXT[$key]}"
-        #unset key
-        ${adb} shell busybox mount "$1"
+        adb_root_system
 
     fi
 
@@ -289,8 +440,26 @@ function mount() {
 
 function read_config() {
 
-    search=$(egrep "$1" "${config}")
-    [[ -n "${search}" ]] && echo "${search#*=}"
+    search=$(grep "$1" "${PWD}/${config}")
+    if [[ -n "${search}" ]]; then
+
+        #if [[ "$(grep "^DIR" <<< "${search}")" || "$(grep "^BCKP" <<< "${search}")" ]]; then
+        s1=$(grep "^DIR" <<< "${search}"); s2=$(grep "^BCKP" <<< "${search}")
+        if [[ "$s1" || "$s2" ]]; then
+
+            # if ultimate character of search isn't '/' and not '=', add-it '/'
+            s3=$(grep "./$" <<< "${search}"); s4=$(grep ".=$" <<< "${search}")
+            if [[ ! "$s3" && ! "$s4" ]]; then
+                search="${search}/";
+            fi
+            unset s3 s4
+
+        fi
+        unset s1 s2
+
+        echo "${search#*=}"
+
+    fi
     unset search
 
 }
@@ -304,38 +473,28 @@ function reboot_recovery() {
 
         if [[ $? -eq 0 && "${ZENITY}" -eq 1 ]]; then
 
-            display_mssg "i" "${text_reboot_recovery}"; sleep 1
-            ${adb} reboot recovery
-            read -p "${text_press_key}" -n1 -s
-            echo " "
-            detect_device
-            choice="UNROOT"
-            #$0
+            steps_to_recovery
 
         elif [[ $? -eq 1 && "${ZENITY}" -eq 1 ]]; then
 
-            display_mssg "i" "${text_reboot_yoursel}"
-            display_mssg "n" "${text_exit_reboot}"
-            exit 1
+            mssg="${text_reboot_yoursel}\n${text_exit_reboot}"
+            display_mssg "i" "${mssg}"
+
+            EXIT
 
         else
 
             while true; do
                 case $REPLY in
                     y|Y|o|O)
-                        display_mssg "i" "${text_reboot_recovery}"; sleep 1
-                        ${adb} reboot recovery
-                        read -p "${text_press_key}" -n1 -s
-                        echo " "
-                        detect_device
-                        choice="UNROOT"
-                        #$0
+                        steps_to_recovery
                         break
                         ;;
                     n|N)
-                        display_mssg "i" "${text_reboot_yoursel}"
-                        display_mssg "n" "${text_exit_reboot}"
-                        exit 1
+                        mssg="${text_reboot_yoursel}\n${text_exit_reboot}"
+                        display_mssg "i" "${mssg}"
+
+                        EXIT
                     ;;
                     *)
                         display_error "${text_choice_invalid}"
@@ -362,30 +521,28 @@ function reboot_system() {
 
     if [[ $? -eq 0 && "${ZENITY}" -eq 1 ]]; then
 
-        mssg=$(printf "${text_goodbye_info}\n${text_goodbye}")
-        display_mssg "i" "${mssg}"
-        ${adb} reboot
+        adb_reboot_system
 
     elif [[ $? -eq 1 && "${ZENITY}" -eq 1 ]]; then
 
-        mssg=$(printf "${text_exit}\n${text_reboot_yourself}")
+        mssg=$(printf "${text_reboot_yourself}\n${text_exit}")
         display_mssg "i" "${mssg}"
-        exit 1
+
+        EXIT
 
     else
 
         while true; do
             case $REPLY in
                 y|Y|o|O)
-                    mssg=$(printf "${text_goodbye_info}\n${text_goodbye}")
-                    display_mssg "i" "${mssg}"
-                    ${adb} reboot
+                    adb_reboot_system
                     break
                 ;;
                 n|N)
-                    mssg=$(printf "${text_exit}\n${text_reboot_yourself}")
+                    mssg=$(printf "${text_reboot_yourself}\n${text_exit}")
                     display_mssg "i" "${mssg}"
-                    exit 1
+
+                    EXIT
                 ;;
                 *)
                     display_error "${text_choice_invalid}"
@@ -412,13 +569,44 @@ function root_to_recovery() {
 
 }
 
+function save_rom() {
+
+    if [[ "${ZENITY}" -ne 0 ]]; then
+        (
+            adb_save_partitions
+        ) | zenity_progress "${text_save_tablet}" "${title_save_tablet}"
+    else
+        adb_save_partitions
+    fi
+
+}
+
+function steps_to_recovery() {
+
+    adb_reboot_recovery
+
+    read -p "${text_press_key}" -n1 -s
+    echo " "
+
+    detect_device
+
+    choice="UNROOT"
+    #$0
+
+}
 
 function test_config_file() {
 
+    display_mssg "n" "\n${text_detect_cfg}"
+
     if [[ -f "${config}" ]]; then
-        #CFG=1
-        #display_detected "${text_config_file_exists}"
+
         LOG=$(read_config "LOG") && display_detected "LOG=${LOG}"
+        BCKP_PHONE=$(read_config "BCKP_PHONE") && display_detected "BCKP_PHONE=${BCKP_PHONE}"
+        CFG=1 && display_detected "CFG=1"
+        DIR_SVG=$(read_config "DIR_SVG") && display_detected "DIR_SVG=${DIR_SVG}"
+        GUI=$(read_config "GUI") && display_detected "GUI=${GUI}"
+
     fi
 
 }
@@ -429,122 +617,52 @@ function unroot_to_recovery() {
     reboot_recovery
 
     # manage datas into /data
-    get_info_system "usrdata"
+    #get_info_system "usrdata"
 
-    if [[ -z $(${adb} shell mount | busybox egrep data) ]]; then mount "data"; fi
+    #if [[ -z $(adb_verify_mount "data") ]]; then mount "data"; fi
+    if [[ -z $(adb_verify_mount "data") ]]; then adb_mount_partition "data"; fi
 
-    ${adb} shell "find ./data/app/ -name com.noshufou.android.su-* -exec rm -f {} \;"
-    ${adb} shell "find ./data/app/ -name com.koushikdutta.superuser-* -exec rm -f {} \;"
-    ${adb} shell "find ./data/app/ -name com.mgyun.shua.su-* -exec rm -f {} \;"
-    ${adb} shell "find ./data/app/ -name *eu.chainfire.supersu* -exec rm -f {} \;"
+    adb_delete_su_datas
 
-    ${adb} shell "find ./data/app-lib/ -name *eu.chainfire.supersu* -exec rm -rf {} \;"
-
-    ${adb} shell "find ./data/data/ -name *eu.chainfire.supersu* -exec rm -rf {} \;"
-
-    ${adb} shell "find ./data/dalvik-cache/ -name *com.noshufou.android.su* -exec rm -f {} \;"
-    ${adb} shell "find ./data/dalvik-cache/ -name *com.koushikdutta.superuser* -exec rm -f {} \;"
-    ${adb} shell "find ./data/dalvik-cache/ -name *com.mgyun.shua.su* -exec rm -f {} \;"
-    ${adb} shell "find ./data/dalvik-cache/ -name *eu.chainfire.supersu* -exec rm -f {} \;"
-    ${adb} shell "find ./data/dalvik-cache/ -name *[Ss]uper[Uu]ser.apk* -exec rm -f {} \;"
-    ${adb} shell "find ./data/dalvik-cache/ -name *.oat -exec rm -f {} \;"
-
-    ${adb} shell busybox umount /data
-    mssg=$(printf "${text_datas_removed}\n" "data")
-    display_mssg "n" "${mssg}"
+    adb_umount_partition "data"
 
     # manage datas into /system
-    get_info_system "android"
+    #get_info_system "android"
 
-    if [[ -z $(${adb} shell mount | busybox egrep system) ]]; then mount "system"; fi
+    #if [[ -z $(adb_verify_mount "system") ]]; then mount "system"; fi
+    if [[ -z $(adb_verify_mount "system") ]]; then adb_mount_partition "system"; fi
 
-    mssg=$(printf "${text_remove}\n" "${SuperSU}")
-    display_mssg "n" "${mssg}"
-    ${adb} shell "find .${SYS_APP} -name [Ss]uper[Uu]ser* -exec rm -f {} \;"
-    ${adb} shell "find .${SYS_APP} -name [Ss]uper[Ss][Uu]* -exec rm -f {} \;"
+    adb_delete_supersu
 
-    mssg=$(printf "${text_remove}\n" "${SU}")
-    display_mssg "n" "${mssg}"
-    ${adb} shell "find ./system/bin/ -name .ext -exec rm -rf {} \;"
-    ${adb} shell "find .${SYS_BIN} -name sugote* -exec rm -f {} \;"
-    ${adb} shell "if [[ -f '${SYS_BIN}${SSUD}' ]]; then rm -f '${SYS_BIN}${SSUD}'; fi"
-    ${adb} shell "find .${SYS_ETC} -name init.d -exec rm -rf {} \;"
-    ${adb} shell "if [[ -f '${SYS_ETC}.installed_su_daemon' ]]; then rm -f '${SYS_ETC}.installed_su_daemon'; fi"
-    ${adb} shell "if [[ -f /system/bin/su || -h /system/bin/su ]]; then rm -f /system/bin/su; fi"
-    ${adb} shell "if [[ -f '${SYS_BIN}${SU}' ]]; then rm -f '${SYS_BIN}${SU}'; fi"
+    adb_delete_su_system
 
-    ${adb} shell busybox umount /system
+    adb_umount_partition "system"
 
     mssg=$(printf "${text_unroot_end}\n${text_verify_errors}\n")
     display_mssg "n" "${mssg}"
-
-    unset mssg
 
 }
 
 function unroot_to_system() {
 
-    id=$(${adb} shell su -c busybox id -un | sed 's/\r$//'); display_detected "${id}"
+    ##id=$(${adb} shell su -c busybox id -un | sed 's/\r$//'); display_detected "${id}"
 
-    if [[ "${id}" == "root" ]]; then
+    if [[ "$(adb_whoami)" == "root" ]]; then
 
-        mount
+        adb_mount_partition "w"
 
-        mssg=$(printf "${text_datas_remove}\n" "data")
-        display_mssg "n" "${mssg}"
+        adb_delete_su_datas
 
-        ${adb} shell su -c "find ./data/app/ -name com.noshufou.android.su-* -exec rm -f {} \;"
-        ${adb} shell su -c "find ./data/app/ -name com.koushikdutta.superuser-* -exec rm -f {} \;"
-        ${adb} shell su -c "find ./data/app/ -name com.mgyun.shua.su-* -exec rm -f {} \;"
-        ${adb} shell su -c "find ./data/app/ -name *eu.chainfire.supersu* -exec rm -f {} \;"
+        adb_delete_supersu
 
-        ${adb} shell su -c "find ./data/app-lib/ -name *eu.chainfire.supersu* -exec rm -rf {} \;"
-
-        ${adb} shell su -c "find ./data/data/ -name *eu.chainfire.supersu* -exec rm -rf {} \;"
-
-        ${adb} shell su -c "find ./data/dalvik-cache/ -name *com.noshufou.android.su* -exec rm -f {} \;"
-        ${adb} shell su -c "find ./data/dalvik-cache/ -name *com.koushikdutta.superuser* -exec rm -f {} \;"
-        ${adb} shell su -c "find ./data/dalvik-cache/ -name *com.mgyun.shua.su* -exec rm -f {} \;"
-        ${adb} shell su -c "find ./data/dalvik-cache/ -name *eu.chainfire.supersu* -exec rm -f {} \;"
-        ${adb} shell su -c "find ./data/dalvik-cache/ -name *[Ss]uper[Uu]ser.apk* -exec rm -f {} \;"
-        ${adb} shell su -c "find ./data/dalvik-cache/ -name *.oat -exec rm -f {} \;"
-
-        mssg=$(printf "${text_datas_removed}\n" "data")
-        display_mssg "n" "${mssg}"
-
-        mssg=$(printf "${text_datas_remove}\n" "system")
-        display_mssg "n" "${mssg}"
-        mssg=$(printf "${text_remove}" "${SuperSU}")
-        display_mssg "n" "${mssg}"
-
-        #${adb} shell su -c "if [[ -f ${SYS_APP}Superuser.apk ]]; then rm -f ${SYS_APP}Superuser.apk; fi"
-        #${adb} shell su -c "if [[ -f ${SYS_APP}superuser.apk ]]; then rm -f ${SYS_APP}superuser.apk; fi"
-        #${adb} shell su -c "if [[ -f ${SYS_APP}SuperUser.apk ]]; then rm -f ${SYS_APP}SuperUser.apk; fi"
-        #${adb} shell su -c "if [[ -f ${SYS_APP}superUser.apk ]]; then rm -f ${SYS_APP}superUser.apk; fi"
-
-        ${adb} shell su -c "find .${SYS_APP} -name [Ss]uper[Uu]ser* -exec rm -f {} \;"
-        ${adb} shell su -c "find .${SYS_APP} -name [Ss]uper[Ss][Uu]* -exec rm -f {} \;"
-
-        mssg=$(printf "${text_remove}" "${SU}")
-        display_mssg "n" "${mssg}"
-
-        ${adb} shell su -c "find ./system/bin/ -name .ext -exec rm -rf {} \;"
-        ${adb} shell su -c "find .${SYS_BIN} -name sugote* -exec rm -f {} \;"
-        ${adb} shell su -c "if [[ -f '${SYS_BIN}${SSUD}' ]]; then rm -f '${SYS_BIN}${SSUD}'; fi"
-        ${adb} shell su -c "find .${SYS_ETC} -name init.d -exec rm -rf {} \;"
-        ${adb} shell su -c "if [[ -f '${SYS_ETC}.installed_su_daemon' ]]; then rm -f '${SYS_ETC}.installed_su_daemon'; fi"
-        ${adb} shell su -c "if [[ -f /system/bin/su || -h /system/bin/su ]]; then rm -f /system/bin/su; fi"
-        ${adb} shell su -c "if [[ -f '${SYS_BIN}${SU}' ]]; then rm -f '${SYS_BIN}${SU}'; fi"
-
-        mssg=$(printf "${text_datas_removed}\n" "system")
-        display_mssg "n" "${mssg}"
+        adb_delete_su_system
 
         mssg=$(printf "${text_unroot_end}\n${text_verify_errors}\n")
         display_mssg "n" "${mssg}"
 
         sleep 3
 
-        adb_mount_system "r"
+        adb_mount_partition "r"
 
     else
 
@@ -569,39 +687,22 @@ function verify_ssu_exists() {
 
         if [[ $? -eq 0 && "${ZENITY}" -eq 1 ]]; then
 
-            mssg=$(printf "${text_dl_supersu}\n" "${DL_SUPERSU}"); display_mssg "i" "${mssg}"
-            curl "${DL_SUPERSU}" > "${FILE_SSU_ZIP}"
-            if [[ $? -ne 0 ]]; then
-                mssg=$(printf "${text_error_dl}" "${FILE_SSU_ZIP}")
-                display_error "${mssg}"
-                exit 1
-            fi
+            dl_file "${DL_SUPERSU}" "${FILE_SSU_ZIP}"
 
         elif [[ $? -eq 1 && "${ZENITY}" -eq 1 ]]; then
 
-            mssg=$(printf "${text_dl_yourself}\n" "${SuperSU}")
-            mssg="${mssg} ${text_exit_relaunch}"
-            display_mssg "i" "${mssg}"
-            exit 1
+            dl_yourself "${SuperSU}"
 
         else
 
             while true; do
                 case $REPLY in
                     y|Y|o|O)
-                        mssg=$(printf "${text_dl_supersu}\n" "${DL_SUPERSU}"); display_mssg "i" "${mssg}"; sleep 1
-                        curl "${DL_SUPERSU}" > "${FILE_SSU_ZIP}"
-                        if [[ $? -ne 0 ]]; then
-                            mssg=$(printf "${text_error_dl}" "${FILE_SSU_ZIP}")
-                            display_error "${mssg}"
-                        fi
+                        dl_file "${DL_SUPERSU}" "${FILE_SSU_ZIP}"
                         break
                         ;;
                     n|N)
-                        mssg=$(printf "${text_dl_yourself}\n" "${SuperSU}")
-                        mssg="${mssg} ${text_exit_relaunch}"
-                        display_mssg "i" "${mssg}"
-                        exit 1
+                        dl_yourself "${SuperSU}"
                     ;;
                     *)
                         display_error "${text_choice_invalid}"
@@ -624,39 +725,53 @@ function verify_ssu_exists() {
 
 function verify_installed() {
 
-    write_file "log" "### ####### ${title_welcome} ####### ###"
-
     mssg=$(printf "\n${text_verify_installed}\n")
     display_mssg "i" "${mssg}"
     sleep 1
 
-    # verify if dialog is installed
-    if [[ -x $(which dialog) ]]; then
-        DIALOG=1
-        ZENITY=0
-        FILE_TMP="/tmp/RKShellDialog.tmp"
-        touch "${FILE_TMP}"
-        trap 'rm -f "${FILE_TMP}"' 0 1 2 3 5 15
-    fi
+    array=("${guis[@]}");
 
-    # verify if zenity is installed.
-    if [[ -x $(which zenity) ]]; then
-        DIALOG=0
-        ZENITY=1
-        write_file "log" "$now *** Zenity: Yes!"
-    fi
+    if [[ -z "$(in_array "${GUI}")" ]]; then
 
-    #DIALOG=1
-    ZENITY=0
+        # verify if dialog is installed
+        if [[ "${GUI}" == "dialog" && -x $(which dialog) ]]; then
+            DIALOG=1
+            ZENITY=0
+
+            #FILE_TMP="/tmp/MTKShellDialog.tmp"
+            #touch "${FILE_TMP}"
+            #trap 'rm -f "${FILE_TMP}"' 0 1 2 3 5 15
+
+            dialog=$(which dialog)
+
+            display_detected "${text_ok_tools}" "Dialog"
+            write_file "log" "$now *** $FUNCNAME: Dialog: Yes!"
+        fi
+
+        # verify if zenity is installed.
+        if [[ "${GUI}" == "zenity" && -x $(which zenity) ]]; then
+            DIALOG=0
+            ZENITY=1
+
+            zenity=$(which zenity)
+
+            display_detected "${text_ok_tools}" "Zenity"
+            write_file "log" "$now *** $FUNCNAME: Zenity: Yes!"
+        fi
+
+        #DIALOG=1
+        #ZENITY=0
+
+    fi
 
     # adb
     if [[ ! -x $(which adb) ]]; then
         display_error "\n${text_error_not_tools}" "ADB"
-        write_file "log" "$now *** adb: Boo!"
-        exit 1
+        write_file "log" "$now *** $FUNCNAME: adb: Boo!"
+        EXIT
     else
-        display_detected "\n${text_ok_tools}" "ADB"
-        write_file "log" "$now *** adb: Yes!"
+        display_detected "${text_ok_tools}" "ADB"
+        write_file "log" "$now *** $FUNCNAME: adb: Yes!"
         adb=$(which adb)
     fi
 
@@ -666,8 +781,8 @@ function verify_installed() {
 function write_file() {
 
     case $1 in
-        "cfg") echo "$2" >> "${config}" ;;
-        "log") [[ "${LOG}" -eq 1 ]] && echo "$2" >> "logs/log_$day" ;;
+        "cfg") sed -i -e "#$2=.*# s##$2=$3#g" "${config}" ;;
+        "log") [[ "${LOG}" -eq 1 ]] && echo "$2" >> "${PWD}/logs/${day}.log" ;;
     esac
 
 }

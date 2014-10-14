@@ -3,7 +3,7 @@ clear
 #######
 ###
 ### Made by Stephane HUC - <devs@stephane-huc.net>
-###  alias ATP, ATP:MIUI...
+###  alias ATP, ATP:MIUI, ATP:RedRice...
 ###
 ### thanks for explains :
 #### http://www.chinaphonearena.com/forum/
@@ -14,17 +14,18 @@ DIR_LANG="$(pwd)/lang" #&& echo $DIR_LANG
 lang="${LANG:0:2}" #&& echo $LANG
 
 # link texts and titles variables
-[[ -f "${DIR_LANG}/titles.${lang}" ]] && source "${DIR_LANG}/titles.${lang}" || source "${DIR_LANG}/titles.en"
-[[ -f "${DIR_LANG}/texts.${lang}" ]] && source "${DIR_LANG}/texts.${lang}" || source "${DIR_LANG}/texts.en"
+if [[ -f "${DIR_LANG}/titles.${lang}" ]]; then source "${DIR_LANG}/titles.${lang}"; else source "${DIR_LANG}/titles.en"; fi
+if [[ -f "${DIR_LANG}/texts.${lang}" ]]; then source "${DIR_LANG}/texts.${lang}"; else source "${DIR_LANG}/texts.en"; fi
 
 # link files needed
 source "${INC}/config"
 source "${INC}/colors"
 
 # link functions needed
-#source "${INC}/dialog"
+source "${INC}/dialog"
 source "${INC}/zenity"
 source "${INC}/display"
+source "${INC}/ADB_functions"
 source "${INC}/functions"
 
 # Launcher

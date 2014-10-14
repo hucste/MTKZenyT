@@ -9,20 +9,25 @@ text_ask_reboot_system="Maintenant, voulez-vous redémarrer le système pour fin
 
 text_choice_invalid="Ce choix n'est pas valide. Par 'o' ou 'n'..."
 
+text_column_addr="Addresse"
 text_column_description="Description"
-text_column_name="Nom"
-text_column_offset="Offset"
+text_column_map="Partition"
+text_column_name="Name"
+text_column_size="Taille"
 
 text_datas_remove="Toutes les données relatives au root dans /%s vont être supprimées"
 text_datas_removed="*** Toutes les données dans /%s ont été supprimées !"
 
-text_detect_dev="*** Detection de votre appareil : "
+text_detect_cfg="*** Détection des valeurs de config : "
+text_detect_dev="*** Détection de votre appareil : "
 
 text_dev_mode="Votre montage est en mode %s ..."
 text_dev_not_recovery="Votre appareil n'est pas dans le mode recovery nécessaire !"
 text_dev_unrecognized="Il semble que votre appareil ne soit pas reconnu par votre système d'exploitation !\nCherchez la raison ..."
 
-text_dl_supersu="URL pour curl: %s"
+text_dir_ok="Ce répertoire a bien été créé : %s"
+
+text_dl_file="URL pour curl: %s"
 text_dl_yourself="Téléchargez vous-même l'application %s !"
 
 text_error_dl="!!! Erreur pendant le téléchargement %s !!!"
@@ -40,13 +45,23 @@ text_into_recovery="Vous êtes dans le mode recovery ! Très bien..."
 text_label_cancel="Quitter"
 text_label_ok="Valider"
 
+text_menu_files="Quels fichiers désirez-vous flasher ?"
+
 text_menu_description[1]="Rooter votre appareil"
 text_menu_description[2]="Enlever le root de votre appareil"
-text_menu_description[3]="Quitter le programme !"
+text_menu_description[3]="Flasher une image officielle de votre appareil"
+text_menu_description[4]="Flasher une Custom ROM dans votre appareil"
+text_menu_description[5]="Sauvegarder votre appareil"
+text_menu_description[6]="Redémarrer votre appareil"
+text_menu_description[7]="Quitter le programme !"
 
 text_menu_name[1]="ROOT"
 text_menu_name[2]="UNROOT"
-text_menu_name[3]="EXIT"
+text_menu_name[3]="FLASH"
+text_menu_name[4]="CUSTOM"
+text_menu_name[5]="BACKUP"
+text_menu_name[6]="REBOOT"
+text_menu_name[7]="EXIT"
 
 text_mount="montage "
 text_mount_error="Il semble y avoir un problème : votre appareil n'est pas en mode root. Au-revoir ..."
@@ -61,6 +76,7 @@ text_ok_tools="L'outil %s est bien installé !"
 text_press_key="Appuyez sur n'importe quelle touche, quand l'appareil a redemarré ..."
 text_ProductID="ProductID: %s"
 
+text_reboot_now="Votre appareil redémarre, maintenant !"
 text_reboot_recovery="Votre appareil redémarre dans une seconde dans le mode recovery.\nC'est nécessaire !"
 text_reboot_yourself="Redémarrez-vous-même l'appareil !"
 

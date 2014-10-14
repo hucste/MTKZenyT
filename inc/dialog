@@ -1,35 +1,42 @@
 #!/bin/bash
 
-
-
 function dialog_list_files() {
 
-    height=$(bc <<< "$3 * 10 + 5")
+    # call: display_files text title count
+    #local height=$(bc <<< "${#mtd_name[@]} * 10 + 5")
+    local items="$3"
 
-    dialog --backtitle "$2" --title "$2" \
+    ${dialog} --stdout --backtitle "$2" --title "$2" \
         --ok-label "${text_label_ok}" --cancel-label "${text_label_cancel}" \
-        --checklist "$1" "$height" 250 "$3" \
-        $(echos_files_to_save) 2> "${FILE_TMP}"
+        --checklist "$1" 0 0 ${#mtd_name[@]} ${items}
 
 }
 
 function dialog_menu() {
 
-    height=$(bc <<< "$3 * 10 + 5")
+    # call: dialog menu text title
+    local texte="1" title="2"
+    local height=$(bc <<< "$3 * 10 + 5")
+    local IFS=" "; shift; read -a menu <<< "$@"
 
-    dialog --backtitle "$2" --title "$2" \
-        --menu "$1" ${height} 250 ${height} "${menu[@]}" 2> "${FILE_TMP}"
+    ${dialog} --backtitle "${title}" --title "${title}" \
+        --menu "${texte}" 0 0 ${height} ${menu[@]}
+        #--menu "$1" 0 0 ${height} "${menu[@]}" 2> "${FILE_TMP}"
 
 }
 
 function dialog_select_dir() {
 
-    dialog --dselect  --title="$1"
+    # call: dialog_select_dir title
+
+    ${dialog} --stdout --title "$1" --dselect "${HOME}" 0 50
 
 }
 
 function dialog_select_file() {
 
-    dialog --fselect  --title="$1"
+    # call: dialog_select_file title
+
+    ${dialog} --stdout --title="$1" --fselect "${HOME}" 0 50
 
 }

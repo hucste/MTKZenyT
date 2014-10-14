@@ -9,20 +9,25 @@ text_ask_reboot_system="Now, do you wan't reboot into system to finalize install
 
 text_choice_invalid="This choice isn't valid. By 'y' or 'n'..."
 
+text_column_addr="Address"
 text_column_description="Description"
+text_column_map="Partition"
 text_column_name="Name"
-text_column_offset="Offset"
+text_column_Size="Size"
 
 text_datas_remove="All datas relatived at root into /%s will be deleted"
 text_datas_removed="*** all datas into /%s are deleted!"
 
+text_detect_cfg="*** Detection of values config:"
 text_detect_dev="*** Detect your device: "
 
 text_dev_mode="Your mount is into %s mode..."
 text_dev_not_recovery="Your device isn't into needed recovery mode!"
 text_dev_unrecognized="It seems your device isn't recognized by your OS! Please, search reason..."
 
-text_dl_supersu="URL to curl: %s"
+text_dir_ok="This folder has been maked: %s"
+
+text_dl_file="URL to curl: %s"
 text_dl_yourself="Download yourself the app %s!"
 
 text_error_dl="!!! Error during download %s !!!"
@@ -40,13 +45,23 @@ text_into_recovery="You're into recovery! Yeahh..."
 text_label_cancel="Quit"
 text_label_ok="Validate"
 
+text_menu_files="Which files do you want to flash?"
+
 text_menu_description[1]="To root your device"
 text_menu_description[2]="To unroot your device"
-text_menu_description[3]="Exit the programe!"
+text_menu_description[3]="To flash original ROM..."
+text_menu_description[4]="To flash custom ROM..."
+text_menu_description[5]="Backup your device"
+text_menu_description[6]="Reboot your device"
+text_menu_description[7]="Exit the program!"
 
 text_menu_name[1]="ROOT"
 text_menu_name[2]="UNROOT"
-text_menu_name[3]="EXIT"
+text_menu_name[3]="FLASH"
+text_menu_name[4]="CUSTOM"
+text_menu_name[5]="BACKUP"
+text_menu_name[6]="REBOOT"
+text_menu_name[7]="EXIT"
 
 text_mount="mount "
 text_mount_error="It seems problem: Your device can't be into root mode! Bye..."
@@ -59,6 +74,7 @@ text_ok_tools="%s is installed!"
 text_press_key="Press any key when it's rebooted..."
 text_ProductID="ProductID: %s"
 
+text_reboot_now="Your device reboot... now!"
 text_reboot_recovery="Your device reboot into recovery in 1 second. Needed!"
 text_reboot_yourself="Reboot yourself the device!"
 
