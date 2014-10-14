@@ -7,21 +7,21 @@ function adb_delete_su_datas() {
     mssg=$(printf "${text_datas_remove}\n" "data")
     display_mssg "n" "${mssg}"
 
-    ${adb} shell ${adb_su}find /data/app/ -type f -name "com.noshufou.android.su-*" -delete
-    ${adb} shell ${adb_su}find /data/app/ -type f -name "com.koushikdutta.superuser-*" -delete
-    ${adb} shell ${adb_su}find /data/app/ -type f -name "com.mgyun.shua.su-*" -delete
-    ${adb} shell ${adb_su}find /data/app/ -type f -name "*eu.chainfire.supersu*" -delete
+    ${adb} shell "${adb_su}find /data/app/ -type f -name 'com.noshufou.android.su-*' -delete"
+    ${adb} shell "${adb_su}find /data/app/ -type f -name 'com.koushikdutta.superuser-*' -delete"
+    ${adb} shell "${adb_su}find /data/app/ -type f -name 'com.mgyun.shua.su-*' -delete"
+    ${adb} shell "${adb_su}find /data/app/ -type f -name '*eu.chainfire.supersu*' -delete"
 
-    ${adb} shell ${adb_su}find /data/app-lib/ -type d -name "*eu.chainfire.supersu*" -depth -exec rm -rf "{}" \;
+    ${adb} shell "${adb_su}find /data/app-lib/ -type d -name '*eu.chainfire.supersu*' -depth -exec rm -rf '{}' \;"
 
-    ${adb} shell ${adb_su}find /data/data/ -type d -name "*eu.chainfire.supersu*" -depth -exec rm -rf "{}" \;
+    ${adb} shell "${adb_su}find /data/data/ -type d -name '*eu.chainfire.supersu*' -depth -exec rm -rf '{}' \;"
 
-    ${adb} shell ${adb_su}find /data/dalvik-cache/ -type f -name "*com.noshufou.android.su*" -delete
-    ${adb} shell ${adb_su}find /data/dalvik-cache/ -type f -name "*com.koushikdutta.superuser*" -delete
-    ${adb} shell ${adb_su}find /data/dalvik-cache/ -type f -name "*com.mgyun.shua.su*" -delete
-    ${adb} shell ${adb_su}find /data/dalvik-cache/ -type f -name "*eu.chainfire.supersu*" -delete
-    ${adb} shell ${adb_su}find /data/dalvik-cache/ -type f -iname "*superuser.apk*" -delete
-    ${adb} shell ${adb_su}find /data/dalvik-cache/ -type f -name "*.oat" -delete
+    ${adb} shell "${adb_su}find /data/dalvik-cache/ -type f -name '*com.noshufou.android.su*' -delete"
+    ${adb} shell "${adb_su}find /data/dalvik-cache/ -type f -name '*com.koushikdutta.superuser*' -delete"
+    ${adb} shell "${adb_su}find /data/dalvik-cache/ -type f -name '*com.mgyun.shua.su*' -delete"
+    ${adb} shell "${adb_su}find /data/dalvik-cache/ -type f -name '*eu.chainfire.supersu*' -delete"
+    ${adb} shell "${adb_su}find /data/dalvik-cache/ -type f -iname '*superuser.apk*' -delete"
+    ${adb} shell "${adb_su}find /data/dalvik-cache/ -type f -name '*.oat' -delete"
 
     mssg=$(printf "${text_datas_removed}\n" "data")
     display_mssg "n" "${mssg}"
@@ -35,13 +35,13 @@ function adb_delete_su_system() {
     mssg=$(printf "${text_remove}\n" "${SU}")
     display_mssg "n" "${mssg}"
 
-    ${adb} shell ${adb_su} if [[ -f "/system/bin/.ext/.su" ]]; then rm -rf /system/bin/.ext/.su; fi
-    ${adb} shell ${adb_su} find "${SYS_BIN}" -name "sugote*" -delete;
-    ${adb} shell ${adb_su} if [[ -f "${SYS_BIN}${SSUD}" ]]; then rm -f "${SYS_BIN}${SSUD}"; fi
-    #${adb} shell ${adb_su}find ${SYS_ETC} -name init.d -exec rm -rf "{}" \;
-    ${adb} shell ${adb_su} if [[ -f "${SYS_ETC}.installed_su_daemon" ]]; then rm -f "${SYS_ETC}.installed_su_daemon"; fi
-    ${adb} shell ${adb_su} if [[ -f /system/bin/su || -h /system/bin/su ]]; then rm -f /system/bin/su; fi
-    ${adb} shell ${adb_su} if [[ -f "${SYS_BIN}${SU}" ]]; then rm -f "${SYS_BIN}${SU}"; fi
+    ${adb} shell "${adb_su} if [[ -f '/system/bin/.ext/.su' ]]; then rm -rf /system/bin/.ext/.su; fi"
+    ${adb} shell "${adb_su} find '${SYS_BIN}' -name 'sugote*' -delete;"
+    ${adb} shell "${adb_su} if [[ -f '${SYS_BIN}${SSUD}' ]]; then rm -f '${SYS_BIN}${SSUD}'; fi"
+    #${adb} shell ${adb_su}find ${SYS_ETC} -name init.d -exec rm -rf '{}' \;"
+    ${adb} shell "${adb_su} if [[ -f '${SYS_ETC}.installed_su_daemon' ]]; then rm -f '${SYS_ETC}.installed_su_daemon'; fi"
+    ${adb} shell "${adb_su} if [[ -f /system/bin/su || -h /system/bin/su ]]; then rm -f /system/bin/su; fi"
+    ${adb} shell "${adb_su} if [[ -f '${SYS_BIN}${SU}' ]]; then rm -f '${SYS_BIN}${SU}'; fi"
 
     mssg=$(printf "${text_datas_removed}\n" "system")
     display_mssg "n" "${mssg}"
@@ -365,7 +365,7 @@ function adb_verify_mount() {
 function adb_whoami() {
 
     adb_su
-    ${adb} shell "${adb_su}"whoami #| sed 's/\r$//'
+    ${adb} shell "${adb_su}"whoami | sed 's/\r$//'
     #display_detected "${id}"
 
 }

@@ -61,29 +61,39 @@ function display_menu() {
             choice=$( echos_menu | zenity_list "${text_welcome}" "${title_welcome}" "${count['name']}")
 
         elif  [[ "${DIALOG}" -ne 0 ]]; then
-
-            FILE_TMP="/tmp/MTK_Dialog_menu.tmp"
-            touch "${FILE_TMP}"
-            trap 'rm -f "${FILE_TMP}"' 0 1 2 3 5 15
+            if [[ -f "${FILE_TMP}_menu.tmp" ]]; then rm -f "${FILE_TMP}_menu.tmp"; fi
+            if [[ -f "${FILE_TMP}" ]]; then rm -f "${FILE_TMP}"; fi
 
             echos_menu
             dialog_menu "${text_welcome}" "${title_welcome}" "$(count ${text_menu_name[@]})"
 
-            case $? in
-                0) choice=$(<"${FILE_TMP}");;
+            #if [[ $? -eq 0 ]]; then choice=$(<"${FILE_TMP}"); fi
+            retour="$?"
+            echo "Value clic: $retour"
+            case "$retour" in
+                0)
+                    choice=$(<"${FILE_TMP}")
+                    unset menu
+                    if [[ -f "${FILE_TMP}" ]]; then rm -f "${FILE_TMP}"; fi
+                    if [[ -f "${FILE_TMP}_menu.tmp" ]]; then rm -f "${FILE_TMP}_menu.tmp"; fi
+                ;;
                 1|255)
                     if [[ -f "${FILE_TMP}_menu.tmp" ]]; then rm -f "${FILE_TMP}_menu.tmp"; fi
                     if [[ -f "${FILE_TMP}" ]]; then rm -f "${FILE_TMP}"; fi
 
                     choice=""; menu=""
+                    dialog_yesno "${text_cancel_menu}" "${title_cancel_menu}"
 
-                    display_menu
+                    case $? in
+                        0) display_menu ;;
+                        1|255) EXIT;;
+                    esac
 
                 ;;
             esac
 
             if [[ -f "${FILE_TMP}_menu.tmp" ]]; then rm -f "${FILE_TMP}_menu.tmp"; fi
-            if [[ -f "${FILE_TMP}" ]]; then rm -f "${FILE_TMP}"; fi
+            #if [[ -f "${FILE_TMP}" ]]; then rm -f "${FILE_TMP}"; fi
 
             unset menu
 
@@ -120,7 +130,7 @@ function display_menu() {
 
     done
 
-    [[ $? -ne 0 ]] && EXIT
+    if [[ $? -ne 0 ]]; then EXIT; fi
 
 }
 
@@ -204,46 +214,46 @@ function echos_menu() {
 
     write_file "log" "$now ### $FUNCNAME: Attempt ones echos to choose menu..."
 
-    local IFS
-    local list=""
+    #local IFS
+    #local list=""
     local -i i=1
 
     if [[ "${DIALOG}" -eq 1 ]]; then
 
-        while [ $i -le $(count "${text_menu_name[@]}") ]; do
-
-            list="${text_menu_name[$i]}|${text_menu_description[$i]}"
-            echo "${list}" >> "${FILE_TMP}_menu.tmp"
-            display_mssg "n" "${list}"
-
-            let "i = $i + 1";
-            unset list
-
-        done
-
-        while IFS="|"; shift; read col1 col2 || [ -n "${col1}" ]; do
-
-            menu+=("${col1}" "${col2}")
-
-        done < "${FILE_TMP}_menu.tmp"
-
-
         #while [ $i -le $(count "${text_menu_name[@]}") ]; do
 
-            #menu+=("${text_menu_name[$i]}" "${text_menu_description[$i]}")
-            ##echo "${list}"
+            #list="${text_menu_name[$i]}|${text_menu_description[$i]}"
+            #echo "${list}" >> "${FILE_TMP}_menu.tmp"
+            #display_mssg "n" "${list}"
 
             #let "i = $i + 1";
-            ##unset list
+            #unset list
 
         #done
 
-        #echo "menu: ${menu[@]}"
+        #while IFS="|"; shift; read col1 col2 || [ -n "${col1}" ]; do
+
+            #menu+=("${col1}" "${col2}")
+
+        #done < "${FILE_TMP}_menu.tmp"
+
+
+        while [ $i -le $(count "${text_menu_name[@]}") ]; do
+
+            menu+=("${text_menu_name[$i]}" "${text_menu_description[$i]}")
+            #echo "${list}"
+
+            let "i = $i + 1";
+            #unset list
+
+        done
+
+        echo "menu: ${menu[@]}"
         #EXIT
         #choice=$(dialog_menu "${text_welcome}" "${title_welcome}" "${#text_menu_name[@]}" "${menu[@]}")
 
-        display_detected "menu: ${menu}"
-        unset items
+        #display_detected "menu: ${menu[@]}"
+        #unset items
 
     else
 
@@ -255,6 +265,6 @@ function echos_menu() {
 
     fi
 
-	unset i IFS
+	unset i #IFS
 
 }
