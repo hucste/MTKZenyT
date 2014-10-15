@@ -3,9 +3,11 @@
 function dialog_info() {
 
     # call: display_info
-    local text="$1"
+    local text="$1" sec="$2"
 
-    ${dialog} --infobox "${text}" 3 50 ; sleep 1
+    if [[ -z "${sec}" ]]; then sec=1; fi
+
+    ${dialog} --infobox "${text}" 0 0 ; sleep ${sec}
 
     unset text
 
@@ -41,11 +43,12 @@ function dialog_menu() {
     # call: dialog menu text title
     local text="$1" title="$2" height=$(bc <<< "$3 * 10 + 5")
 
-    touch "${FILE_TMP}"
-    trap 'rm -f "${FILE_TMP}"' 0 1 2 3 5 15
+    #touch "${FILE_TMP}"
+    #trap 'rm -f "${FILE_TMP}"' 0 1 2 3 5 15
 
     ${dialog} --backtitle "${title}" --title "${title}" \
-        --menu "${text}" 0 0 ${height} "${menu[@]}" 2> "${FILE_TMP}"
+        --menu "${text}" 0 0 ${height} "${menu[@]}" 2>&1 1>&3
+        #--menu "${text}" 0 0 ${height} "${menu[@]}" 2> "${FILE_TMP}"
 
     unset text title height
 
@@ -56,7 +59,7 @@ function dialog_mssg() {
     # call: dialog_mssg text title
     local text="$1" title="$2"
 
-    ${dialog} --colors --title "${title}" --msgbox "${text}" 6 50
+    ${dialog} --colors --title "${title}" --msgbox "${text}" 0 0
 
 }
 
@@ -65,7 +68,7 @@ function dialog_select_dir() {
     # call: dialog_select_dir title
     local title="$1"
 
-    ${dialog} --stdout --title "${title}" --dselect "${HOME}" 0 50
+    ${dialog} --stdout --title "${title}" --dselect "${HOME}" 0 0
 
     unset title
 

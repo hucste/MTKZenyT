@@ -79,7 +79,7 @@ function CUSTOM() {
 
 function EXIT() {
 
-    display_mssg "n" "${text_goodbye}" "${title_goodbye}"
+    display_mssg "n" "${text_goodbye}" "${title_goodbye}" "1"
     destruct
     exit 0
 
@@ -219,7 +219,7 @@ function destruct() {
 
 function detect_device() {
 
-    display_mssg "n" "${text_detect_dev}"; sleep 1
+    display_mssg "n" "${text_detect_dev}" "" "1"
 
     for (( x=0; x < ${#VID[@]} ; x++ )); do
         lsusb=$(lsusb | egrep "${VID[$x]}")
@@ -236,9 +236,9 @@ function detect_device() {
     if [[ -z "${pid}" ]]; then
 
         display_error "${text_dev_unrecognized}\n"
-        display_mssg "i" "${text_exit}"
+        display_mssg "n" "${text_exit}"
 
-        press_any_key
+        #press_any_key
 
         EXIT
 
@@ -437,8 +437,18 @@ function manage_colors() {
 
     while [ $i -le $(count ${colors_name[@]}) ]; do
 
-        if [[ -n "${colors_name[$i]}" ]]; then
-            export declare "${colors_name[$i]}"="3${colors_value[$i]}"
+        if [[ "${DIALOG}" -ne 0 ]]; then
+
+            if [[ -n "${colors_name[$i]}" ]]; then
+                export declare "${colors_name[$i]}"="${colors_value[$i]}"
+            fi
+
+        else
+
+            if [[ -n "${colors_name[$i]}" ]]; then
+                export declare "${colors_name[$i]}"="3${colors_value[$i]}"
+            fi
+
         fi
 
         let "i = $i + 1"
@@ -451,15 +461,13 @@ function manage_colors() {
 
 function manage_fonts() {
 
+    manage_colors
+
     i=0
 
     while [ $i -le $(count ${colors_name[@]}) ]; do
 
         if [[ "${DIALOG}" -ne 0 ]]; then
-
-            if [[ -n "${colors_name[$i]}" ]]; then
-                export declare "${colors_name[$i]}"="${colors_value[$i]}"
-            fi
 
             neutral="n"
             bold="b"; unbold="B"
@@ -727,7 +735,7 @@ function unroot_to_system() {
         adb_delete_su_system
 
         mssg=$(printf "${text_unroot_end}\n${text_verify_errors}\n")
-        display_mssg "n" "${mssg}"
+        display_mssg "n" "${mssg}" "" "1"
 
         sleep 3
 
@@ -800,9 +808,6 @@ function verify_installed() {
     display_mssg "i" "${mssg}"
     sleep 1
 
-    #array=("${guis[@]}");
-
-    #if [[ -z "$(in_array "${GUI}")" ]]; then
     if [[ "$(in_array "${GUI}" "${guis[@]}")" ]]; then
 
         # verify if dialog is installed
@@ -810,14 +815,8 @@ function verify_installed() {
             DIALOG=1
             ZENITY=0
 
-            #FILE_TMP="/tmp/MTKShellDialog.tmp"
-            #touch "${FILE_TMP}"
-            #trap 'rm -f "${FILE_TMP}"' 0 1 2 3 5 15
-
             dialog=$(which dialog)
 
-            display_detected "${text_ok_tools}" "Dialog"
-            write_file "log" "$now *** $FUNCNAME: Dialog: Yes!"
         fi
 
         # verify if zenity is installed.
@@ -827,8 +826,6 @@ function verify_installed() {
 
             zenity=$(which zenity)
 
-            display_detected "${text_ok_tools}" "Zenity"
-            write_file "log" "$now *** $FUNCNAME: Zenity: Yes!"
         fi
 
         #DIALOG=1
@@ -837,6 +834,16 @@ function verify_installed() {
     fi
 
     manage_fonts
+
+    if [[ "${DIALOG}" -eq 1 ]]; then
+        display_detected "${text_ok_tools}" "Dialog"
+        write_file "log" "$now *** $FUNCNAME: Dialog: Yes!"
+    fi
+
+    if [[ "${ZENITY}" -eq 1 ]]; then
+        display_detected "${text_ok_tools}" "Zenity"
+        write_file "log" "$now *** $FUNCNAME: Zenity: Yes!"
+    fi
 
     # adb
     if [[ ! -x $(which adb) ]]; then

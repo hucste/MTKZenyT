@@ -7,7 +7,8 @@ function display_detected() {
 
     if [[ "${DIALOG}" -ne 0 ]]; then
 
-        echo -e "\Z${green}${mssg}\Z${neutral}"
+        if [[ "${esc_seq}" ]]; then esc_seq="\e["; neutral=0; fi
+        echo -e "${esc_seq};3${green}m${mssg}${esc_seq};${neutral}m"
 
     else
 
@@ -87,35 +88,18 @@ function display_menu() {
             choice=$( echos_menu | zenity_list "${text_welcome}" "${title_welcome}" "${count['name']}")
 
         elif  [[ "${DIALOG}" -ne 0 ]]; then
-            if [[ -f "${FILE_TMP}_menu.tmp" ]]; then rm -f "${FILE_TMP}_menu.tmp"; fi
-            if [[ -f "${FILE_TMP}" ]]; then rm -f "${FILE_TMP}"; fi
+
+            #if [[ -f "${FILE_TMP}_menu.tmp" ]]; then rm -f "${FILE_TMP}_menu.tmp"; fi
+            #if [[ -f "${FILE_TMP}" ]]; then rm -f "${FILE_TMP}"; fi
 
             echos_menu
-            dialog_menu "${text_welcome}" "${title_welcome}" "$(count ${text_menu_name[@]})"
 
-            #if [[ $? -eq 0 ]]; then choice=$(<"${FILE_TMP}"); fi
-            case "$?" in
-                0)
-                    choice=$(<"${FILE_TMP}")
-                    unset menu
-                ;;
-                1|255)
-                    if [[ -f "${FILE_TMP}_menu.tmp" ]]; then rm -f "${FILE_TMP}_menu.tmp"; fi
-                    if [[ -f "${FILE_TMP}" ]]; then rm -f "${FILE_TMP}"; fi
+            exec 3>&1;
+            choice=$(dialog_menu "${text_welcome}" "${title_welcome}" "$(count ${text_menu_name[@]})")
+            exec 3>&-;
 
-                    choice=""; menu=""
-                    dialog_yesno "${text_cancel_menu}" "${title_cancel_menu}"
-
-                    case $? in
-                        0) display_menu ;;
-                        1|255) EXIT;;
-                    esac
-
-                ;;
-            esac
-
-            if [[ -f "${FILE_TMP}_menu.tmp" ]]; then rm -f "${FILE_TMP}_menu.tmp"; fi
-            if [[ -f "${FILE_TMP}" ]]; then rm -f "${FILE_TMP}"; fi
+            #if [[ -f "${FILE_TMP}_menu.tmp" ]]; then rm -f "${FILE_TMP}_menu.tmp"; fi
+            #if [[ -f "${FILE_TMP}" ]]; then rm -f "${FILE_TMP}"; fi
 
             unset menu
 
@@ -158,29 +142,33 @@ function display_menu() {
 
 function display_mssg() {
 
-    # call: display_mssg option title texte
+    # call: display_mssg option title text sec
+    #+ param sec is for DIALOG info
+    local menu="$1" text="$2" title="$3" sec="$4"
 
     if [[ "${ZENITY}" -ne 0 ]]; then
 
-        case "$1" in
-            i) zenity_info "$2" "$3" ;;
-            n) zenity_notify "$2" "$3" ;;
-            q) zenity_question "$2" "$3" ;;
+        case "$menu" in
+            i) zenity_info "${text}" "${title}" ;;
+            n) zenity_notify "${text}" "${title}" ;;
+            q) zenity_question "${text}" "${title}" ;;
         esac
 
     elif [[ "${DIALOG}" -eq 1 ]]; then
 
-        case "$1" in
+        case "$menu" in
+            i)
+                dialog_mssg "${text}" ;;
             q)
-                dialog_yesno "$2" ""
+                dialog_yesno "${text}" ""
                 #echo -e "$2" "${text_yes_no}"; read
             ;;
-            *) dialog_info "$2" ;;
+            *)  dialog_info "${text}" "${sec}" ;;
         esac
 
     else
 
-        case "$1" in
+        case "$menu" in
             q) echo -e "$2" "${text_yes_no}"; read ;;
             *) echo -e "$2" ;;
         esac
@@ -258,7 +246,7 @@ function echos_menu() {
 
         done
 
-        display_detected "menu: ${menu[@]}"
+        #display_detected "menu: ${menu}"
 
     else
 

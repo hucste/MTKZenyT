@@ -16,7 +16,7 @@ text_column_name="Name"
 text_column_size="Taille"
 
 text_datas_remove="Toutes les données relatives au root dans /%s vont être supprimées"
-text_datas_removed="*** Toutes les données dans /%s ont été supprimées !"
+text_datas_removed="*** Toutes les données dans /%s devraient être supprimées ! Veuillez vérifier ..."
 
 text_detect_cfg="*** Détection des valeurs de config : "
 text_detect_dev="*** Détection de votre appareil : "
@@ -85,7 +85,7 @@ text_reboot_yourself="Redémarrez-vous-même l'appareil !"
 
 text_remove="Suppression de %s"
 
-text_see_phone="SVP, regardez votre téléphone pour accepter l'accès à ADB Shell par SuperSU !"
+text_see_phone="SVP, regardez votre téléphone pour accepter l'accès à ADB Shell par SuperSU ! (si besoin)"
 
 text_ssu_exists="L'archive de SuperSu est bien sur votre ordinateur ! Bonne chose..."
 text_SSU_installed="SuperSU %s est installé !"

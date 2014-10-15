@@ -16,7 +16,7 @@ text_column_name="Name"
 text_column_Size="Size"
 
 text_datas_remove="All datas relatived at root into /%s will be deleted"
-text_datas_removed="*** all datas into /%s are deleted!"
+text_datas_removed="*** all datas into /%s should be deleted! Verify..."
 
 text_detect_cfg="*** Detection of values config:"
 text_detect_dev="*** Detect your device: "
@@ -82,7 +82,7 @@ text_reboot_yourself="Reboot yourself the device!"
 
 text_remove="Remove %s"
 
-text_see_phone="Please, see your phone to accept ADB shell by SuperSU!"
+text_see_phone="Please, see your phone to accept ADB shell by SuperSU! (if need...)"
 
 text_su_cp="cp SU binary into "
 text_su_inactive="It seems SU is inactive... may-be isn't installed?"
