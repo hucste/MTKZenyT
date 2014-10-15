@@ -6,6 +6,7 @@ function MTKZenyTux() {
     echo -e "### ${title_welcome} ###"
     echo -e "#################################"
 
+    manage_colors
     test_config_file
 
     write_file "log" "#################################################"
@@ -237,6 +238,8 @@ function detect_device() {
         display_error "${text_dev_unrecognized}\n"
         display_mssg "i" "${text_exit}"
 
+        press_any_key
+
         EXIT
 
     else
@@ -428,6 +431,65 @@ function make_dir_dated() {
 
 }
 
+function manage_colors() {
+
+    i=0
+
+    while [ $i -le $(count ${colors_name[@]}) ]; do
+
+        if [[ -n "${colors_name[$i]}" ]]; then
+            export declare "${colors_name[$i]}"="3${colors_value[$i]}"
+        fi
+
+        let "i = $i + 1"
+
+    done
+
+    unset i
+
+}
+
+function manage_fonts() {
+
+    i=0
+
+    while [ $i -le $(count ${colors_name[@]}) ]; do
+
+        if [[ "${DIALOG}" -ne 0 ]]; then
+
+            if [[ -n "${colors_name[$i]}" ]]; then
+                export declare "${colors_name[$i]}"="${colors_value[$i]}"
+            fi
+
+            neutral="n"
+            bold="b"; unbold="B"
+            underline="u"; ununderline="U"
+            esc_seq="\Z"
+
+        elif [[ "${ZENITY}" -ne 0 ]]; then
+
+            neutral="<span color=\"black\">"
+            bold="<b>"; unbold="</b>"
+            underline"<u>"; ununderline="</u>"
+            esc_seq=""
+
+        else
+
+            neutral="0"
+            bold="1"; unbold="${neutral}"
+            underline="4"; ununderline="${neutral}"
+            esc_seq="\e["
+
+        fi
+
+        let "i = $i + 1"
+
+    done
+
+    unset i
+
+}
+
 function modify_system() {
 
     if [[ "${vid}" == "${VID[0]}" ]]; then
@@ -435,6 +497,13 @@ function modify_system() {
         adb_root_system
 
     fi
+
+}
+
+function press_any_key() {
+
+    read -p "${text_press_key}" -n1 -s
+    echo " "
 
 }
 
@@ -585,8 +654,7 @@ function steps_to_recovery() {
 
     adb_reboot_recovery
 
-    read -p "${text_press_key}" -n1 -s
-    echo " "
+    press_any_key
 
     detect_device
 
@@ -670,6 +738,8 @@ function unroot_to_system() {
         mssg=$(printf "%s" "${text_su_inactive}\n${text_unroot_stop}\n")
         display_error "${mssg}"
 
+        press_any_key
+
     fi
 
     unset id
@@ -730,9 +800,10 @@ function verify_installed() {
     display_mssg "i" "${mssg}"
     sleep 1
 
-    array=("${guis[@]}");
+    #array=("${guis[@]}");
 
-    if [[ -z "$(in_array "${GUI}")" ]]; then
+    #if [[ -z "$(in_array "${GUI}")" ]]; then
+    if [[ "$(in_array "${GUI}" "${guis[@]}")" ]]; then
 
         # verify if dialog is installed
         if [[ "${GUI}" == "dialog" && -x $(which dialog) ]]; then
@@ -764,6 +835,8 @@ function verify_installed() {
         #ZENITY=0
 
     fi
+
+    manage_fonts
 
     # adb
     if [[ ! -x $(which adb) ]]; then

@@ -72,7 +72,8 @@ text_mount_rw="Mount %s to read'n write into your device!"
 
 text_ok_tools="%s is installed!"
 
-text_press_key="Press any key when it's rebooted..."
+text_press_key="Press any key..."
+text_press_key_after_reboot="Press any key when it's rebooted..."
 text_ProductID="ProductID: %s"
 
 text_reboot_now="Your device reboot... now!"

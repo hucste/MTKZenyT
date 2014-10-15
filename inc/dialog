@@ -1,14 +1,36 @@
 #!/bin/bash
 
+function dialog_info() {
+
+    # call: display_info
+    local text="$1"
+
+    ${dialog} --infobox "${text}" 3 50 ; sleep 1
+
+    unset text
+
+}
+
+function dialog_input() {
+
+    # call: display_input text title
+    local text="$1" title="$2"
+
+    ${dialog} --stdout --title "${title}" --inputbox "${text}" 10 30 | read
+
+    unset text title
+
+}
+
 function dialog_list_files() {
 
     # call: display_files text title count
     #local height=$(bc <<< "${#mtd_name[@]} * 10 + 5")
-    texte="$1" title="$2" items="$3"
+    local text="$1" title="$2" items="$3"
 
     ${dialog} --stdout --backtitle "${title}" --title "${title}" \
         --ok-label "${text_label_ok}" --cancel-label "${text_label_cancel}" \
-        --checklist "${texte}" 0 0 ${#mtd_name[@]} ${items}
+        --checklist "${text}" 0 0 ${#mtd_name[@]} ${items}
 
     unset texte title items
 
@@ -17,15 +39,24 @@ function dialog_list_files() {
 function dialog_menu() {
 
     # call: dialog menu text title
-    local texte="$1" title="$2" height=$(bc <<< "$3 * 10 + 5")
+    local text="$1" title="$2" height=$(bc <<< "$3 * 10 + 5")
 
     touch "${FILE_TMP}"
     trap 'rm -f "${FILE_TMP}"' 0 1 2 3 5 15
 
     ${dialog} --backtitle "${title}" --title "${title}" \
-        --menu "${texte}" 0 0 ${height} "${menu[@]}" 2> "${FILE_TMP}"
+        --menu "${text}" 0 0 ${height} "${menu[@]}" 2> "${FILE_TMP}"
 
-    unset texte title height
+    unset text title height
+
+}
+
+function dialog_mssg() {
+
+    # call: dialog_mssg text title
+    local text="$1" title="$2"
+
+    ${dialog} --colors --title "${title}" --msgbox "${text}" 6 50
 
 }
 
@@ -54,10 +85,10 @@ function dialog_select_file() {
 function dialog_yesno() {
 
     # call: dialog_yesno
-    local texte="$1" title="$2"
+    local text="$1" title="$2"
 
-    ${dialog} --stdout --title="${title}" --clear --yesno "${texte}" 10 30
+    ${dialog} --stdout --title="${title}" --clear --yesno "${text}" 10 30
 
-    unset texte title
+    unset text title
 
 }

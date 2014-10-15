@@ -3,11 +3,22 @@
 function display_detected() {
 
     # call: display_detected mssg
+    local mssg=$(printf "$1\n" "$2");
 
-    mssg=$(printf "$1\n" "$2");
-    echo -e "${green}${mssg}${neutral}"
+    if [[ "${DIALOG}" -ne 0 ]]; then
+
+        echo -e "\Z${green}${mssg}\Z${neutral}"
+
+    else
+
+        if [[ -z "${esc_seq}" ]]; then esc_seq="\e["; fi
+        echo -e "${esc_seq};${green}m${mssg}${esc_seq};${neutral}m"
+
+    fi
 
     write_file "log" "### Detected: ${mssg}"
+
+    unset mssg
 
 }
 
@@ -15,13 +26,28 @@ function display_error() {
 
     # call: display_error mssg
 
-    if [[ "${ZENITY}" -ne 0 ]]; then
-        zenity_error "<span color=\"red\">$1</span>" "$2"
+    if [[ "${DIALOG}" -ne 0 ]]; then
+
+        local text="\Z${bold}\Z${red}$1\Z${neutral}\Z${unbold}"
+        text=$(printf "${text}" "$2")
+
+        dialog_mssg "${text}" "${title_error}"
+
+
+    elif [[ "${ZENITY}" -ne 0 ]]; then
+
+        zenity_error "<span color=\"${red}\">${bold}$1${unbold}</span>" "$2"
+
     else
-        printf "${red}$1${neutral}" "$2"
+
+        if [[ -z "${esc_seq}" ]]; then esc_seq="\e["; fi
+        local text="${esc_seq}${bold};${red}m$1${esc_seq}${neutral};${unbold}m"
+        printf "${text}" "$2"
+
     fi
 
     write_file "log" "### Error: $1"
+    unset text
 
 }
 
@@ -68,14 +94,10 @@ function display_menu() {
             dialog_menu "${text_welcome}" "${title_welcome}" "$(count ${text_menu_name[@]})"
 
             #if [[ $? -eq 0 ]]; then choice=$(<"${FILE_TMP}"); fi
-            retour="$?"
-            echo "Value clic: $retour"
-            case "$retour" in
+            case "$?" in
                 0)
                     choice=$(<"${FILE_TMP}")
                     unset menu
-                    if [[ -f "${FILE_TMP}" ]]; then rm -f "${FILE_TMP}"; fi
-                    if [[ -f "${FILE_TMP}_menu.tmp" ]]; then rm -f "${FILE_TMP}_menu.tmp"; fi
                 ;;
                 1|255)
                     if [[ -f "${FILE_TMP}_menu.tmp" ]]; then rm -f "${FILE_TMP}_menu.tmp"; fi
@@ -93,7 +115,7 @@ function display_menu() {
             esac
 
             if [[ -f "${FILE_TMP}_menu.tmp" ]]; then rm -f "${FILE_TMP}_menu.tmp"; fi
-            #if [[ -f "${FILE_TMP}" ]]; then rm -f "${FILE_TMP}"; fi
+            if [[ -f "${FILE_TMP}" ]]; then rm -f "${FILE_TMP}"; fi
 
             unset menu
 
@@ -144,6 +166,16 @@ function display_mssg() {
             i) zenity_info "$2" "$3" ;;
             n) zenity_notify "$2" "$3" ;;
             q) zenity_question "$2" "$3" ;;
+        esac
+
+    elif [[ "${DIALOG}" -eq 1 ]]; then
+
+        case "$1" in
+            q)
+                dialog_yesno "$2" ""
+                #echo -e "$2" "${text_yes_no}"; read
+            ;;
+            *) dialog_info "$2" ;;
         esac
 
     else
@@ -214,46 +246,19 @@ function echos_menu() {
 
     write_file "log" "$now ### $FUNCNAME: Attempt ones echos to choose menu..."
 
-    #local IFS
-    #local list=""
     local -i i=1
 
     if [[ "${DIALOG}" -eq 1 ]]; then
 
-        #while [ $i -le $(count "${text_menu_name[@]}") ]; do
-
-            #list="${text_menu_name[$i]}|${text_menu_description[$i]}"
-            #echo "${list}" >> "${FILE_TMP}_menu.tmp"
-            #display_mssg "n" "${list}"
-
-            #let "i = $i + 1";
-            #unset list
-
-        #done
-
-        #while IFS="|"; shift; read col1 col2 || [ -n "${col1}" ]; do
-
-            #menu+=("${col1}" "${col2}")
-
-        #done < "${FILE_TMP}_menu.tmp"
-
-
         while [ $i -le $(count "${text_menu_name[@]}") ]; do
 
             menu+=("${text_menu_name[$i]}" "${text_menu_description[$i]}")
-            #echo "${list}"
 
             let "i = $i + 1";
-            #unset list
 
         done
 
-        echo "menu: ${menu[@]}"
-        #EXIT
-        #choice=$(dialog_menu "${text_welcome}" "${title_welcome}" "${#text_menu_name[@]}" "${menu[@]}")
-
-        #display_detected "menu: ${menu[@]}"
-        #unset items
+        display_detected "menu: ${menu[@]}"
 
     else
 
@@ -265,6 +270,6 @@ function echos_menu() {
 
     fi
 
-	unset i #IFS
+	unset i
 
 }

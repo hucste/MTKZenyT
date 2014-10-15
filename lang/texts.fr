@@ -75,7 +75,8 @@ text_error_not_adb="L'outil ADB n'est pas installé. Veuillez faire le nécessai
 
 text_ok_tools="L'outil %s est bien installé !"
 
-text_press_key="Appuyez sur n'importe quelle touche, quand l'appareil a redemarré ..."
+text_press_key="Appuyez sur n'importe quelle touche ..."
+text_press_key_after_reboot="Appuyez sur n'importe quelle touche, quand l'appareil a redemarré ..."
 text_ProductID="ProductID: %s"
 
 text_reboot_now="Votre appareil redémarre, maintenant !"

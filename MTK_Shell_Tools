@@ -19,7 +19,7 @@ if [[ -f "${DIR_LANG}/texts.${lang}" ]]; then source "${DIR_LANG}/texts.${lang}"
 
 # link files needed
 source "${INC}/config"
-source "${INC}/colors"
+#source "${INC}/colors"
 
 # link functions needed
 source "${INC}/dialog"
