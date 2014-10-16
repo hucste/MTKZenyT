@@ -8,6 +8,7 @@ text_ask_restart="=> Voulez-vous que je le redémarre pour vous maintenant ?"
 text_ask_reboot_system="Maintenant, voulez-vous redémarrer le système pour finaliser l'installation ?"
 
 text_choice_invalid="Ce choix n'est pas valide. Par 'o' ou 'n'..."
+text_choose_gui="SVP, choisissez une interface graphique, telle que : dialog, ou zenity ...\n Configurez le fichier de config : "
 
 text_column_addr="Addresse"
 text_column_description="Description"
@@ -40,6 +41,8 @@ text_error_zip_ssu="!!! Erreur : La taille de l'archive zip de SuperSU n'est pas
 text_exit="Le script va s'arrêter ..."
 text_exit_reboot="Le script va s'arrêter ... Relancez-le après le redémarrage de l'appareil !"
 text_exit_relaunch="Le script va s'arrêter ... Relancez-le après !"
+
+text_feature_disable="%s: Cette fonctionnalité est désactivée.\n"
 
 text_goodbye="Au-revoir ..."
 text_goodbye_info="Quand vous serez dans la session Android, veuillez taper sur l'app SuperSU ...\net installer le binaire su quand cela vous sera demandé."

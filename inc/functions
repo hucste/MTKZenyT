@@ -25,7 +25,13 @@ function BACKUP() {
 
     write_file "log" "${now} ### $FUNCNAME: Will try to your backup device !"
 
-    if [[ "$(adb_whoami)" == "root" ]]; then
+    if [[ -z "$(in_array "${GUI}" "${guis[@]}")" ]]; then
+
+        mssg="${text_feature_disable}${text_choose_gui}${config}"
+        mssg="$(printf "${mssg}" "${FUNCNAME}")"
+        display_error "${mssg}"
+
+    elif [[ "$(adb_whoami)" == "root" ]]; then
 
         # obtain dir to save
         if [[ -z "${DIR_SVG}" ]]; then

@@ -8,6 +8,7 @@ text_ask_restart="=> Do you wan't to restart-it for you?"
 text_ask_reboot_system="Now, do you wan't reboot into system to finalize install?"
 
 text_choice_invalid="This choice isn't valid. By 'y' or 'n'..."
+text_choose_gui="Please, choose a GUI to use: dialog, or zenity...\n Configure file config: "
 
 text_column_addr="Address"
 text_column_description="Description"
@@ -40,6 +41,8 @@ text_error_zip_ssu="!!! ERROR: Size of Archive zip SuperSU is not good: %s (shou
 text_exit="The script will exit..."
 text_exit_reboot="The script exit... Relaunch after rebooting!"
 text_exit_relaunch="The script exit... Relaunch after!"
+
+text_feature_disable="%s: This feature is disable.\n"
 
 text_goodbye="Bye..."
 text_goodbye_info="When you are into Android session, please tap onto SuperSU app...\nand Install su binary when it's ask."
