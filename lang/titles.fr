@@ -1,5 +1,6 @@
 #!/bin/bash
 
+title_detect_dev="*** Détection de l'appareil ***"
 title_dir_svg="Dans quel répertoire, désirez-vous sauvegarder votre appareil ?"
 
 title_goodbye="*** Au revoir ! ***"

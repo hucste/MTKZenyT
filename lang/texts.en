@@ -30,6 +30,7 @@ text_dir_ok="This folder has been maked: %s"
 text_dl_file="URL to curl: %s"
 text_dl_yourself="Download yourself the app %s!"
 
+text_error_file="!!! ERROR with file %s! Checks its presence and its readable..."
 text_error_dl="!!! Error during download %s !!!"
 text_error_not_adb="ADB isn't install. Do the needful!"
 

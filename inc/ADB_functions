@@ -12,9 +12,9 @@ function adb_delete_su_datas() {
     ${adb} shell "${adb_su}find /data/app/ -type f -name 'com.noshufou.android.su-*' -delete"
     ${adb} shell "${adb_su}find /data/app/ -type f -name '*eu.chainfire.supersu*' -delete"
 
-    ${adb} shell "${adb_su}find /data/app-lib/ -type d -name '*eu.chainfire.supersu*' -depth -exec rm -rf '{}' \;"
+    ${adb} shell "${adb_su}find /data/app-lib/ -type d -name '*eu.chainfire.supersu*' -depth | xargs -0 rm -rf {}" #-exec rm -rf \"{}\" \;"
 
-    ${adb} shell "${adb_su}find /data/data/ -type d -name '*eu.chainfire.supersu*' -depth -exec rm -rf '{}' \;"
+    ${adb} shell "${adb_su}find /data/data/ -type d -name '*eu.chainfire.supersu*' -depth | xargs -0 rm -rf {}" #-exec rm -rf \"{}\" \;"
 
     ${adb} shell "${adb_su}find /data/dalvik-cache/ -type f -name '*com.noshufou.android.su*' -delete"
     ${adb} shell "${adb_su}find /data/dalvik-cache/ -type f -name '*com.koushikdutta.superuser*' -delete"
@@ -55,8 +55,8 @@ function adb_delete_supersu() {
     mssg=$(printf "${text_remove}\n" "${SuperSU}")
     display_mssg "n" "${mssg}"
 
-    ${adb} shell "${adb_su}find ${SYS_APP} -iname 'superuser*' -delete"
-    ${adb} shell "${adb_su}find ${SYS_APP} -iname 'supersu*' -delete"
+    ${adb} shell "${adb_su}find '${SYS_APP}' -iname 'superuser*' -delete"
+    ${adb} shell "${adb_su}find '${SYS_APP}' -iname 'supersu*' -delete"
 
 }
 

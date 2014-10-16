@@ -7,7 +7,7 @@ function dialog_info() {
 
     if [[ -z "${sec}" ]]; then sec=1; fi
 
-    ${dialog} --infobox "${text}" 0 0 ; sleep ${sec}
+    ${dialog} --colors --infobox "${text}" 0 0 ; sleep ${sec}
 
     unset text
 
@@ -18,7 +18,7 @@ function dialog_input() {
     # call: display_input text title
     local text="$1" title="$2"
 
-    ${dialog} --stdout --title "${title}" --inputbox "${text}" 10 30 | read
+    ${dialog} --stdout --title "${title}" --inputbox "${text}" 10 30 ; echo $? > /tmp/dialog_input.tmp
 
     unset text title
 
@@ -79,7 +79,7 @@ function dialog_select_file() {
     # call: dialog_select_file title
     local title="$1"
 
-    ${dialog} --stdout --title="${title}" --fselect "${HOME}" 0 50
+    ${dialog} --stdout --title "${title}" --fselect "${HOME}" 0 50
 
     unset title
 
@@ -90,7 +90,7 @@ function dialog_yesno() {
     # call: dialog_yesno
     local text="$1" title="$2"
 
-    ${dialog} --stdout --title="${title}" --clear --yesno "${text}" 10 30
+    ${dialog} --clear --title "${title}" --yesno "${text}" 10 30 ; echo $? > /tmp/dialog_yesno.tmp
 
     unset text title
 

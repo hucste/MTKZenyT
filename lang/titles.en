@@ -1,5 +1,6 @@
 #!/bin/bash
 
+title_detect_dev="*** Detection Device ***"
 title_dir_svg="In which folder, do you want to save your device?"
 
 title_goodbye="*** GoodBye! ***"

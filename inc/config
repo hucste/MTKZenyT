@@ -56,7 +56,7 @@ FILES[5]="usrdata"
 # Others
 declare -a colors_name=('black' 'red' 'green' 'yellow' 'blue' 'magenta' 'cyan' 'white')
 declare -a colors_value=('0' '1' '2' '3' '4' '5' '6' '7')
-declare -a guis=('dialog' 'zenity')
+declare -a guis=( 'd' 'dialog' 'z' 'zenity')
 declare -a info_map
 declare -a info_name=('name' 'size' 'addr' 'type' 'map')
 declare -a mtd_addr
@@ -74,7 +74,6 @@ dir=""
 BCKP_PHONE="/sdcard/"
 DIR_SVG=""
 DIR_SVG_DATED=""
-FILE_TMP="/tmp/MTK_Dialog_menu.tmp"
 FILE_PARAM="${DIR_Tools}/dumchar.info"
 FILE_SSU_ZIP="${DIR_Tools}UPDATE-SuperSU-${version}.zip"
 GUI=""

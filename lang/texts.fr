@@ -31,6 +31,7 @@ text_dl_file="URL pour curl: %s"
 text_dl_yourself="Téléchargez vous-même l'application %s !"
 
 text_error_dl="!!! Erreur pendant le téléchargement %s !!!"
+text_error_file="!!! Erreur avec le fichier %s! Vérifiez sa présence et ses droits en lecture ..."
 text_error_not_tools="L'outil %s n'est pas installé. Veuillez faire le nécessaire !"
 
 text_exit="Le script va s'arrêter ..."

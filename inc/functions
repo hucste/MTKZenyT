@@ -206,7 +206,7 @@ function destruct() {
 
     write_file "log" "$now ### $FUNCNAME: Destruct variables"
 
-    if [[ "${DIALOG}" -eq 1 ]]; then rm "${FILE_TMP}"; fi
+    if [[ "${DIALOG}" && -f "${FILE_TMP}" ]]; then rm -f "${FILE_TMP}"; fi
 
     unset DIALOG FILE_TMP ZENITY
     unset archive choice mssg
@@ -219,7 +219,9 @@ function destruct() {
 
 function detect_device() {
 
-    display_mssg "n" "${text_detect_dev}" "" "1"
+    if [[ (( "${GUI}" != "z" && "${GUI}" != "zenity" )) ]]; then
+        display_mssg "n" "${text_detect_dev}" "" "1";
+    fi
 
     for (( x=0; x < ${#VID[@]} ; x++ )); do
         lsusb=$(lsusb | egrep "${VID[$x]}")
@@ -238,19 +240,37 @@ function detect_device() {
         display_error "${text_dev_unrecognized}\n"
         display_mssg "n" "${text_exit}"
 
-        #press_any_key
+        if [[ -z "$(in_array "${GUI}" "${guis[@]}")"  ]]; then press_any_key; fi
 
         EXIT
 
     else
 
+        local mode=""
+
         display_detected "${text_VendorID}" "${vid}"
         display_detected "${text_ProductID}" "${pid}"
 
         if [[ "${vid}" == "${VID[0]}" ]]; then
-            display_detected "Mode: Recovery"
+            mode="Mode: Recovery"
         else
-            display_detected "Mode: Session"
+            mode="Mode: Session"
+        fi
+
+        display_detected "${mode}"
+
+        if [[ "${DIALOG}" -ne 0 ]]; then
+            mssg="$(printf "%s" "\Z${bold}\Z${green}${text_VendorID}\n${text_ProductID}\n${mode}\Z${neutral}\Z${unbold}")"
+            mssg="$(printf "${mssg}" "${vid}" "${pid}")";
+            display_mssg "n" "${mssg}";
+        elif [[ "${ZENITY}" -ne 0 ]]; then
+            mssg="$(printf "%s" "<span color=\"${green}\"><b>${text_VendorID}\n${text_ProductID}\n${mode}</b></span>")"
+            mssg="$(printf "${mssg}" "${vid}" "${pid}")";
+            display_mssg "i" "${mssg}" "${text_detect_dev}" "${title_detect_dev}";
+        fi
+
+        if [[ "${mssg}" ]]; then
+            unset mssg
         fi
 
     fi
@@ -265,7 +285,7 @@ function dl_file() {
 
     mssg=$(printf "${text_dl_file}\n" "$1"); display_mssg "i" "${mssg}"
 
-    curl "$1" > "$2"
+    curl "$1" > "$2" 2> /dev/null
     if [[ $? -ne 0 ]]; then
         mssg=$(printf "${text_error_dl}" "$2")
         display_error "${mssg}"
@@ -443,6 +463,12 @@ function manage_colors() {
                 export declare "${colors_name[$i]}"="${colors_value[$i]}"
             fi
 
+        elif [[ "${ZENITY}" -ne 0 ]]; then
+
+            if [[ -n "${colors_name[$i]}" ]]; then
+                export declare "${colors_name[$i]}"="${colors_name[$i]}"
+            fi
+
         else
 
             if [[ -n "${colors_name[$i]}" ]]; then
@@ -476,9 +502,9 @@ function manage_fonts() {
 
         elif [[ "${ZENITY}" -ne 0 ]]; then
 
-            neutral="<span color=\"black\">"
+            neutral="</span>"
             bold="<b>"; unbold="</b>"
-            underline"<u>"; ununderline="</u>"
+            underline="<u>"; ununderline="</u>"
             esc_seq=""
 
         else
@@ -558,6 +584,18 @@ function reboot_recovery() {
             display_mssg "i" "${mssg}"
 
             EXIT
+
+        elif [[ "${DIALOG}" ]]; then
+
+            case "${read}" in
+                0)  steps_to_recovery ;;
+                1)
+                    mssg="${text_reboot_yoursel}\n${text_exit_reboot}"
+                    display_mssg "i" "${mssg}"
+
+                    EXIT
+                ;;
+            esac
 
         else
 
@@ -675,13 +713,21 @@ function test_config_file() {
 
     display_mssg "n" "\n${text_detect_cfg}"
 
-    if [[ -f "${config}" ]]; then
+    if [[ -f "${config}" && -r "${config}" ]]; then
 
         LOG=$(read_config "LOG") && display_detected "LOG=${LOG}"
         BCKP_PHONE=$(read_config "BCKP_PHONE") && display_detected "BCKP_PHONE=${BCKP_PHONE}"
         CFG=1 && display_detected "CFG=1"
         DIR_SVG=$(read_config "DIR_SVG") && display_detected "DIR_SVG=${DIR_SVG}"
         GUI=$(read_config "GUI") && display_detected "GUI=${GUI}"
+
+    else
+
+        mssg="$(printf "${text_error_file}\n" "${config}")"
+        display_error "${mssg}"
+
+        press_any_key
+        EXIT
 
     fi
 
@@ -746,7 +792,7 @@ function unroot_to_system() {
         mssg=$(printf "%s" "${text_su_inactive}\n${text_unroot_stop}\n")
         display_error "${mssg}"
 
-        press_any_key
+        if [[ -z "$(in_array "${GUI}" "${guis[@]}")" ]]; then press_any_key; fi
 
     fi
 
@@ -762,15 +808,21 @@ function verify_ssu_exists() {
         mssg="${mssg}"$(printf "${text_app_dl}\n" "${SuperSU}" "${URL_SUPERSU}")
         mssg="${mssg}"$(printf "\n${text_ask_dl} ${text_yes_no}")
 
-        display_mssg "q" "${mssg}"
+        display_mssg "q" "${mssg}" ""
 
-        if [[ $? -eq 0 && "${ZENITY}" -eq 1 ]]; then
+        if [[ "${ZENITY}" ]]; then
 
-            dl_file "${DL_SUPERSU}" "${FILE_SSU_ZIP}"
+            case $? in
+                0) dl_file "${DL_SUPERSU}" "${FILE_SSU_ZIP}" ;;
+                1) dl_yourself "${SuperSU}" ;;
+            esac
 
-        elif [[ $? -eq 1 && "${ZENITY}" -eq 1 ]]; then
+        elif [[ "${DIALOG}" ]]; then
 
-            dl_yourself "${SuperSU}"
+            case "${read}" in
+                0) dl_file "${DL_SUPERSU}" "${FILE_SSU_ZIP}" ;;
+                1) dl_yourself "${SuperSU}" ;;
+            esac
 
         else
 
@@ -800,6 +852,8 @@ function verify_ssu_exists() {
 
     fi
 
+    EXIT
+
 }
 
 function verify_installed() {
@@ -808,10 +862,15 @@ function verify_installed() {
     display_mssg "i" "${mssg}"
     sleep 1
 
+    if [[ "${GUI}" ]]; then
+        GUI=$(awk '{print tolower($0)}' <<< $GUI);
+        display_detected "GUI: ${GUI}"
+    fi
+
     if [[ "$(in_array "${GUI}" "${guis[@]}")" ]]; then
 
         # verify if dialog is installed
-        if [[ "${GUI}" == "dialog" && -x $(which dialog) ]]; then
+        if [[ (( "${GUI}" == "d" || "${GUI}" == "dialog" )) && -x $(which dialog) ]]; then
             DIALOG=1
             ZENITY=0
 
@@ -820,7 +879,7 @@ function verify_installed() {
         fi
 
         # verify if zenity is installed.
-        if [[ "${GUI}" == "zenity" && -x $(which zenity) ]]; then
+        if [[ (( "${GUI}" == "z" || "${GUI}" == "zenity" )) && -x $(which zenity) ]]; then
             DIALOG=0
             ZENITY=1
 

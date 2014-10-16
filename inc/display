@@ -9,6 +9,12 @@ function display_detected() {
 
         if [[ "${esc_seq}" ]]; then esc_seq="\e["; neutral=0; fi
         echo -e "${esc_seq};3${green}m${mssg}${esc_seq};${neutral}m"
+        #echo -e "\Z${bold}\Z${green}${mssg}\Z${neutral}\Z${unbold}"
+
+    elif [[ "${ZENITY}" -ne 0 ]]; then
+
+        if [[ -z "${esc_seq}" ]]; then esc_seq="\e["; neutral=0; fi
+        echo -e "${esc_seq};32m${mssg}${esc_seq};${neutral}m"
 
     else
 
@@ -26,10 +32,11 @@ function display_detected() {
 function display_error() {
 
     # call: display_error mssg
+    local text
 
     if [[ "${DIALOG}" -ne 0 ]]; then
 
-        local text="\Z${bold}\Z${red}$1\Z${neutral}\Z${unbold}"
+        text="\Z${bold}\Z${red}$1\Z${neutral}\Z${unbold}"
         text=$(printf "${text}" "$2")
 
         dialog_mssg "${text}" "${title_error}"
@@ -42,7 +49,7 @@ function display_error() {
     else
 
         if [[ -z "${esc_seq}" ]]; then esc_seq="\e["; fi
-        local text="${esc_seq}${bold};${red}m$1${esc_seq}${neutral};${unbold}m"
+        text="${esc_seq}${bold};${red}m$1${esc_seq}${neutral};${unbold}m"
         printf "${text}" "$2"
 
     fi
@@ -154,14 +161,17 @@ function display_mssg() {
             q) zenity_question "${text}" "${title}" ;;
         esac
 
-    elif [[ "${DIALOG}" -eq 1 ]]; then
+    elif [[ "${DIALOG}" -ne 0 ]]; then
 
         case "$menu" in
             i)
                 dialog_mssg "${text}" ;;
             q)
-                dialog_yesno "${text}" ""
-                #echo -e "$2" "${text_yes_no}"; read
+                dialog_yesno "${text}" "${title}"
+
+                read=$(</tmp/dialog_yesno.tmp)
+                if [[ -f /tmp/dialog_yesno.tmp ]]; then rm -rf /tmp/dialog_yesno.tmp; fi
+
             ;;
             *)  dialog_info "${text}" "${sec}" ;;
         esac
