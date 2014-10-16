@@ -41,3 +41,7 @@ It's possible to use file config.
 
 Enjoy-it!
 =========
+
+!!! It's a beta development!
+!!! It's really possible not run!!!
+
