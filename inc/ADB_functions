@@ -113,12 +113,17 @@ function adb_mount_partition() {
 
     else
 
-        display_mssg "i" "\n${text_mount_try}\n"; sleep 1
+        display_mssg "n" "\n${text_mount_try}\n"; sleep 1
 
         ${adb} shell busybox mount "$1"
-        #key=$(array_search "$1")
-        #${adb} shell mount "${info_map[$1]}" "/${PART_TEXT[$key]}"
-        #unset key
+
+        if [[ $? -ne 0 ]]; then
+            key=$(array_search "$1" "${PART_TEXT[0]}")
+            search="${PART_NAME[${key}]}"
+            key=$(array_search "${search}" "${mtd_name[@]}")
+            ${adb} shell busybox mount "${key}" "${mtd_map[$key]}"
+            unset key
+        fi
 
     fi
 
@@ -155,87 +160,119 @@ function adb_reboot_system() {
 function adb_root_system() {
 
     mssg=$(printf "${text_mount_rw}" "system")
-    display_mssg "i" "${mssg}"
+    display_mssg "n" "${mssg}"
 
     #${adb} shell mount "${info_map['android']}" /system
-    if [[ -z $(${adb} shell mount | busybox egrep system) ]]; then mount "system"; fi
+    if [[ -z "$(adb_verify_mount system)" ]]; then adb_mount_partition "system"; fi
 
-    #display_mssg "n" "cp busybox into /tmp"
-    #${adb} shell cp "${SYS_BIN}busybox" /tmp/busybox
-    #${adb} shell chmod 0755 /tmp/busybox
-    #${adb} shell chown 0:0 /tmp/busybox
-    #${adb} shell busybox umount /system
+    if [[ "$(${adb} shell mount | busybox grep system)" ]]; then
 
-    #display_mssg "n" "mount system by /tmp/busybox"
-    #${adb} shell /tmp/busybox mount /system
+        sleep 1
+        local ERROR=0
 
-    #${adb} shell "if [[ ! -d /system/bin/.ext ]]; then mkdir /system/bin/.ext; fi"
-    #${adb} shell chmod 0777 /system/bin/.ext
-    #${adb} shell chown 0:0 /system/bin/.ext
-    sleep 1
+        if [[ -f "${DIR_SSU}" ]]; then
+            display_mssg "n" "${text_supersu_cp}${SYS_APP}"
+            ${adb} push "${DIR_SSU}" "${SYS_APP}"
 
-    display_mssg "n" "${text_supersu_cp}${SYS_APP}"
-    ${adb} push "${DIR_SSU}" "${SYS_APP}"
-    display_mssg "n" "${text_supersu_chmod}${SYS_APP}"
-    ${adb} shell chmod 0644 "${SYS_APP}${SuperSU}"
-    ${adb} shell chown 0:0 "${SYS_APP}${SuperSU}"
-    sleep 1
+            display_mssg "n" "${text_supersu_chmod}${SYS_APP}"
+            ${adb} shell 'if [[ -f "${SYS_APP}${SuperSU}" ]]; then chmod 0644 "${SYS_APP}${SuperSU}"; fi'
+            ${adb} shell 'if [[ -f "${SYS_APP}${SuperSU}" ]]; then chown 0:0 "${SYS_APP}${SuperSU}"; fi'
+            sleep 1
+        else
+            mssg="$(printf "${text_error_file}" "${DIR_SSU}")"
+            display_error "${mssg}"
+            ERROR=1
+        fi
 
-    display_mssg "n" "${text_su_cp}${SYS_BIN}"
-    ${adb} push "${DIR_SU}" "${SYS_BIN}"
-    #${adb} shell cp "${SYS_BIN}${SU}" "${SYS_BIN}daemonsu"
-    #${adb} shell cp "${SYS_BIN}${SU}" "/system/bin/.ext/.${SU}"
-    sleep 1
+        if [[ -f "${DIR_SU}" ]]; then
+            display_mssg "n" "${text_su_cp}${SYS_BIN}"
+            ${adb} push "${DIR_SU}" "${SYS_BIN}"
+            #${adb} shell cp "${SYS_BIN}${SU}" "${SYS_BIN}daemonsu"
+            #${adb} shell cp "${SYS_BIN}${SU}" "/system/bin/.ext/.${SU}"
+            sleep 1
 
-    #display_mssg "i" "Verify ${SYS_ETC}init.d and create if not exists!"
-    #${adb} shell "if [[ ! -d '${SYS_ETC}init.d' ]]; then mkdir '${SYS_ETC}init.d'; fi"
-    #${adb} push "${DIR_SSUD}" "${SYS_ETC}init.d"
+            display_mssg "n" "chmod and chown ${SYS_BIN}${SU}"
 
-    #${adb} shell chmod 0755 "${SYS_ETC}init.d/${SSUD}"
-    #${adb} shell chown 0:0 "${SYS_ETC}init.d/${SSUD}"
+            SDK=$(${adb} shell egrep ro.build.version.sdk /system/build.prop | dd bs=1 skip=21 count=2)
+            #SDK="$(${adb} shell grep ro.build.version.sdk /system/build.prop)"
+            #echo "SDK: $SDK"
+            #SDK="${SDK#*=}"
+            echo "SDK: ${SDK}"
+            if [[ "${SDK}" -gt 17 ]]; then
+                display_detected "SDK: ${SDK} > 17"
+                ${adb} shell 'if [[ -f "${SYS_BIN}${SU}" ]]; then chmod 0755 "${SYS_BIN}${SU}"; fi'
+                #${adb} shell chmod 0755 "/system/bin/.ext/.${SU}"
+            else
+                display_detected "SDK: ${SDK} <= 17"
+                ${adb} shell 'if [[ -f "${SYS_BIN}${SU}" ]]; then chmod 6755 "${SYS_BIN}${SU}"; fi'
+                #${adb} shell 'if [[ -f "${SYS_BIN}${SU}" ]]; then chmod 06755 "/system/xbin/su; fi'
+                #${adb} shell chmod 06755 "/system/bin/.ext/.${SU}"
+            fi
+            unset SDK
 
-    #${adb} shell "if [[ ! -f '${SYS_ETC}.installed_su_daemon' ]]; then touch '${SYS_ETC}.installed_su_daemon'; fi"
-    #${adb} shell "echo 1 > ${SYS_ETC}.installed_su_daemon"
 
-    #${adb} shell chmod 0644 "${SYS_ETC}.installed_su_daemon"
-    #${adb} shell chown 0:0 "${SYS_ETC}.installed_su_daemon"
+            #${adb} shell chmod 0755 "${SYS_BIN}daemonsu"
 
-    display_mssg "n" "chmod and chown ${SYS_BIN}${SU}"
-    #API=$(${adb} shell egrep ro.build.version.sdk /system/build.prop | dd bs=1 skip=21 count=2)
-    SDK=$(${adb} shell egrep ro.build.version.sdk /system/build.prop); SDK="${SDK#$=}"
-    echo "SDK: ${SDK}"
-    if [[ "${SDK}" -gt 17 ]]; then
-        echo "SDK > 17"
-        ${adb} shell chmod 0755 "${SYS_BIN}${SU}"
-        #${adb} shell chmod 0755 "/system/bin/.ext/.${SU}"
-    else
-        echo "SDK <= 17"
-        #${adb} shell chmod 06755 "${SYS_BIN}${SU}"
-        ${adb} shell chmod 06755 "/system/xbin/su"
-        #${adb} shell chmod 06755 "/system/bin/.ext/.${SU}"
+            ${adb} shell 'if [[ -f "${SYS_BIN}${SU}" ]]; then chown 0:0 "${SYS_BIN}${SU}"; fi'
+            #${adb} shell chown 0:0 "/system/bin/.ext/.${SU}"
+
+            ${adb} shell "if [[ ! -h '/system/bin/${SU}' ]]; then ln -s ${SYS_BIN}${SU} /system/bin/${SU}; fi"
+        else
+            mssg="$(printf "${text_error_file}" "${DIR_SU}")"
+            display_error "${mssg}"
+            ERROR=1
+        fi
+
+        #display_mssg "n" "cp busybox into /tmp"
+        #${adb} shell cp "${SYS_BIN}busybox" /tmp/busybox
+        #${adb} shell chmod 0755 /tmp/busybox
+        #${adb} shell chown 0:0 /tmp/busybox
+        #${adb} shell busybox umount /system
+
+        #display_mssg "n" "mount system by /tmp/busybox"
+        #${adb} shell /tmp/busybox mount /system
+
+        #${adb} shell "if [[ ! -d /system/bin/.ext ]]; then mkdir /system/bin/.ext; fi"
+        #${adb} shell chmod 0777 /system/bin/.ext
+        #${adb} shell chown 0:0 /system/bin/.ext
+
+        #display_mssg "i" "Verify ${SYS_ETC}init.d and create if not exists!"
+            #${adb} shell "if [[ ! -d '${SYS_ETC}init.d' ]]; then mkdir '${SYS_ETC}init.d'; fi"
+            #${adb} push "${DIR_SSUD}" "${SYS_ETC}init.d"
+
+            #${adb} shell chmod 0755 "${SYS_ETC}init.d/${SSUD}"
+            #${adb} shell chown 0:0 "${SYS_ETC}init.d/${SSUD}"
+
+            #${adb} shell "if [[ ! -f '${SYS_ETC}.installed_su_daemon' ]]; then touch '${SYS_ETC}.installed_su_daemon'; fi"
+            #${adb} shell "echo 1 > ${SYS_ETC}.installed_su_daemon"
+
+            #${adb} shell chmod 0644 "${SYS_ETC}.installed_su_daemon"
+            #${adb} shell chown 0:0 "${SYS_ETC}.installed_su_daemon"
+
+        #${adb} shell "${SYS_BIN}${SU} --install"
+
+        #${adb} shell chmod 04755 /system/xbin/busybox
+        #${adb} shell chown 0:0 /system/xbin/busybox
+        #${adb} shell /system/xbin/busybox --install -s /system/xbin
+
+        #display_mssg "n" "rm /tmp/busybox"
+        #${adb} shell /tmp/busybox umount /system
+        #${adb} shell rm -f /tmp/busybox
+
+        adb_umount_partition "system"
+
+        sleep 1
+
+        if [[ "${ERROR}" -eq 0 ]]; then
+            mssg=$(printf "${text_SSU_installed}" "${version}")
+        else
+            mssg=$(printf "${text_SSU_install_pb}" "${version}")
+        fi
+
+        display_mssg "i" "${mssg}"
+        unset mssg ERROR
+
     fi
-    unset SDK
-    #${adb} shell chmod 0755 "${SYS_BIN}daemonsu"
-
-    ${adb} shell chown 0:0 "${SYS_BIN}${SU}"
-    #${adb} shell chown 0:0 "/system/bin/.ext/.${SU}"
-
-    ${adb} shell "if [[ ! -h '/system/bin/${SU}' ]]; then ln -s ${SYS_BIN}${SU} /system/bin/${SU}; fi"
-
-    #${adb} shell "${SYS_BIN}${SU} --install"
-
-    #${adb} shell chmod 04755 /system/xbin/busybox
-    #${adb} shell chown 0:0 /system/xbin/busybox
-    #${adb} shell /system/xbin/busybox --install -s /system/xbin
-
-    #display_mssg "n" "rm /tmp/busybox"
-    #${adb} shell /tmp/busybox umount /system
-    #${adb} shell rm -f /tmp/busybox
-    ${adb} shell busybox umount /system
-    sleep 1
-
-    mssg=$(printf "${text_SSU_installed}" "${version}")
-    display_mssg "i" "${mssg}"
 
 }
 
@@ -377,7 +414,7 @@ function adb_umount_partition() {
 
 function adb_verify_mount() {
 
-    ${adb} shell mount | busybox egrep "$1"
+    ${adb} shell mount | busybox grep "$1"
 
 }
 

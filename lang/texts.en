@@ -26,6 +26,7 @@ text_dev_not_recovery="Your device isn't into needed recovery mode!"
 text_dev_unrecognized="It seems your device isn't recognized by your OS! Please, search reason..."
 
 text_dir_ok="This folder has been maked: %s"
+text_dir_ssu_upd="It seems that the archive has been unpacked. \nThe relative folder exists!\n Do you want to keep (YES) or delete (NO)?"
 
 text_dl_file="URL to curl: %s"
 text_dl_yourself="Download yourself the app %s!"
@@ -33,6 +34,8 @@ text_dl_yourself="Download yourself the app %s!"
 text_error_file="!!! ERROR with file %s! Checks its presence and its readable..."
 text_error_dl="!!! Error during download %s !!!"
 text_error_not_adb="ADB isn't install. Do the needful!"
+text_error_unzip="!!! ERROR (Code: %s) with archive %s!\nIt seems a problem to unzip-it...\nPlease, check-it!"
+text_error_zip_ssu="!!! ERROR: Size of Archive zip SuperSU is not good: %s (should be %s) !!!"
 
 text_exit="The script will exit..."
 text_exit_reboot="The script exit... Relaunch after rebooting!"
@@ -42,6 +45,7 @@ text_goodbye="Bye..."
 text_goodbye_info="When you are into Android session, please tap onto SuperSU app...\nand Install su binary when it's ask."
 
 text_into_recovery="You're into recovery! Yeahh..."
+text_into_tools="Put into folder tools: %s"
 
 text_label_cancel="Quit"
 text_label_ok="Validate"
@@ -92,13 +96,15 @@ text_supersu_cp="cp Superuser app into "
 text_supersu_chmod="chmod and chown Superuser app into "
 
 text_ssu_exists="The archive SuperSu is into your computer! Well..."
-text_SSU_installed="SuperSU %s is installed!"
+text_SSU_installed="SuperSU %s will be installed!"
+text_SSU_install_pb="It seems a problem during install SuperSU %s !\n Check..."
 
-text_system_info="System is into: "
+text_system_info="System is into: %s (%s)"
 
 text_unroot_end="UNROOT step ENDING... "
 text_unroot_stop="UNROOT step is stopped!"
-text_unzip="Unzip the archive: % "
+text_unzip="Unzip the archive: %s "
+text_unzip_ok="Unzip ok!"
 
 text_VendorID="VendorID: %s"
 text_verify_errors="Please, verify there are no errors messages!"

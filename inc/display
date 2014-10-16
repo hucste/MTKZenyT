@@ -44,7 +44,7 @@ function display_error() {
 
     elif [[ "${ZENITY}" -ne 0 ]]; then
 
-        zenity_error "<span color=\"${red}\">${bold}$1${unbold}</span>" "$2"
+        zenity_error "<span color=\"${red}\"><b>$1</b></span>" "$2"
 
     else
 
@@ -149,7 +149,7 @@ function display_menu() {
 
 function display_mssg() {
 
-    # call: display_mssg option title text sec
+    # call: display_mssg option text title sec
     #+ param sec is for DIALOG info
     local menu="$1" text="$2" title="$3" sec="$4"
 

@@ -26,6 +26,7 @@ text_dev_not_recovery="Votre appareil n'est pas dans le mode recovery nécessair
 text_dev_unrecognized="Il semble que votre appareil ne soit pas reconnu par votre système d'exploitation !\nCherchez la raison ..."
 
 text_dir_ok="Ce répertoire a bien été créé : %s"
+text_dir_ssu_upd="Il semble que l'archive a déjà été décompressée. \nLe répertoire relatif existe !\n Voulez-vous le garder (OUI) ou le supprimer (NON) ?"
 
 text_dl_file="URL pour curl: %s"
 text_dl_yourself="Téléchargez vous-même l'application %s !"
@@ -33,6 +34,8 @@ text_dl_yourself="Téléchargez vous-même l'application %s !"
 text_error_dl="!!! Erreur pendant le téléchargement %s !!!"
 text_error_file="!!! Erreur avec le fichier %s! Vérifiez sa présence et ses droits en lecture ..."
 text_error_not_tools="L'outil %s n'est pas installé. Veuillez faire le nécessaire !"
+text_error_unzip="!!! Erreur (Code: %s) avec l'archive %s!\nIl semble y avoir un problème durant la décompression.\nVeuillez la vérifier !"
+text_error_zip_ssu="!!! Erreur : La taille de l'archive zip de SuperSU n'est pas bonne : %s (elle devrait être de %s) !!!"
 
 text_exit="Le script va s'arrêter ..."
 text_exit_reboot="Le script va s'arrêter ... Relancez-le après le redémarrage de l'appareil !"
@@ -42,6 +45,7 @@ text_goodbye="Au-revoir ..."
 text_goodbye_info="Quand vous serez dans la session Android, veuillez taper sur l'app SuperSU ...\net installer le binaire su quand cela vous sera demandé."
 
 text_into_recovery="Vous êtes dans le mode recovery ! Très bien..."
+text_into_tools="Placez-la dans le répertoire tools suivant : %s"
 
 text_label_cancel="Quitter"
 text_label_ok="Valider"
@@ -72,8 +76,6 @@ text_mount_try="Tentative de montage de votre appareil ..."
 text_mount_ro="Montage en lecture seule de %s !"
 text_mount_rw="Montage en écriture de %s !"
 
-text_error_not_adb="L'outil ADB n'est pas installé. Veuillez faire le nécessaire !"
-
 text_ok_tools="L'outil %s est bien installé !"
 
 text_press_key="Appuyez sur n'importe quelle touche ..."
@@ -89,7 +91,8 @@ text_remove="Suppression de %s"
 text_see_phone="SVP, regardez votre téléphone pour accepter l'accès à ADB Shell par SuperSU ! (si besoin)"
 
 text_ssu_exists="L'archive de SuperSu est bien sur votre ordinateur ! Bonne chose..."
-text_SSU_installed="SuperSU %s est installé !"
+text_SSU_installed="SuperSU %s devrait être installé !"
+text_SSU_install_pb="Il semble y avoir eu un problème durant l'installation de SuperSU %s !\nVérifiez ..."
 
 text_su_cp="Copie du binaire SU dans "
 text_su_inactive="Il semble que SU ne soit pas actif ... Peut-être n'est-il pas installé ?"
@@ -97,11 +100,12 @@ text_su_inactive="Il semble que SU ne soit pas actif ... Peut-être n'est-il pas
 text_supersu_cp="Copie Superuser dans "
 text_supersu_chmod="chmod et chown Superuser "
 
-text_system_info="Vous êtes dans : "
+text_system_info="Le système est positionné dans : %s (%s)"
 
 text_unroot_end="Étape UNROOT terminée ... "
 text_unroot_stop="Étape UNROOT est arrêtée !"
-text_unzip="Décompression de l'archive : % "
+text_unzip="Décompression de l'archive : %s "
+text_unzip="Décompression terminée correctement !"
 
 text_VendorID="VendorID: %s"
 text_verify_errors="SVP, vérifiez qu'il n'y ait pas de messages d'erreurs !"
@@ -110,3 +114,4 @@ text_verify_installed="Le programme va vérifier que vous ayez bien les différe
 text_welcome="Que voulez-vous faire : "
 
 text_yes_no=" (O:oui ; N:non) "
+

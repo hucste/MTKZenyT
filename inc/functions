@@ -202,6 +202,12 @@ function count() {
 
 }
 
+function delete_dir() {
+
+    if [[ -d "$1" ]]; then rm -rf "$1"; fi
+
+}
+
 function destruct() {
 
     write_file "log" "$now ### $FUNCNAME: Destruct variables"
@@ -283,9 +289,10 @@ function dl_file() {
 
     # call: dl_file URL FILE_NAME
 
-    mssg=$(printf "${text_dl_file}\n" "$1"); display_mssg "i" "${mssg}"
+    mssg=$(printf "${text_dl_file}\n" "$1"); display_mssg "n" "${mssg}"
 
-    curl "$1" > "$2" 2> /dev/null
+    curl "$1" > "$2"
+
     if [[ $? -ne 0 ]]; then
         mssg=$(printf "${text_error_dl}" "$2")
         display_error "${mssg}"
@@ -301,7 +308,8 @@ function dl_yourself() {
 
     # call: dl_yoursel FILE_NAME
 
-    mssg=$(printf "${text_dl_yourself}\n" "$1")
+    mssg="$(printf "${text_dl_yourself}\n" "$1")"
+    mssg="$(printf "${text_into_tools}\n" "${DIR_Tools}")"
     mssg="${mssg} ${text_exit_relaunch}"
     display_mssg "i" "${mssg}"
 
@@ -328,16 +336,53 @@ function explode() {
 
 function extract_archive_zip() {
 
-    if [[ -f "${FILE_SSU_ZIP}" ]]; then
+    if [[ -d "${DIR_SSU_UPD}" ]]; then
 
-        mssg=$(printf "\n${text_unzip}\n" "${FILE_SSU_ZIP}")
-        display_mssg "i" "${mssg}"
-        unzip "${DIR_Tools}/UPDATE-SuperSU-${version}" -d "${DIR_Tools}/UPDATE-SuperSU-${version}"
+        display_mssg "q" "${text_dir_ssu_upd}"
 
-        if [[ $? -eq 0 ]]; then
-            write_file "log" "$now ### $FUNCNAME: Unzip OK: ${DIR_Tools}/UPDATE-SuperSU-${version}"
-        else
-            write_file "log" "$now ### $FUNCNAME: Unzip KO: ${DIR_Tools}/UPDATE-SuperSU-${version}"
+        if [[ "${ZENITY}" -ne 0 ]]; then
+            REPLY=$?
+        elif [[ "${DIALOG}" -ne 0 ]]; then
+            REPLY="${read}"
+        fi
+
+        case "${REPLY}" in
+            o|O|y|Y|0)
+                sleep 1 ;;
+            n|N|1)
+                delete_dir "${DIR_SSU_UPD}"; sleep 3 ;;
+            *)
+                display_error "${text_choice_invalid}"
+                press_any_key
+                extract_archive_zip
+            ;;
+        esac
+
+    fi
+
+    if [[ ! -d "${DIR_SSU_UPD}" ]]; then
+
+        if [[ -f "${FILE_SSU_ZIP}" ]]; then
+
+            mssg=$(printf "\n${text_unzip}\n" "${FILE_SSU_ZIP}")
+            display_mssg "n" "${mssg}"
+            unzip -o "${DIR_UNZIP}" -d "${DIR_UNZIP}"
+
+            if [[ $? -eq 0 ]]; then
+                mssg="$(printf "${text_unzip_ok}" "${FILE_SSU_ZIP}")"
+                display_mssg "n" "${mssg}"
+
+                write_file "log" "$now ### $FUNCNAME: Unzip OK: ${DIR_Tools}UPDATE-SuperSU-${version}"
+            else
+                mssg="$(printf "${text_error_unzip}" "$?" "${FILE_SSU_ZIP}")"
+                display_error "${mssg}"
+
+                write_file "log" "$now ### $FUNCNAME: Unzip KO: ${DIR_Tools}UPDATE-SuperSU-${version}"
+
+                press_any_key
+                EXIT
+            fi
+
         fi
 
     fi
@@ -353,7 +398,7 @@ function extract_info_system() {
         local IFS=": "; shift; read -a params <<< "${CMDLINE}"
 
         info_map["$1"]=${params[4]}
-        mssg=$(printf "%s" "${text_system_info}${info_map[$1]}\n")
+        mssg=$(printf "${text_system_info}\n" "$1" "${info_map[$1]}" )
         display_mssg "n" "${mssg}"
 
         write_file "log" "$now ### $FUNCNAME: $1 == ${info_map[$1]}"
@@ -372,11 +417,13 @@ function file_to_array_dynamic() {
 
             local IFS=" "; shift; read -a mtd <<< "$(echo "${line}" | sed 's/\r$//' | tr -s ' ')"
 
-            ## create arrays dynamic 'mtd_$info_name[value]'
-            #for (( j=0; j < ${#info_name[@]}; j++)) {
+            # create arrays dynamic 'mtd_$info_name[value]'
+            #for (( j=0; j < $(count "${info_name[@]}"); j++)) {
 
+                #export declare "mtd_${info_name[$j]}"
                 #idx="mtd_${info_name[$j]}[$x]"
-                #declare -a "${idx}"="${mtd[$j]}"
+                #export declare "mtd_${info_name[$j]}_$x"="${mtd[$j]}"
+                #declare "${idx}"="${mtd[$j]}"
 
             #}
 
@@ -574,55 +621,39 @@ function reboot_recovery() {
         display_error "\n${text_dev_not_recovery}\n"
         display_mssg "q" "${text_ask_restart}"
 
-        if [[ $? -eq 0 && "${ZENITY}" -eq 1 ]]; then
+        if [[ "${ZENITY}" -ne 0 ]]; then
 
-            steps_to_recovery
+            REPLY=$?
 
-        elif [[ $? -eq 1 && "${ZENITY}" -eq 1 ]]; then
+        elif [[ "${DIALOG}" -ne 0 ]]; then
 
-            mssg="${text_reboot_yoursel}\n${text_exit_reboot}"
-            display_mssg "i" "${mssg}"
+            REPLY="${read}"
 
-            EXIT
+        fi
 
-        elif [[ "${DIALOG}" ]]; then
-
-            case "${read}" in
-                0)  steps_to_recovery ;;
-                1)
+        while true; do
+            case $REPLY in
+                y|Y|o|O|0)
+                    steps_to_recovery
+                    break
+                ;;
+                n|N|1)
                     mssg="${text_reboot_yoursel}\n${text_exit_reboot}"
                     display_mssg "i" "${mssg}"
 
                     EXIT
                 ;;
+                *)
+                    display_error "${text_choice_invalid}"
+                    press_any_key
+                    reboot_system
+                ;;
             esac
-
-        else
-
-            while true; do
-                case $REPLY in
-                    y|Y|o|O)
-                        steps_to_recovery
-                        break
-                        ;;
-                    n|N)
-                        mssg="${text_reboot_yoursel}\n${text_exit_reboot}"
-                        display_mssg "i" "${mssg}"
-
-                        EXIT
-                    ;;
-                    *)
-                        display_error "${text_choice_invalid}"
-                        read
-                    ;;
-                esac
-            done
-
-        fi
+        done
 
     else
 
-        display_mssg "i" "\n${text_into_recovery}\n"; sleep 1
+        display_mssg "n" "\n${text_into_recovery}\n"; sleep 1
 
     fi
 
@@ -630,57 +661,60 @@ function reboot_recovery() {
 
 function reboot_system() {
 
-    display_mssg "i" "${text_verif_errors}"
+    display_mssg "i" "${text_verify_errors}"
 
     display_mssg "q" "${text_ask_reboot_system}"
 
-    if [[ $? -eq 0 && "${ZENITY}" -eq 1 ]]; then
+    if [[ "${ZENITY}" -ne 0 ]]; then
 
-        adb_reboot_system
+        REPLY=$?
 
-    elif [[ $? -eq 1 && "${ZENITY}" -eq 1 ]]; then
+    elif [[ "${DIALOG}" -ne 0 ]]; then
 
-        mssg=$(printf "${text_reboot_yourself}\n${text_exit}")
-        display_mssg "i" "${mssg}"
-
-        EXIT
-
-    else
-
-        while true; do
-            case $REPLY in
-                y|Y|o|O)
-                    adb_reboot_system
-                    break
-                ;;
-                n|N)
-                    mssg=$(printf "${text_reboot_yourself}\n${text_exit}")
-                    display_mssg "i" "${mssg}"
-
-                    EXIT
-                ;;
-                *)
-                    display_error "${text_choice_invalid}"
-                    read
-                ;;
-            esac
-        done
+        REPLY="${read}"
 
     fi
+
+    while true; do
+        case $REPLY in
+            y|Y|o|O|0)
+                adb_reboot_system
+                break
+            ;;
+            n|N|1)
+                mssg=$(printf "${text_reboot_yourself}\n${text_exit}")
+                display_mssg "i" "${mssg}"
+
+                EXIT
+            ;;
+            *)
+                display_error "${text_choice_invalid}"
+                press_any_key
+                reboot_system
+            ;;
+        esac
+    done
 
 }
 
 function root_to_recovery() {
 
-    verify_ssu_exists
-
     reboot_recovery
 
-    get_info_system "android"
+    verify_ssu_exists
 
-    modify_system
+    #get_info_system "android"
+    adb_read_partitions
 
-    reboot_system
+    if [[ -f "${FILE_PARAM}" ]]; then
+
+        file_to_array_dynamic
+
+        adb_root_system
+
+        reboot_system
+
+    fi
 
 }
 
@@ -802,7 +836,7 @@ function unroot_to_system() {
 
 function verify_ssu_exists() {
 
-    if [[ ! -f "${DIR_SSU}" ]]; then
+    if [[ ! -f "${FILE_SSU_ZIP}" ]]; then
 
         mssg=$(printf "\n${text_app_inexistant}\n" "${SuperSU}")
         mssg="${mssg}"$(printf "${text_app_dl}\n" "${SuperSU}" "${URL_SUPERSU}")
@@ -810,49 +844,63 @@ function verify_ssu_exists() {
 
         display_mssg "q" "${mssg}" ""
 
-        if [[ "${ZENITY}" ]]; then
+        if [[ "${ZENITY}" -ne 0 ]]; then
 
-            case $? in
-                0) dl_file "${DL_SUPERSU}" "${FILE_SSU_ZIP}" ;;
-                1) dl_yourself "${SuperSU}" ;;
-            esac
+            REPLY=$?
 
-        elif [[ "${DIALOG}" ]]; then
+        elif [[ "${DIALOG}" -ne 0 ]]; then
 
-            case "${read}" in
-                0) dl_file "${DL_SUPERSU}" "${FILE_SSU_ZIP}" ;;
-                1) dl_yourself "${SuperSU}" ;;
-            esac
-
-        else
-
-            while true; do
-                case $REPLY in
-                    y|Y|o|O)
-                        dl_file "${DL_SUPERSU}" "${FILE_SSU_ZIP}"
-                        break
-                        ;;
-                    n|N)
-                        dl_yourself "${SuperSU}"
-                    ;;
-                    *)
-                        display_error "${text_choice_invalid}"
-                        read
-                    ;;
-                esac
-            done
+            REPLY="${read}"
 
         fi
 
-        extract_archive_zip
+        while true; do
+            case $REPLY in
+                y|Y|o|O|0)
+                    dl_file "${DL_SUPERSU}" "${FILE_SSU_ZIP}"
+                    break
+                ;;
+                n|N|1)
+                    dl_yourself "${SuperSU}"
+                ;;
+                *)
+                    display_error "${text_choice_invalid}"
+                    verify_ssu_exists
+                ;;
+            esac
+        done
+
+
+        verify_archive
 
     else
 
-        display_detected "\n${text_ssu_exists}"
+        display_mssg "n" "\n${text_ssu_exists}"
+
+        verify_archive
 
     fi
 
-    EXIT
+}
+
+function verify_archive() {
+
+    if [[ -f "${FILE_SSU_ZIP}" ]]; then
+        local key="$(array_search "${version}" "${stats_ssu_version[@]}")"
+        local stat="$(stat -c "%s" "${FILE_SSU_ZIP}")"
+
+        if [[ "${stat}" -ne "${stats_ssu_size[${key}]}" ]]; then
+            mssg="$(printf "${text_error_zip_ssu}" "${stat}" "${stats_ssu_size[${key}]}")"
+            display_error "${mssg}"
+
+            dl_yourself
+        else
+
+            extract_archive_zip
+
+        fi
+
+    fi
 
 }
 

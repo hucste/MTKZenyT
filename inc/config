@@ -3,20 +3,22 @@
 # Packages names
 SuperSU="Superuser.apk"
 SU="su"
-version="v2.13"
+version="2.14"
 SSUD="99SuperSUDaemon"
 
 # others vars - DONT TOUCH!
 PWD=$(pwd)
 
 # URL app
-DL_SUPERSU="http://download.chainfire.eu/567/SuperSU/UPDATE-SuperSU-${version}.zip?retrieve_file=1"
+DL_SUPERSU="http://download.chainfire.eu/578/SuperSU/UPDATE-SuperSU-v${version}.zip?retrieve_file=1"
 URL_SUPERSU="http://download.chainfire.eu/supersu"
 
 # Directories where are packages needed into your computer
 DIR_Tools="${PWD}/tools/"
-DIR_ARM="${DIR_Tools}UPDATE-SuperSU-${version}/arm/"
-DIR_CMN="${DIR_Tools}UPDATE-SuperSU-${version}/common/"
+DIR_UNZIP="${DIR_Tools}UPDATE-SuperSU-v${version}"
+DIR_SSU_UPD="${DIR_Tools}UPDATE-SuperSU-v${version}/"
+DIR_ARM="${DIR_SSU_UPD}arm/"
+DIR_CMN="${DIR_SSU_UPD}common/"
 DIR_SSU="${DIR_CMN}${SuperSU}"
 DIR_SSUD="${DIR_CMN}${SSUD}"
 DIR_SU="${DIR_ARM}${SU}"
@@ -66,6 +68,8 @@ declare -a mtd_size
 declare -a mtd_type
 declare -a mtd_addr_dec
 declare -a mtd_size_dec
+declare -a stats_ssu_size=('5864' '2647595' '2647622')
+declare -a stats_ssu_version=('2.02' '2.13' '2.14')
 
 adb_su=""
 config="config.ini" # file to save some variables
@@ -75,7 +79,7 @@ BCKP_PHONE="/sdcard/"
 DIR_SVG=""
 DIR_SVG_DATED=""
 FILE_PARAM="${DIR_Tools}/dumchar.info"
-FILE_SSU_ZIP="${DIR_Tools}UPDATE-SuperSU-${version}.zip"
+FILE_SSU_ZIP="${DIR_Tools}UPDATE-SuperSU-v${version}.zip"
 GUI=""
 HOME=~
 
