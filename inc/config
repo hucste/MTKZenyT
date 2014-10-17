@@ -55,6 +55,8 @@ FILES[3]="logo"
 FILES[4]="android"
 FILES[5]="usrdata"
 
+NOBCKP=('pmt' 'pro_info' 'protect_f' 'protect_s' 'seccfg' 'misc' 'expdb' 'bmtpool')
+
 # Others
 declare -a colors_name=('black' 'red' 'green' 'yellow' 'blue' 'magenta' 'cyan' 'white')
 declare -a colors_value=('0' '1' '2' '3' '4' '5' '6' '7')

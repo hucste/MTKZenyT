@@ -440,6 +440,8 @@ function file_to_array_dynamic() {
             mtd_map[$x]="${mtd[4]}"
             mtd_size_dec[$x]=$(hexdec "${mtd_size[$x]}")
             mtd_addr_dec[$x]=$(hexdec "${mtd_addr[$x]}")
+            mtd_size_block[$x]=$(bc <<< "${mtd_size_dec[$key]} / ${INODE}")
+            mtd_addr_block[$x]=$(bc <<< "${mtd_addr_dec[$key]} / ${INODE}")
 
             unset mtd
 
@@ -466,10 +468,6 @@ function get_info_system() {
 
 function hexdec() {
 
-    #hex="${1#*x}"
-    #echo "ibase=16;obase=A;${hex}" | bc
-    #bc <<< "ibase=16;obase=A;${hex}"
-    #unset hex
     echo "$(($1))"
 
 }
