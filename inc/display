@@ -61,11 +61,11 @@ function display_error() {
 
 function display_files() {
 
-    write_file "log" "$now ### $FUNCNAME: attempt to display files for choosing..."
+    write_file "log" "${NOW} ### $FUNCNAME: attempt to display files for choosing..."
 
     if [[ "${ZENITY}" -eq 1 ]]; then
 
-        files=$( echos_files | zenity_list_files "${text_menu_files}" "${title_menu_files}" "${#mtd_name[@]}")
+        files=$( echos_files | zenity_list_files "${text_menu_files}" "${title_menu_files}" "${#MTD_NAME[@]}")
 
     fi
 
@@ -86,14 +86,14 @@ function display_files() {
 
 function display_menu() {
 
-    write_file "log" "$now ### $FUNCNAME: attempt to display menu..."
+    write_file "log" "${NOW} ### $FUNCNAME: attempt to display menu..."
 
     while true; do
         choice=""
 
         if [[ "${ZENITY}" -ne 0 ]]; then
 
-            choice=$( echos_menu | zenity_list "${text_welcome}" "${title_welcome}" "${count['name']}")
+            choice=$( echos_menu | zenity_list "${text_welcome}" "${title_welcome}" "$(count ${MENU_NAME[@]})")
 
         elif  [[ "${DIALOG}" -ne 0 ]]; then
 
@@ -103,7 +103,7 @@ function display_menu() {
             echos_menu
 
             exec 3>&1;
-            choice=$(dialog_menu "${text_welcome}" "${title_welcome}" "$(count ${text_menu_name[@]})")
+            choice=$(dialog_menu "${text_welcome}" "${title_welcome}" "$(count ${MENU_NAME[@]})")
             exec 3>&-;
 
             #if [[ -f "${FILE_TMP}_menu.tmp" ]]; then rm -f "${FILE_TMP}_menu.tmp"; fi
@@ -118,11 +118,11 @@ function display_menu() {
             PS3="${text_welcome} "
             select menu in "${text_menu_description[@]}"; do
                 if [[ "$REPLY" == "q" || "$REPLY" == "Q" ]]; then
-                    choice="${text_menu_name[${#text_menu_name[*]}]}"
-                elif [[ -z "${text_menu_name[$REPLY]}" ]]; then
+                    choice="${MENU_NAME[${#MENU_NAME[*]}]}"
+                elif [[ -z "${MENU_NAME[$REPLY]}" ]]; then
                     choice=""
                 else
-                    choice="${text_menu_name[$REPLY]}"
+                    choice="${MENU_NAME[$REPLY]}"
                 fi
                 break
             done
@@ -134,7 +134,7 @@ function display_menu() {
         # if choice exists, then run-it!
         if [[ "$choice" ]]; then
 
-            key=$(array_search "${choice}" "${text_menu_name[@]}");
+            key=$(array_search "${choice}" "${MENU_NAME[@]}");
 
             if [[ -z "${key}" ]]; then unset choice; else "${choice}"; fi
             unset array key
@@ -192,16 +192,16 @@ function display_mssg() {
 
 function echos_files() {
 
-    write_file "log" "$now ### $FUNCNAME: Attempt ones echos to choose files..."
+    write_file "log" "${NOW} ### $FUNCNAME: Attempt ones echos to choose files..."
 
     local -i i=0 j=1
 
     if [[ "${DIALOG}" -eq 1 ]]; then
 
         items=""
-        for name in "${mtd_name[@]}"; do
+        for name in "${MTD_NAME[@]}"; do
 
-            key=$(array_search "${name}" "${FILES[@]}");
+            key=$(array_search "${name}" "${PART_DEFAULT[@]}");
             if [[ -n "$key" ]] ; then key="on"; else key="off"; fi
 
             items="${items} $j ${name} ${key}"
@@ -213,7 +213,7 @@ function echos_files() {
 
         display_detected "items: ${items}"
 
-        dialog_list_files "${text_menu_files}" "${title_menu_files}" "${items}" "$(count ${mtd_name[@]})"
+        dialog_list_files "${text_menu_files}" "${title_menu_files}" "${items}" "$(count ${MTD_NAME[@]})"
 
         unset items
 
@@ -221,16 +221,16 @@ function echos_files() {
 
     if [[ "${ZENITY}" -eq 1 ]]; then
 
-        #while [ $i -le $(count "${mtd_name[@]}") ]; do
-        for name in "${mtd_name[@]}"; do
+        #while [ $i -le $(count "${MTD_NAME[@]}") ]; do
+        for name in "${MTD_NAME[@]}"; do
 
-            key=$(array_search "${name}" "${FILES[@]}");
+            key=$(array_search "${name}" "${PART_DEFAULT[@]}");
             if [[ -n "${key}" ]]; then echo TRUE; else echo FALSE; fi
 
-            echo "${mtd_name[$i]}"
-            echo "${mtd_size[$i]}"
-            echo "${mtd_addr[$i]}"
-            echo "${mtd_map[$i]}"
+            echo "${name}"
+            echo "${MTD_SIZE[$i]}"
+            echo "${MTD_ADDR[$i]}"
+            echo "${MTD_MAP[$i]}"
 
             let "i = $i + 1";
             unset key
@@ -245,17 +245,14 @@ function echos_files() {
 
 function echos_menu() {
 
-    write_file "log" "$now ### $FUNCNAME: Attempt ones echos to choose menu..."
-
-    local -i i=1
+    write_file "log" "${NOW} ### $FUNCNAME: Attempt ones echos to choose menu..."
 
     if [[ "${DIALOG}" -eq 1 ]]; then
 
-        while [ $i -le $(count "${text_menu_name[@]}") ]; do
+        for name in "${MENU_NAME[@]}"; do
 
-            menu+=("${text_menu_name[$i]}" "${text_menu_description[$i]}")
-
-            let "i = $i + 1";
+            menu+=("${name}" "${MENU_TEXT[${name}]}")
+            #let "i = $i + 1";
 
         done
 
@@ -263,14 +260,15 @@ function echos_menu() {
 
     else
 
-        while [ $i -le $(count "${text_menu_name[@]}") ]; do
-            echo "${text_menu_name[$i]}";
-            echo "${text_menu_description[$i]}";
-            let "i = $i + 1";
+        for name in "${MENU_NAME[@]}"; do
+
+            echo "${name}";
+            echo "${MENU_TEXT[${name}]}";
+
+            unset name
+
         done
 
     fi
-
-	unset i
 
 }

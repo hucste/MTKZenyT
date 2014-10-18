@@ -8,7 +8,8 @@ function MTKZenyTux() {
 
     manage_colors
     test_config_file
-
+    build_vars
+    #EXIT
     write_file "log" "#################################################"
     write_file "log" "### ### ### ${title_welcome} ### ### ###"
     write_file "log" "#################################################"
@@ -23,12 +24,12 @@ function MTKZenyTux() {
 
 function BACKUP() {
 
-    write_file "log" "${now} ### $FUNCNAME: Will try to your backup device !"
+    write_file "log" "${NOW} ### $FUNCNAME: Will try to your backup device !"
 
-    in_array "${GUI}" "${guis[@]}";
+    in_array "${GUI}" "${GUIS[@]}";
     if [[ $? -eq 1 ]]; then
 
-        mssg="${text_feature_disable}${text_choose_gui}${config}"
+        mssg="${text_feature_disable}${text_choose_gui}${CONFIG}"
         mssg="$(printf "${mssg}" "${FUNCNAME}")"
         display_error "${mssg}"
 
@@ -45,7 +46,7 @@ function BACKUP() {
 
             fi
 
-            write_file "log" "$now *** $FUNCNAME: DIR_SVG=${DIR_SVG}"
+            write_file "log" "${NOW} *** $FUNCNAME: DIR_SVG=${DIR_SVG}"
 
             # mkdir dated into DIR_SVG !
             if [[ -d "${DIR_SVG}" ]]; then
@@ -163,6 +164,23 @@ function array_search() {
 
 }
 
+function build_vars() {
+
+    if [[ -n "${MENU_NAME[@]}" ]]; then
+        local i=0
+
+        for name in "${MENU_NAME[@]}"; do
+
+            var="text_menu_description_$name"
+            MENU_TEXT["${name}"]="${!var}"
+            unset var
+
+        done
+
+    fi
+
+}
+
 function choose_directory() {
 
     #display_mssg "n" "Choose an directory, please:"
@@ -184,7 +202,7 @@ function choose_directory() {
 
     fi
 
-    write_file "log" "$now ### $FUNCNAME: ${dir}"
+    write_file "log" "${NOW} ### $FUNCNAME: ${dir}"
 
 }
 
@@ -197,13 +215,13 @@ function chr() {
 
 function convert_str_to_array() {
 
-    write_file "log" "${now} ### $FUNCNAME: string: ${files}"
+    write_file "log" "${NOW} ### $FUNCNAME: string: ${files}"
 
     x=0
     for file in $files; do files[$x]="$file"; let "x = $x + 1"; done
     unset x
 
-    write_file "log" "${now} ### $FUNCNAME: array: ${files[*]}"
+    write_file "log" "${NOW} ### $FUNCNAME: array: ${files[*]}"
 
 }
 
@@ -227,7 +245,7 @@ function delete_dir() {
 
 function destruct() {
 
-    write_file "log" "$now ### $FUNCNAME: Destruct variables"
+    write_file "log" "${NOW} ### $FUNCNAME: Destruct variables"
 
     if [[ "${DIALOG}" && -f "${FILE_TMP}" ]]; then rm -f "${FILE_TMP}"; fi
 
@@ -246,7 +264,7 @@ function detect_device() {
         display_mssg "n" "${text_detect_dev}" "" "1";
     fi
 
-    for (( x=0; x < ${#VID[@]} ; x++ )); do
+    for (( x=0; x < $(count "${VID[@]}") ; x++ )); do
         lsusb=$(lsusb | egrep "${VID[$x]}")
 
         if [[ "${lsusb}" ]]; then
@@ -264,7 +282,7 @@ function detect_device() {
         display_mssg "n" "${text_exit}"
 
         # if GUI=0|no then display press any key
-        in_array "${GUI}" "${guis[@]}"
+        in_array "${GUI}" "${GUIS[@]}"
         if [[ $? -eq 0 ]]; then press_any_key; fi
 
         EXIT
@@ -300,7 +318,7 @@ function detect_device() {
 
     fi
 
-    write_file "log" "$now ### $FUNCNAME: VID:${vid} and PID:${pid} "
+    write_file "log" "${NOW} ### $FUNCNAME: VID:${vid} and PID:${pid} "
 
 }
 
@@ -316,7 +334,7 @@ function dl_file() {
         mssg=$(printf "${text_error_dl}" "$2")
         display_error "${mssg}"
 
-        write_file "log" "$now ### $FUNCNAME: Error to download file: $2 - from: $1"
+        write_file "log" "${NOW} ### $FUNCNAME: Error to download file: $2 - from: $1"
 
         EXIT
     fi
@@ -328,11 +346,11 @@ function dl_yourself() {
     # call: dl_yoursel FILE_NAME
 
     mssg="$(printf "${text_dl_yourself}\n" "$1")"
-    mssg="$(printf "${text_into_tools}\n" "${DIR_Tools}")"
+    mssg="$(printf "${text_into_tools}\n" "${DIR_TOOLS}")"
     mssg="${mssg} ${text_exit_relaunch}"
     display_mssg "i" "${mssg}"
 
-    write_file "log" "$now ### $FUNCNAME: Need to download yourself the file: $1"
+    write_file "log" "${NOW} ### $FUNCNAME: Need to download yourself the file: $1"
 
     EXIT
 
@@ -343,13 +361,13 @@ function explode() {
     # call: array=("$(explode $delimiter $string)")
     # equivalent PHP explode
     local delimiter="$1" string="$2"
-    write_file "log" "${now} ### $FUNCNAME: string: ${string}"
+    write_file "log" "${NOW} ### $FUNCNAME: string: ${string}"
 
     local IFS="${delimiter}"; shift; read -a array <<< "${string}"
 
     if [[ "${array[*]}" ]]; then echo "${array[*]}"; else return 1; fi
 
-    write_file "log" "${now} ### $FUNCNAME: array: ${array[*]}"
+    write_file "log" "${NOW} ### $FUNCNAME: array: ${array[*]}"
 
 }
 
@@ -391,12 +409,12 @@ function extract_archive_zip() {
                 mssg="$(printf "${text_unzip_ok}" "${FILE_SSU_ZIP}")"
                 display_mssg "n" "${mssg}"
 
-                write_file "log" "$now ### $FUNCNAME: Unzip OK: ${DIR_Tools}UPDATE-SuperSU-${version}"
+                write_file "log" "${NOW} ### $FUNCNAME: Unzip OK: ${DIR_TOOLS}UPDATE-SuperSU-${SSU_VERSION}"
             else
                 mssg="$(printf "${text_error_unzip}" "$?" "${FILE_SSU_ZIP}")"
                 display_error "${mssg}"
 
-                write_file "log" "$now ### $FUNCNAME: Unzip KO: ${DIR_Tools}UPDATE-SuperSU-${version}"
+                write_file "log" "${NOW} ### $FUNCNAME: Unzip KO: ${DIR_TOOLS}UPDATE-SuperSU-${SSU_VERSION}"
 
                 press_any_key
                 EXIT
@@ -416,11 +434,11 @@ function extract_info_system() {
 
         local IFS=": "; shift; read -a params <<< "${CMDLINE}"
 
-        info_map["$1"]=${params[4]}
-        mssg=$(printf "${text_system_info}\n" "$1" "${info_map[$1]}" )
+        INFO_MAP["$1"]=${params[4]}
+        mssg=$(printf "${text_system_info}\n" "$1" "${INFO_MAP[$1]}" )
         display_mssg "n" "${mssg}"
 
-        write_file "log" "$now ### $FUNCNAME: $1 == ${info_map[$1]}"
+        write_file "log" "${NOW} ### $FUNCNAME: $1 == ${INFO_MAP[$1]}"
 
     fi
 
@@ -437,18 +455,18 @@ function file_to_array_mtd() {
             local IFS=" "; shift; read -a mtd <<< "$(echo "${line}" | sed 's/\r$//' | tr -s ' ')"
 
             # create arrays dynamic 'mtd_$info_name[value]'
-            in_array "${mtd[0]}" "${NOBCKP[@]}"
+            in_array "${mtd[0]}" "${PART_NOBCKP[@]}"
             if [[ $? -ne 0 ]]; then
 
-                mtd_name[$x]="${mtd[0]}"
-                mtd_size[$x]="${mtd[1]}"
-                mtd_addr[$x]="${mtd[2]}"
-                mtd_type[$x]="${mtd[3]}"
-                mtd_map[$x]="${mtd[4]}"
-                mtd_size_dec[$x]=$(hexdec "${mtd_size[$x]}")
-                mtd_addr_dec[$x]=$(hexdec "${mtd_addr[$x]}")
-                mtd_size_block[$x]=$(bc <<< "${mtd_size_dec[$key]} / ${INODE}")
-                mtd_addr_block[$x]=$(bc <<< "${mtd_addr_dec[$key]} / ${INODE}")
+                MTD_NAME[$x]="${mtd[0]}"
+                MTD_SIZE[$x]="${mtd[1]}"
+                MTD_ADDR[$x]="${mtd[2]}"
+                MTD_TYPE[$x]="${mtd[3]}"
+                MTD_MAP[$x]="${mtd[4]}"
+                MTD_SIZE_DEC[$x]=$(hexdec "${MTD_SIZE[$x]}")
+                MTD_ADDR_DEC[$x]=$(hexdec "${MTD_ADDR[$x]}")
+                MTD_SIZE_BLOCK[$x]=$(bc <<< "${MTD_SIZE_DEC[$key]} / ${INODE}")
+                MTD_ADDR_BLOCK[$x]=$(bc <<< "${MTD_ADDR_DEC[$key]} / ${INODE}")
 
             fi
             unset mtd
@@ -461,17 +479,17 @@ function file_to_array_mtd() {
     unset x
 
     # reindex mtd arrays
-    mtd_name=("${mtd_name[@]}")
-    mtd_size=("${mtd_size[@]}")
-    mtd_addr=("${mtd_addr[@]}")
-    mtd_type=("${mtd_type[@]}")
-    mtd_map=("${mtd_map[@]}")
-    mtd_size_dec=("${mtd_size_dec[@]}")
-    mtd_addr_dec=("${mtd_addr_dec[@]}")
-    mtd_size_block=("${mtd_size_block[@]}")
-    mtd_addr_block=("${mtd_addr_block[@]}")
+    MTD_NAME=("${MTD_NAME[@]}")
+    MTD_SIZE=("${MTD_SIZE[@]}")
+    MTD_ADDR=("${MTD_ADDR[@]}")
+    MTD_TYPE=("${MTD_TYPE[@]}")
+    MTD_MAP=("${MTD_MAP[@]}")
+    MTD_SIZE_DEC=("${MTD_SIZE_DEC[@]}")
+    MTD_ADDR_DEC=("${MTD_ADDR_DEC[@]}")
+    MTD_SIZE_BLOCK=("${MTD_SIZE_BLOCK[@]}")
+    MTD_ADDR_BLOCK=("${MTD_ADDR_BLOCK[@]}")
 
-    write_file "log" "$now ### $FUNCNAME: Create mtd array: mtd_name[ ${mtd_name[*]} ]"
+    write_file "log" "${NOW} ### $FUNCNAME: Create mtd array: MTD_NAME[ ${MTD_NAME[*]} ]"
 
 }
 
@@ -512,13 +530,13 @@ function make_dir_dated() {
 
     if [[ -d "${DIR_SVG}" ]]; then
 
-        DIR_SVG_DATED="${DIR_SVG}/${vid}:${pid}_$now"
+        DIR_SVG_DATED="${DIR_SVG}/${vid}:${pid}_${NOW}"
 
         if [[ ! -d "${DIR_SVG_DATED}" ]]; then
             mkdir "${DIR_SVG_DATED}" && display_detected "${text_dir_ok}" "${DIR_SVG_DATED}"
         fi
 
-        write_file "log" "$now ### $FUNCNAME: DIR_SVG_DATED: ${DIR_SVG_DATED}"
+        write_file "log" "${NOW} ### $FUNCNAME: DIR_SVG_DATED: ${DIR_SVG_DATED}"
 
     fi
 
@@ -528,24 +546,24 @@ function manage_colors() {
 
     i=0
 
-    while [ $i -le $(count ${colors_name[@]}) ]; do
+    while [ $i -le $(count ${COLORS_NAME[@]}) ]; do
 
         if [[ "${DIALOG}" -ne 0 ]]; then
 
-            if [[ -n "${colors_name[$i]}" ]]; then
-                export declare "${colors_name[$i]}"="${colors_value[$i]}"
+            if [[ -n "${COLORS_NAME[$i]}" ]]; then
+                export declare "${COLORS_NAME[$i]}"="${COLORS_VALUE[$i]}"
             fi
 
         elif [[ "${ZENITY}" -ne 0 ]]; then
 
-            if [[ -n "${colors_name[$i]}" ]]; then
-                export declare "${colors_name[$i]}"="${colors_name[$i]}"
+            if [[ -n "${COLORS_NAME[$i]}" ]]; then
+                export declare "${COLORS_NAME[$i]}"="${COLORS_NAME[$i]}"
             fi
 
         else
 
-            if [[ -n "${colors_name[$i]}" ]]; then
-                export declare "${colors_name[$i]}"="3${colors_value[$i]}"
+            if [[ -n "${COLORS_NAME[$i]}" ]]; then
+                export declare "${COLORS_NAME[$i]}"="3${COLORS_VALUE[$i]}"
             fi
 
         fi
@@ -564,7 +582,7 @@ function manage_fonts() {
 
     i=0
 
-    while [ $i -le $(count ${colors_name[@]}) ]; do
+    while [ $i -le $(count ${COLORS_NAME[@]}) ]; do
 
         if [[ "${DIALOG}" -ne 0 ]]; then
 
@@ -616,7 +634,7 @@ function press_any_key() {
 
 function read_config() {
 
-    search=$(grep "$1" "${PWD}/${config}")
+    search=$(grep "$1" "${PWD}/${CONFIG}")
     if [[ -n "${search}" ]]; then
 
         #if [[ "$(grep "^DIR" <<< "${search}")" || "$(grep "^BCKP" <<< "${search}")" ]]; then
@@ -774,7 +792,7 @@ function test_config_file() {
 
     display_mssg "n" "\n${text_detect_cfg}"
 
-    if [[ -f "${config}" && -r "${config}" ]]; then
+    if [[ -f "${CONFIG}" && -r "${CONFIG}" ]]; then
 
         LOG=$(read_config "LOG") && display_detected "LOG=${LOG}"
         BCKP_PHONE=$(read_config "BCKP_PHONE") && display_detected "BCKP_PHONE=${BCKP_PHONE}"
@@ -784,7 +802,7 @@ function test_config_file() {
 
     else
 
-        mssg="$(printf "${text_error_file}\n" "${config}")"
+        mssg="$(printf "${text_error_file}\n" "${CONFIG}")"
         display_error "${mssg}"
 
         press_any_key
@@ -853,7 +871,7 @@ function unroot_to_system() {
         mssg=$(printf "%s" "${text_su_inactive}\n${text_unroot_stop}\n")
         display_error "${mssg}"
 
-        in_array "${GUI}" "${guis[@]}"
+        in_array "${GUI}" "${GUIS[@]}"
         if [[ $? -eq 0 ]]; then press_any_key; fi
 
     fi
@@ -914,11 +932,11 @@ function verify_ssu_exists() {
 function verify_archive() {
 
     if [[ -f "${FILE_SSU_ZIP}" ]]; then
-        local key="$(array_search "${version}" "${stats_ssu_version[@]}")"
+        local key="$(array_search "${SSU_VERSION}" "${STATS_SSU_VERSION[@]}")"
         local stat="$(stat -c "%s" "${FILE_SSU_ZIP}")"
 
-        if [[ "${stat}" -ne "${stats_ssu_size[${key}]}" ]]; then
-            mssg="$(printf "${text_error_zip_ssu}" "${stat}" "${stats_ssu_size[${key}]}")"
+        if [[ "${stat}" -ne "${STATS_SSU_SIZE[${key}]}" ]]; then
+            mssg="$(printf "${text_error_zip_ssu}" "${stat}" "${STATS_SSU_SIZE[${key}]}")"
             display_error "${mssg}"
 
             dl_yourself
@@ -943,7 +961,7 @@ function verify_installed() {
         display_detected "GUI: ${GUI}"
     fi
 
-    in_array "${GUI}" "${guis[@]}"
+    in_array "${GUI}" "${GUIS[@]}"
     if [[ $? -eq 0 ]]; then
 
         # verify if dialog is installed
@@ -973,22 +991,22 @@ function verify_installed() {
 
     if [[ "${DIALOG}" -eq 1 ]]; then
         display_detected "${text_ok_tools}" "Dialog"
-        write_file "log" "$now *** $FUNCNAME: Dialog: Yes!"
+        write_file "log" "${NOW} *** $FUNCNAME: Dialog: Yes!"
     fi
 
     if [[ "${ZENITY}" -eq 1 ]]; then
         display_detected "${text_ok_tools}" "Zenity"
-        write_file "log" "$now *** $FUNCNAME: Zenity: Yes!"
+        write_file "log" "${NOW} *** $FUNCNAME: Zenity: Yes!"
     fi
 
     # adb
     if [[ ! -x $(which adb) ]]; then
         display_error "\n${text_error_not_tools}" "ADB"
-        write_file "log" "$now *** $FUNCNAME: adb: Boo!"
+        write_file "log" "${NOW} *** $FUNCNAME: adb: Boo!"
         EXIT
     else
         display_detected "${text_ok_tools}" "ADB"
-        write_file "log" "$now *** $FUNCNAME: adb: Yes!"
+        write_file "log" "${NOW} *** $FUNCNAME: adb: Yes!"
         adb=$(which adb)
     fi
 
@@ -998,8 +1016,8 @@ function verify_installed() {
 function write_file() {
 
     case $1 in
-        "cfg") sed -i -e "#$2=.*# s##$2=$3#g" "${config}" ;;
-        "log") [[ "${LOG}" -eq 1 ]] && echo "$2" >> "${PWD}/logs/${day}.log" ;;
+        "cfg") sed -i -e "#$2=.*# s##$2=$3#g" "${CONFIG}" ;;
+        "log") [[ "${LOG}" -eq 1 ]] && echo "$2" >> "${PWD}/logs/${DAY}.log" ;;
     esac
 
 }

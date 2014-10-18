@@ -1,22 +1,25 @@
 #!/bin/bash
 
+CONFIG="config.ini" # file to save some variables
+BCKP_PHONE="/sdcard/" # dir to backup into phone
+
 # Packages names
 SuperSU="Superuser.apk"
-SU="su"
-version="2.14"
+SSU_VERSION="2.14"
 SSUD="99SuperSUDaemon"
-
-# others vars - DONT TOUCH!
-PWD=$(pwd)
+SU="su"
 
 # URL app
-DL_SUPERSU="http://download.chainfire.eu/578/SuperSU/UPDATE-SuperSU-v${version}.zip?retrieve_file=1"
+DL_SUPERSU="http://download.chainfire.eu/578/SuperSU/UPDATE-SuperSU-v${SSU_VERSION}.zip?retrieve_file=1"
 URL_SUPERSU="http://download.chainfire.eu/supersu"
 
+# others vars - DONT TOUCH!!!
+PWD=$(pwd)
+
 # Directories where are packages needed into your computer
-DIR_Tools="${PWD}/tools/"
-DIR_UNZIP="${DIR_Tools}UPDATE-SuperSU-v${version}"
-DIR_SSU_UPD="${DIR_Tools}UPDATE-SuperSU-v${version}/"
+DIR_TOOLS="${PWD}/tools/"
+DIR_UNZIP="${DIR_TOOLS}UPDATE-SuperSU-v${SSU_VERSION}"
+DIR_SSU_UPD="${DIR_TOOLS}UPDATE-SuperSU-v${SSU_VERSION}/"
 DIR_ARM="${DIR_SSU_UPD}arm/"
 DIR_CMN="${DIR_SSU_UPD}common/"
 DIR_SSU="${DIR_CMN}${SuperSU}"
@@ -40,56 +43,53 @@ PID[1]="1218" # Redmi PTP with USB Debug
 PID[2]="1228" # Redmi UMS with USB Debug
 PID[3]="1248" # Redmi MTP with USB Debug
 
-# Partitions
-PART_NAME[0]="android"
-PART_NAME[1]="usrdata"
-
-PART_TEXT[0]="system"
-PART_TEXT[1]="data"
-
-# files to saved by default
-#FILES[0]="uboot"
-#FILES[1]="bootimg"
-#FILES[2]="recovery"
-#FILES[3]="logo"
-#FILES[4]="android"
-#FILES[5]="usrdata"
-
-FILES=('uboot' 'bootimg' 'recovery' 'logo' 'android' 'usrdata')
-NOBCKP=('pmt' 'pro_info' 'protect_f' 'protect_s' 'seccfg' 'misc' 'expdb' 'bmtpool')
-
 # Others
-declare -a colors_name=('black' 'red' 'green' 'yellow' 'blue' 'magenta' 'cyan' 'white')
-declare -a colors_value=('0' '1' '2' '3' '4' '5' '6' '7')
-declare -a guis=( 'd' 'dialog' 'z' 'zenity')
-declare -a info_map
-declare -a info_name=('name' 'size' 'addr' 'type' 'map')
-declare -a mtd_addr
-declare -a mtd_map
-declare -a mtd_name
-declare -a mtd_size
-declare -a mtd_type
-declare -a mtd_addr_dec
-declare -a mtd_size_dec
-declare -a stats_ssu_size=('5864' '2647595' '2647622')
-declare -a stats_ssu_version=('2.02' '2.13' '2.14')
+declare -a COLORS_NAME=('black' 'red' 'green' 'yellow' 'blue' 'magenta' 'cyan' 'white')
+declare -a COLORS_VALUE=('0' '1' '2' '3' '4' '5' '6' '7')
 
+declare -a GUIS=( 'd' 'dialog' 'z' 'zenity')
+
+declare -a INFO_MAP
+declare -a INFO_NAME=('name' 'size' 'addr' 'type' 'map')
+
+declare -a MENU_NAME=("ROOT" "UNROOT" "FLASH" "BACKUP" "REBOOT" "EXIT")
+declare -A MENU_TEXT
+
+declare -a MTD_ADDR
+declare -a MTD_MAP
+declare -a MTD_NAME
+declare -a MTD_SIZE
+declare -a MTD_TYPE
+declare -a MTD_ADDR_BLOCK
+declare -a MTD_ADDR_DEC
+declare -a MTD_SIZE_BLOCK
+declare -a MTD_SIZE_DEC
+
+# Partitions
+declare -a PART_NAME=("android" "usrdata")
+declare -a PART_TEXT=("system" "data")
+# files to saved by default
+declare -a PART_DEFAULT=('uboot' 'bootimg' 'recovery' 'logo' 'android' 'usrdata')
+declare -a PART_NOBCKP=('pmt' 'pro_info' 'protect_f' 'protect_s' 'seccfg' 'misc' 'expdb' 'bmtpool')
+
+declare -a STATS_SSU_SIZE=('5864' '2647595' '2647622')
+declare -a STATS_SSU_VERSION=('2.02' '2.13' '2.14')
+
+# Others variable
 adb_su=""
-config="config.ini" # file to save some variables
 dir=""
 
-BCKP_PHONE="/sdcard/"
 DIR_SVG=""
 DIR_SVG_DATED=""
-FILE_PARAM="${DIR_Tools}/dumchar.info"
-FILE_SSU_ZIP="${DIR_Tools}UPDATE-SuperSU-v${version}.zip"
+FILE_PARAM="${DIR_TOOLS}/dumchar.info"
+FILE_SSU_ZIP="${DIR_TOOLS}UPDATE-SuperSU-v${SSU_VERSION}.zip"
 GUI=""
 HOME=~
 
-day=$(date +"%d-%m-%Y")
-now=$(date +"%d-%m-%Y_%H-%M-%S")
+DAY=$(date +"%d-%m-%Y")
+NOW=$(date +"%d-%m-%Y_%H-%M-%S")
 
-choice=0
+CHOICE=0
 CFG=0
 DIALOG=0
 INODE=4096

@@ -120,8 +120,8 @@ function adb_mount_partition() {
         if [[ $? -ne 0 ]]; then
             key=$(array_search "$1" "${PART_TEXT[0]}")
             search="${PART_NAME[${key}]}"
-            key=$(array_search "${search}" "${mtd_name[@]}")
-            adb shell busybox mount "${key}" "${mtd_map[${key}]}"
+            key=$(array_search "${search}" "${MTD_NAME[@]}")
+            adb shell busybox mount "${key}" "${MTD_MAP[${key}]}"
             unset key
         fi
 
@@ -264,9 +264,9 @@ function adb_root_system() {
         sleep 1
 
         if [[ "${ERROR}" -eq 0 ]]; then
-            mssg=$(printf "${text_SSU_installed}" "${version}")
+            mssg=$(printf "${text_SSU_installed}" "${SSU_VERSION}")
         else
-            mssg=$(printf "${text_SSU_install_pb}" "${version}")
+            mssg=$(printf "${text_SSU_install_pb}" "${SSU_VERSION}")
         fi
 
         display_mssg "i" "${mssg}"
@@ -290,17 +290,17 @@ function adb_save_partitions() {
         for (( x=0 ; x < $(count "${files[@]}"); x++ )); do
 
             if [[ "${ZENITY}" -ne 0 ]]; then
-                key=$(bc <<< "$(array_search "${files[$x]}" "${mtd_name[@]}") + 1"); display_detected "key: ${key}"
+                key=$(bc <<< "$(array_search "${files[$x]}" "${MTD_NAME[@]}") + 1"); display_detected "key: ${key}"
             fi
 
             if [[ "${DIALOG}" -ne 0 ]]; then
                 key="${files[$x]}"; display_detected "key: ${key}"
             fi
 
-            ddname="${mtd_name[${key}]}"; display_detected "dd_name: ${ddname}"
-            ddof="${BCKP_PHONE}BACKUP/${mtd_name[${key}]}.img"; display_detected "dd_of: ${ddof}"
+            ddname="${MTD_NAME[${key}]}"; display_detected "dd_name: ${ddname}"
+            ddof="${BCKP_PHONE}BACKUP/${MTD_NAME[${key}]}.img"; display_detected "dd_of: ${ddof}"
             ddif="/dev/${ddname}"; display_detected "dd_if: ${ddif}"
-            ddbs="${mtd_size_dec[${key}]}"; display_detected "dd_bs: ${ddbs}"
+            ddbs="${MTD_SIZE_DEC[${key}]}"; display_detected "dd_bs: ${ddbs}"
 
             adb_write_img "${ddname}" "${ddif}" "${ddof}" "${ddbs}" "${ddskip}"
 
@@ -308,13 +308,13 @@ function adb_save_partitions() {
                 adb pull "${ddof}" "${DIR_SVG_DATED}"
                 adb shell rm -f "${ddof}"
 
-                display_mssg "n" "${text_bckp} ${DIR_SVG_DATED}/${mtd_name[${key}]}.img"
-                write_file "log" "### $FUNCNAME: Partition saved: ${DIR_SVG_DATED}/${mtd_name[${key}]}.img"
+                display_mssg "n" "${text_bckp} ${DIR_SVG_DATED}/${MTD_NAME[${key}]}.img"
+                write_file "log" "### $FUNCNAME: Partition saved: ${DIR_SVG_DATED}/${MTD_NAME[${key}]}.img"
             else
                 mssg="$(printf "${text_error_bckp}" "${ddof}")"
                 display_error "${mssg}"
 
-                write_file "log" "### $FUNCNAME: CANT saving Partition: ${DIR_SVG_DATED}/${mtd_name[${key}]}.img"
+                write_file "log" "### $FUNCNAME: CANT saving Partition: ${DIR_SVG_DATED}/${MTD_NAME[${key}]}.img"
             fi
 
             if [[ -z "$(adb_test "-f ${BCKP_PHONE}BACKUP/nvram.tgz")" ]]; then
@@ -361,9 +361,9 @@ function adb_write_img() {
         display_error "${mssg}"
         display_mssg "n" "${text_bckp_method2}${ddif}"
 
-        ddif="${mtd_map[${key}]}"; display_detected "${ddname}: new dd_if: ${ddif}"
-        ddbs="${mtd_size_block[${key}]}"; display_detected "${ddname}: new dd_bs: ${ddbs}"
-        ddskip="${mtd_addr_block[${key}]}"; display_detected "${ddname}: new dd_skip: ${ddskip}"
+        ddif="${MTD_MAP[${key}]}"; display_detected "${ddname}: new dd_if: ${ddif}"
+        ddbs="${MTD_SIZE_BLOCK[${key}]}"; display_detected "${ddname}: new dd_bs: ${ddbs}"
+        ddskip="${MTD_ADDR_BLOCK[${key}]}"; display_detected "${ddname}: new dd_skip: ${ddskip}"
 
         adb shell "${adb_su}dd if=${ddif} of=${ddof} bs=4096 count=${ddbs} skip=${ddskip}"
 
