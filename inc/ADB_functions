@@ -336,7 +336,7 @@ function adb_write_img() {
 
     local ddname="$1" ddif="$2" ddof="$3" ddbs="$4" ddskip="$5"
 
-    adb shell "${adb_su}dd if=${ddif} of=${ddof} bs=${ddbs} count=1"
+    adb shell 'if [[ -c "${ddif}" ]]; then ${adb_su}dd if=${ddif} of=${ddof} bs=${ddbs} count=1; fi'
 
     if [[ $? -eq 0 ]]; then
 
@@ -351,7 +351,7 @@ function adb_write_img() {
         ddbs="${mtd_size_block[${key}]}"; display_detected "${ddname}: new dd_bs: ${ddbs}"
         ddskip="${mtd_addr_block[${key}]}"; display_detected "${ddname}: new dd_skip: ${ddskip}"
 
-        adb shell "${adb_su}dd if=${ddif} of=${ddof} bs=4096 count=${ddbs} skip=${ddskip}"
+        adb shell 'if [[ -b "${ddif}" ]]; then ${adb_su}dd if=${ddif} of=${ddof} bs=4096 count=${ddbs} skip=${ddskip}; fi'
 
         if [[ $? -eq 0 ]]; then
             display_detected "dd if=${ddif} of=${ddof} bs=4096 count=${ddbs} skip=${ddskip}"
@@ -367,10 +367,11 @@ function adb_write_img() {
 
 function adb_su() {
 
-    #if [[ "${vid}" != "${VID[0]}" ]]; then
-        #adb_su="su -c "
-    #fi
-    adb_su="su -c "
+    adb_su=""
+
+    if [[ "${vid}" != "${VID[0]}" ]]; then
+        adb_su="su -c "
+    fi
 
 }
 
