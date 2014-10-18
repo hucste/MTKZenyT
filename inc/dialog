@@ -28,13 +28,15 @@ function dialog_list_files() {
 
     # call: display_files text title count
     #local height=$(bc <<< "${#mtd_name[@]} * 10 + 5")
-    local text="$1" title="$2" items="$3"
+    local text="$1" title="$2" items="$3" height="$4"
 
-    ${dialog} --stdout --backtitle "${title}" --title "${title}" \
+    ${dialog} --backtitle "${title}" --title "${title}" \
         --ok-label "${text_label_ok}" --cancel-label "${text_label_cancel}" \
-        --checklist "${text}" 0 0 ${#mtd_name[@]} ${items}
+        --checklist "${text}" 0 0 ${height} ${items} 2> /tmp/dialog_checklist_reply.tmp
 
-    unset texte title items
+    echo $? > /tmp/dialog_checklist.tmp
+
+    unset texte title items height
 
 }
 

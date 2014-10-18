@@ -139,7 +139,7 @@ function array_key_exists() {
     # call: if [[ $(array_key_exists key array) ]]; then echo "key exists!"; fi
 
     local key="$1" IFS=" "; shift; read -a array <<< "$@"
-    if [[ "${array[$key]}" ]]; then echo 0; return 1; fi
+    if [[ "${array[$key]}" ]]; then return 0; return 1; fi
 
     unset array key IFS
 
@@ -457,6 +457,17 @@ function file_to_array_mtd() {
 
     done < "${FILE_PARAM}"
     unset x
+
+    # reindex mtd arrays
+    mtd_name=("${mtd_name[@]}")
+    mtd_size=("${mtd_size[@]}")
+    mtd_addr=("${mtd_addr[@]}")
+    mtd_type=("${mtd_type[@]}")
+    mtd_map=("${mtd_map[@]}")
+    mtd_size_dec=("${mtd_size_dec[@]}")
+    mtd_addr_dec=("${mtd_addr_dec[@]}")
+    mtd_size_block=("${mtd_size_block[@]}")
+    mtd_addr_block=("${mtd_addr_block[@]}")
 
     write_file "log" "$now ### $FUNCNAME: Create mtd array: mtd_name[ ${mtd_name[*]} ]"
 

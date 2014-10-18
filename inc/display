@@ -73,6 +73,7 @@ function display_files() {
 
         echos_files
 
+        files="$(cat /tmp/dialog_checklist_reply.tmp)"
         display_detected "files: $files"
 
     fi
@@ -193,35 +194,37 @@ function echos_files() {
 
     write_file "log" "$now ### $FUNCNAME: Attempt ones echos to choose files..."
 
-    i=1
+    local -i i=0 j=1
 
     if [[ "${DIALOG}" -eq 1 ]]; then
 
         items=""
         for name in "${mtd_name[@]}"; do
 
-            key=$(array_search "${mtd_name[$i]}" "${FILES[@]}")
+            key=$(array_search "${name}" "${FILES[@]}");
             if [[ -n "$key" ]] ; then key="on"; else key="off"; fi
 
-            items="${items} $i ${name} ${key}"
+            items="${items} $j ${name} ${key}"
 
-            let "i = $i + 1";
+            let "i = $i + 1"; let "j = $i + 1"
             unset key
 
         done
 
-        files=$(dialog_list_files "${text_menu_files}" "${title_menu_files}" "${items}")
-
         display_detected "items: ${items}"
+
+        dialog_list_files "${text_menu_files}" "${title_menu_files}" "${items}" "$(count ${mtd_name[@]})"
+
         unset items
 
     fi
 
     if [[ "${ZENITY}" -eq 1 ]]; then
 
-        while [ $i -le $(count "${mtd_name[@]}") ]; do
+        #while [ $i -le $(count "${mtd_name[@]}") ]; do
+        for name in "${mtd_name[@]}"; do
 
-            key=$(array_search "${mtd_name[$i]}" "${FILES[@]}");
+            key=$(array_search "${name}" "${FILES[@]}");
             if [[ -n "${key}" ]]; then echo TRUE; else echo FALSE; fi
 
             echo "${mtd_name[$i]}"
@@ -236,7 +239,7 @@ function echos_files() {
 
     fi
 
-    unset array i
+    unset array i j
 
 }
 
