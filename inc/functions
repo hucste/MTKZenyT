@@ -53,7 +53,7 @@ function BACKUP() {
 
             if [[ -f "${FILE_PARAM}" ]]; then
 
-                file_to_array_dynamic
+                file_to_array_mtd
 
                 display_files
 
@@ -413,7 +413,7 @@ function extract_info_system() {
 
 }
 
-function file_to_array_dynamic() {
+function file_to_array_mtd() {
 
     x=0
     # read file param into array
@@ -424,24 +424,19 @@ function file_to_array_dynamic() {
             local IFS=" "; shift; read -a mtd <<< "$(echo "${line}" | sed 's/\r$//' | tr -s ' ')"
 
             # create arrays dynamic 'mtd_$info_name[value]'
-            #for (( j=0; j < $(count "${info_name[@]}"); j++)) {
+            if [[ -z "$(in_array "${mtd_name[$x]}" "${NOBCKP[@]}")" ]]; then
 
-                #export declare "mtd_${info_name[$j]}"
-                #idx="mtd_${info_name[$j]}[$x]"
-                #export declare "mtd_${info_name[$j]}_$x"="${mtd[$j]}"
-                #declare "${idx}"="${mtd[$j]}"
+                mtd_name[$x]="${mtd[0]}"
+                mtd_size[$x]="${mtd[1]}"
+                mtd_addr[$x]="${mtd[2]}"
+                mtd_type[$x]="${mtd[3]}"
+                mtd_map[$x]="${mtd[4]}"
+                mtd_size_dec[$x]=$(hexdec "${mtd_size[$x]}")
+                mtd_addr_dec[$x]=$(hexdec "${mtd_addr[$x]}")
+                mtd_size_block[$x]=$(bc <<< "${mtd_size_dec[$key]} / ${INODE}")
+                mtd_addr_block[$x]=$(bc <<< "${mtd_addr_dec[$key]} / ${INODE}")
 
-            #}
-
-            mtd_name[$x]="${mtd[0]}"
-            mtd_size[$x]="${mtd[1]}"
-            mtd_addr[$x]="${mtd[2]}"
-            mtd_type[$x]="${mtd[3]}"
-            mtd_map[$x]="${mtd[4]}"
-            mtd_size_dec[$x]=$(hexdec "${mtd_size[$x]}")
-            mtd_addr_dec[$x]=$(hexdec "${mtd_addr[$x]}")
-            mtd_size_block[$x]=$(bc <<< "${mtd_size_dec[$key]} / ${INODE}")
-            mtd_addr_block[$x]=$(bc <<< "${mtd_addr_dec[$key]} / ${INODE}")
+            fi
 
             unset mtd
 
@@ -712,7 +707,7 @@ function root_to_recovery() {
 
     if [[ -f "${FILE_PARAM}" ]]; then
 
-        file_to_array_dynamic
+        file_to_array_mtd
 
         adb_root_system
 
