@@ -49,20 +49,24 @@ function BACKUP() {
 
             make_dir_dated
 
-            adb_read_partitions
+            if [[ -d "${DIR_SVG_DATED}" ]]; then
 
-            if [[ -f "${FILE_PARAM}" ]]; then
+                adb_read_partitions
 
-                file_to_array_mtd
+                if [[ -f "${FILE_PARAM}" ]]; then
 
-                display_files
+                    file_to_array_mtd
 
-                #convert_str_to_array
-                if [[ "${files}" ]]; then
-                    files=($(explode " " "${files}"))
+                    display_files
+
+                    #convert_str_to_array
+                    if [[ "${files}" ]]; then
+                        files=($(explode " " "${files}"))
+                    fi
+
+                    adb_save_partitions
+
                 fi
-
-                adb_save_partitions
 
             fi
 
@@ -489,7 +493,10 @@ function make_dir_dated() {
     if [[ -d "${DIR_SVG}" ]]; then
 
         DIR_SVG_DATED="${DIR_SVG}/${vid}:${pid}_$now"
-        mkdir "${DIR_SVG_DATED}" && display_detected "${text_dir_ok}" "${DIR_SVG_DATED}"
+
+        if [[ ! -d "${DIR_SVG_DATED}" ]]; then
+            mkdir "${DIR_SVG_DATED}" && display_detected "${text_dir_ok}" "${DIR_SVG_DATED}"
+        fi
 
         write_file "log" "$now ### $FUNCNAME: DIR_SVG_DATED: ${DIR_SVG_DATED}"
 
