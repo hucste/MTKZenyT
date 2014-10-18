@@ -165,7 +165,9 @@ function adb_root_system() {
     #adb shell mount "${info_map['android']}" /system
     if [[ -z "$(adb_verify_mount system)" ]]; then adb_mount_partition "system"; fi
 
-    if [[ "$(adb shell mount | busybox grep system)" ]]; then
+    local search=$(adb shell grep "system" /proc/mounts)
+    #if [[ "$(adb shell mount | busybox grep system)" ]]; then
+    if [[ -n "${search}" ]]; then
 
         sleep 1
         local ERROR=0
@@ -271,6 +273,7 @@ function adb_root_system() {
         unset mssg ERROR
 
     fi
+    unset search
 
 }
 
@@ -278,11 +281,11 @@ function adb_save_partitions() {
 
     write_file "log" "*** $FUNCNAME: Call ADB to save partitions "
 
-    if [[ -d "${DIR_SVG_DATED}" ]]; then
+    local search=$(adb shell grep "${BCKP_PHONE:1:(-1)}" /proc/mounts)
 
-        adb_su
+    if [[ -n "${search}" ]]; then
 
-        adb shell 'if [[ ! -d "${BCKP_PHONE}BACKUP/" ]]; then mkdir ${BCKP_PHONE}BACKUP; fi'
+        adb shell 'if [[ ! -d "${BCKP_PHONE}BACKUP" ]]; then mkdir ${BCKP_PHONE}BACKUP; fi'
 
         for (( x=0 ; x < $(count "${files[@]}"); x++ )); do
 
@@ -304,8 +307,14 @@ function adb_save_partitions() {
             if [[ -z "$(adb_test "-f ${ddof}")" ]]; then
                 adb pull "${ddof}" "${DIR_SVG_DATED}"
                 adb shell rm -f "${ddof}"
+
+                display_mssg "n" "${text_bckp} ${DIR_SVG_DATED}/${mtd_name[${key}]}.img"
+                write_file "log" "### $FUNCNAME: Partition saved: ${DIR_SVG_DATED}/${mtd_name[${key}]}.img"
             else
-                display_error "!!! It seems Backup failed: ${ddof} not exists !!!"
+                mssg="$(printf "${text_error_bckp}" "${ddof}")"
+                display_error "${mssg}"
+
+                write_file "log" "### $FUNCNAME: CANT saving Partition: ${DIR_SVG_DATED}/${mtd_name[${key}]}.img"
             fi
 
             if [[ -z "$(adb_test "-f ${BCKP_PHONE}BACKUP/nvram.tgz")" ]]; then
@@ -315,8 +324,7 @@ function adb_save_partitions() {
                 fi
             fi
 
-            write_file "log" "### $FUNCNAME: Partition saved: ${DIR_SVG_DATED}/${mtd_name[${key}]}.img"
-            display_mssg "n" "ADB saved partition: ${DIR_SVG_DATED}/${mtd_name[${key}]}.img"
+
             sleep 1
 
             unset ddif ddof ddbs ddskip key
@@ -324,9 +332,14 @@ function adb_save_partitions() {
         done
         unset x
 
+    else
+
+        mssg="$(printf "${text_bckp_phone_inexists}" "${BCKP_PHONE}")"
+        display_error "${mssg}"
+
     fi
 
-    unset array
+    unset search
 
 }
 
@@ -336,7 +349,7 @@ function adb_write_img() {
 
     local ddname="$1" ddif="$2" ddof="$3" ddbs="$4" ddskip="$5"
 
-    adb shell 'if [[ -c "${ddif}" ]]; then ${adb_su}dd if=${ddif} of=${ddof} bs=${ddbs} count=1; fi'
+    adb shell "${adb_su}dd if=${ddif} of=${ddof} bs=${ddbs} count=1"
 
     if [[ $? -eq 0 ]]; then
 
@@ -344,19 +357,22 @@ function adb_write_img() {
 
     else
 
-        display_error "!!! Error during write img ${ddif} !!!"
-        display_mssg "i" "We trying another method to backup your partition : ${ddif}"
+        mssg="$(printf "${text_error_write_img}" "${ddif}")"
+        display_error "${mssg}"
+        display_mssg "n" "${text_bckp_method2}${ddif}"
 
         ddif="${mtd_map[${key}]}"; display_detected "${ddname}: new dd_if: ${ddif}"
         ddbs="${mtd_size_block[${key}]}"; display_detected "${ddname}: new dd_bs: ${ddbs}"
         ddskip="${mtd_addr_block[${key}]}"; display_detected "${ddname}: new dd_skip: ${ddskip}"
 
-        adb shell 'if [[ -b "${ddif}" ]]; then ${adb_su}dd if=${ddif} of=${ddof} bs=4096 count=${ddbs} skip=${ddskip}; fi'
+        adb shell "${adb_su}dd if=${ddif} of=${ddof} bs=4096 count=${ddbs} skip=${ddskip}"
 
         if [[ $? -eq 0 ]]; then
             display_detected "dd if=${ddif} of=${ddof} bs=4096 count=${ddbs} skip=${ddskip}"
         else
-            display_error "!!! Error during write img with this other method: ${ddif} !!!"
+            mssg="$(printf "" "${ddif}")"
+            display_error "${mssg}"
+            display_mssg "n" "${text_sorry}"
         fi
 
     fi

@@ -7,6 +7,10 @@ text_ask_dl="=> Voulez-vous que je le télécharge maintenant ?"
 text_ask_restart="=> Voulez-vous que je le redémarre pour vous maintenant ?"
 text_ask_reboot_system="Maintenant, voulez-vous redémarrer le système pour finaliser l'installation ?"
 
+text_bcp="ADB a sauvegardé la partition : "
+text_bckp_method2="Nous allons essayer une autre manière de sauvegarder votre partition : "
+text_bckp_phone_inexists="%s semble ne pas être accessible.\n La sauvegarde ne peut être faite..."
+
 text_choice_invalid="Ce choix n'est pas valide. Par 'o' ou 'n'..."
 text_choose_gui="SVP, choisissez une interface graphique, telle que : dialog, ou zenity ...\n Configurez le fichier de config : "
 
@@ -32,10 +36,13 @@ text_dir_ssu_upd="Il semble que l'archive a déjà été décompressée. \nLe r�
 text_dl_file="URL pour curl: %s"
 text_dl_yourself="Téléchargez vous-même l'application %s !"
 
+text_error_bckp="!!! Erreur : Il semble que la sauvegarde n'a pas eu lieu : %s n'existe pas !!!"
 text_error_dl="!!! Erreur pendant le téléchargement %s !!!"
 text_error_file="!!! Erreur avec le fichier %s! Vérifiez sa présence et ses droits en lecture ..."
 text_error_not_tools="L'outil %s n'est pas installé. Veuillez faire le nécessaire !"
 text_error_unzip="!!! Erreur (Code: %s) avec l'archive %s!\nIl semble y avoir un problème durant la décompression.\nVeuillez la vérifier !"
+text_error_write_img="!!! Erreur : Le fichier %s ne peut être écrit !"
+text_error_write_img_2="!!! Erreur : Le fichier %s ne peut pas être écrit avec la seconde méthode !!!"
 text_error_zip_ssu="!!! Erreur : La taille de l'archive zip de SuperSU n'est pas bonne : %s (elle devrait être de %s) !!!"
 
 text_exit="Le script va s'arrêter ..."
@@ -92,6 +99,8 @@ text_reboot_yourself="Redémarrez-vous-même l'appareil !"
 text_remove="Suppression de %s"
 
 text_see_phone="SVP, regardez votre téléphone pour accepter l'accès à ADB Shell par SuperSU ! (si besoin)"
+
+text_sorry="Désolé, mais nous ne pouvons rien faire de plus !"
 
 text_ssu_exists="L'archive de SuperSu est bien sur votre ordinateur ! Bonne chose..."
 text_SSU_installed="SuperSU %s devrait être installé !"

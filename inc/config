@@ -48,13 +48,14 @@ PART_TEXT[0]="system"
 PART_TEXT[1]="data"
 
 # files to saved by default
-FILES[0]="uboot"
-FILES[1]="bootimg"
-FILES[2]="recovery"
-FILES[3]="logo"
-FILES[4]="android"
-FILES[5]="usrdata"
+#FILES[0]="uboot"
+#FILES[1]="bootimg"
+#FILES[2]="recovery"
+#FILES[3]="logo"
+#FILES[4]="android"
+#FILES[5]="usrdata"
 
+FILES=('uboot' 'bootimg' 'recovery' 'logo' 'android' 'usrdata')
 NOBCKP=('pmt' 'pro_info' 'protect_f' 'protect_s' 'seccfg' 'misc' 'expdb' 'bmtpool')
 
 # Others

@@ -7,6 +7,10 @@ text_ask_dl="=> Do you want download now for you?"
 text_ask_restart="=> Do you wan't to restart-it for you?"
 text_ask_reboot_system="Now, do you wan't reboot into system to finalize install?"
 
+text_bckp="ADB backuped partition: "
+text_bckp_method2="We trying another method to backup your partition : "
+text_bckp_phone_inexists="%s seems not be accessible.\n The backup can't be create..."
+
 text_choice_invalid="This choice isn't valid. By 'y' or 'n'..."
 text_choose_gui="Please, choose a GUI to use: dialog, or zenity...\n Configure file config: "
 
@@ -32,10 +36,13 @@ text_dir_ssu_upd="It seems that the archive has been unpacked. \nThe relative fo
 text_dl_file="URL to curl: %s"
 text_dl_yourself="Download yourself the app %s!"
 
+text_error_bckp="!!! ERROR: It seems Backup failed: %s not exists !!!"
 text_error_file="!!! ERROR with file %s! Checks its presence and its readable..."
 text_error_dl="!!! Error during download %s !!!"
 text_error_not_adb="ADB isn't install. Do the needful!"
 text_error_unzip="!!! ERROR (Code: %s) with archive %s!\nIt seems a problem to unzip-it...\nPlease, check-it!"
+text_error_write_img="!!! ERROR during write img %s !!!"
+text_error_write_img_2="!!! Error during write img %s with this other method !!!"
 text_error_zip_ssu="!!! ERROR: Size of Archive zip SuperSU is not good: %s (should be %s) !!!"
 
 text_exit="The script will exit..."
@@ -91,6 +98,8 @@ text_reboot_yourself="Reboot yourself the device!"
 text_remove="Remove %s"
 
 text_see_phone="Please, see your phone to accept ADB shell by SuperSU! (if need...)"
+
+text_sorry="Sorry, but we can't do anything more!"
 
 text_su_cp="cp SU binary into "
 text_su_inactive="It seems SU is inactive... may-be isn't installed?"
