@@ -25,57 +25,62 @@ function BACKUP() {
 
     write_file "log" "${now} ### $FUNCNAME: Will try to your backup device !"
 
-    if [[ -z "$(in_array "${GUI}" "${guis[@]}")" ]]; then
+    in_array "${GUI}" "${guis[@]}";
+    if [[ $? -eq 1 ]]; then
 
         mssg="${text_feature_disable}${text_choose_gui}${config}"
         mssg="$(printf "${mssg}" "${FUNCNAME}")"
         display_error "${mssg}"
 
-    elif [[ "$(adb_whoami)" == "root" ]]; then
+    else
 
-        # obtain dir to save
-        if [[ -z "${DIR_SVG}" ]]; then
+        if [[ "$(adb_whoami)" == "root" ]]; then
 
-            #DIR_SVG=$(choose_directory "d" "${title_dir_svg}")
-            choose_directory "d" "${title_dir_svg}" && DIR_SVG="${dir}"
-            write_file "cfg" "DIR_SVG" "${DIR_SVG}"
+            # obtain dir to save
+            if [[ -z "${DIR_SVG}" ]]; then
 
-        fi
+                #DIR_SVG=$(choose_directory "d" "${title_dir_svg}")
+                choose_directory "d" "${title_dir_svg}" && DIR_SVG="${dir}"
+                write_file "cfg" "DIR_SVG" "${DIR_SVG}"
 
-        write_file "log" "$now *** $FUNCNAME: DIR_SVG=${DIR_SVG}"
+            fi
 
-        # mkdir dated into DIR_SVG !
-        if [[ -d "${DIR_SVG}" ]]; then
+            write_file "log" "$now *** $FUNCNAME: DIR_SVG=${DIR_SVG}"
 
-            make_dir_dated
+            # mkdir dated into DIR_SVG !
+            if [[ -d "${DIR_SVG}" ]]; then
 
-            if [[ -d "${DIR_SVG_DATED}" ]]; then
+                make_dir_dated
 
-                adb_read_partitions
+                if [[ -d "${DIR_SVG_DATED}" ]]; then
 
-                if [[ -f "${FILE_PARAM}" ]]; then
+                    adb_read_partitions
 
-                    file_to_array_mtd
+                    if [[ -f "${FILE_PARAM}" ]]; then
 
-                    display_files
+                        file_to_array_mtd
 
-                    #convert_str_to_array
-                    if [[ "${files}" ]]; then
-                        files=($(explode " " "${files}"))
+                        display_files
+
+                        #convert_str_to_array
+                        if [[ "${files}" ]]; then
+                            files=($(explode " " "${files}"))
+                        fi
+
+                        adb_save_partitions
+
                     fi
-
-                    adb_save_partitions
 
                 fi
 
             fi
 
+        else
+
+            mssg=$(printf "%s" "${text_su_inactive}\n${text_unroot_stop}\n")
+            display_error "${mssg}"
+
         fi
-
-    else
-
-        mssg=$(printf "%s" "${text_su_inactive}\n${text_unroot_stop}\n")
-        display_error "${mssg}"
 
     fi
 
@@ -256,7 +261,9 @@ function detect_device() {
         display_error "${text_dev_unrecognized}\n"
         display_mssg "n" "${text_exit}"
 
-        if [[ -z "$(in_array "${GUI}" "${guis[@]}")"  ]]; then press_any_key; fi
+        # if GUI=0|no then display press any key
+        in_array "${GUI}" "${guis[@]}"
+        if [[ $? -eq 0 ]]; then press_any_key; fi
 
         EXIT
 
@@ -423,12 +430,13 @@ function file_to_array_mtd() {
     # read file param into array
     while read line; do
 
-        if [[ "$x" -ge 1 && "$x" -le 22 ]]; then
+        if [[ $x -ge 1 && $x -le 22 ]]; then
 
             local IFS=" "; shift; read -a mtd <<< "$(echo "${line}" | sed 's/\r$//' | tr -s ' ')"
 
             # create arrays dynamic 'mtd_$info_name[value]'
-            if [[ -z "$(in_array "${mtd_name[$x]}" "${NOBCKP[@]}")" ]]; then
+            in_array "${mtd[0]}" "${NOBCKP[@]}"
+            if [[ $? -ne 0 ]]; then
 
                 mtd_name[$x]="${mtd[0]}"
                 mtd_size[$x]="${mtd[1]}"
@@ -441,7 +449,6 @@ function file_to_array_mtd() {
                 mtd_addr_block[$x]=$(bc <<< "${mtd_addr_dec[$key]} / ${INODE}")
 
             fi
-
             unset mtd
 
         fi
@@ -451,7 +458,7 @@ function file_to_array_mtd() {
     done < "${FILE_PARAM}"
     unset x
 
-    write_file "log" "$now ### $FUNCNAME: Create mtd array dynamic: mtd_name[ ${mtd_name[*]} ]"
+    write_file "log" "$now ### $FUNCNAME: Create mtd array: mtd_name[ ${mtd_name[*]} ]"
 
 }
 
@@ -479,7 +486,7 @@ function in_array() {
     local i=0 needle="$1" IFS=" "; shift; read -a array <<< "$@"
 
     while [ $i -le ${#array[@]} ]; do
-        if [[ "${array[$i]}" == "${needle}" ]]; then echo 0; fi # true
+        if [[ "${array[$i]}" == "${needle}" ]]; then return 0; fi # true
         let "i = $i + 1"
     done
     return 1
@@ -652,7 +659,7 @@ function reboot_recovery() {
                 *)
                     display_error "${text_choice_invalid}"
                     press_any_key
-                    reboot_system
+                    reboot_recovery
                 ;;
             esac
         done
@@ -740,6 +747,7 @@ function steps_to_recovery() {
 
     adb_reboot_recovery
 
+    display_mssg "n" "${press_any_key_after_reboot}"
     press_any_key
 
     detect_device
@@ -832,7 +840,8 @@ function unroot_to_system() {
         mssg=$(printf "%s" "${text_su_inactive}\n${text_unroot_stop}\n")
         display_error "${mssg}"
 
-        if [[ -z "$(in_array "${GUI}" "${guis[@]}")" ]]; then press_any_key; fi
+        in_array "${GUI}" "${guis[@]}"
+        if [[ $? -eq 0 ]]; then press_any_key; fi
 
     fi
 
@@ -917,11 +926,12 @@ function verify_installed() {
     sleep 1
 
     if [[ "${GUI}" ]]; then
-        GUI=$(awk '{print tolower($0)}' <<< $GUI);
+        GUI=$(awk '{print tolower($0)}' <<< ${GUI});
         display_detected "GUI: ${GUI}"
     fi
 
-    if [[ "$(in_array "${GUI}" "${guis[@]}")" ]]; then
+    in_array "${GUI}" "${guis[@]}"
+    if [[ $? -eq 0 ]]; then
 
         # verify if dialog is installed
         if [[ (( "${GUI}" == "d" || "${GUI}" == "dialog" )) && -x $(which dialog) ]]; then
