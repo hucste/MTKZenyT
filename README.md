@@ -9,9 +9,11 @@ Author
 ------
 
 **HUC Stéphane** : <devs@stephane-huc.net><br />
-alias *ATP* :
-- <http://en.miui.com/index.php?192725708>
-
+*alias* : *[ATP:RedRice][1]*, *[ATP:MIUI][2]*, *[ATP][3]*
+[1]: http://en.miui.com/index.php?192725708
+[2]: http://forum.frandroid.com/user/1514-atpmiui/
+[3]: http://www.freaktab.com/member.php?42437-ATP
+<br />
 *GIT* : <https://github.com/hucste/MTKZenyT>
 
 ----
@@ -26,7 +28,7 @@ This tool use :
     - <http://download.chainfire.eu/supersu> <br />
 	- <https://play.google.com/store/apps/details?id=eu.chainfire.supersu> <br />
 
-<em>It's possible to use <b>dialog</b> or <b>zenity</b>, if you have installed them.</em>
+*It's possible to use <b>dialog</b> or <b>zenity</b>, if you have installed them.*
 
 ---
 
@@ -49,7 +51,7 @@ You can rename-it, but in this case, change value into script bash /inc/config
     - dialog: `GUI=d` or `GUI=dialog`
     - zenity: `GUI=z` or `GUI=zenity`
     - no: `GUI=0` or `GUI=no`
-2. **To log activities:** *Change value of LOG***
+2. **To log activities:** *Change value of **LOG***
     - `0` to disable,
     - `1` to enable.
 3. **BACK_PHONE** is variable to indicate where create backups into your phone.
