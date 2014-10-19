@@ -167,11 +167,10 @@ function array_search() {
 function build_vars() {
 
     if [[ -n "${MENU_NAME[@]}" ]]; then
-        local i=0
 
         for name in "${MENU_NAME[@]}"; do
-
-            var="text_menu_description_$name"
+            # fill array MENU_TEXT...
+            var="text_menu_$name"
             MENU_TEXT["${name}"]="${!var}"
             unset var
 
