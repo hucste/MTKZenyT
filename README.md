@@ -1,47 +1,72 @@
 MTKZenyT
 ========
 
-(French project!)
+*(EN/FR project!)*
 
 Scripts Bash to flash MT6589 (as Xiaomi Redmi) under Linux.
 
 Author
-======
-HUC Stéphane : <devs@stephane-huc.net>
-alias ATP : 
-	- http://en.miui.com/index.php?192725708
-GIT : https://github.com/hucste/MTKZenyT
+------
+
+**HUC Stéphane** : <devs@stephane-huc.net><br />
+alias *ATP* :
+- <http://en.miui.com/index.php?192725708>
+
+*GIT* : <https://github.com/hucste/MTKZenyT>
 
 ----
 
 This tool use :
 
-- adb commands: Please see your distribution Linux.
-- SuperSU app
+1. **adb tools** <br />
+    - For *Buntu 13.04 >= (and like), use PPA:
+    <https://launchpad.net/~phablet-team/+archive/tools>
+2. **SuperSU** <br />
+	- <http://www.chainfire.eu/> <br />
+    - <http://download.chainfire.eu/supersu> <br />
+	- <https://play.google.com/store/apps/details?id=eu.chainfire.supersu> <br />
 
-1/ adb tools 
-    For *Buntu 13.04 >= (and like), use PPA:
-    https://launchpad.net/~phablet-team/+archive/tools
-
-2/ SuperSU
-	http://www.chainfire.eu/
-	https://play.google.com/store/apps/details?id=eu.chainfire.supersu
+<em>It's possible to use <b>dialog</b> or <b>zenity</b>, if you have installed them.</em>
 
 ---
 
 USE
-====
-1/ make script MTK_Shell_Tools executable!
-2/ IMPERATIVE: run-it in terminal-console.
-3/ answer questions :p
+---
+
+1. make script MTK_Shell_Tools executable!
+2. run-it in terminal-console.
+3. answer questions :p
 
 Config
-======
-It's possible to use file config.
+------
+
+It's possible to use file config, named 'config.ini'.<br />
+You can rename-it, but in this case, change value into script bash /inc/config
+
+**To use:**
+
+1. **To display a GUI:** *Change value of **GUI***
+    - dialog: `GUI=d` or `GUI=dialog`
+    - zenity: `GUI=z` or `GUI=zenity`
+    - no: `GUI=0` or `GUI=no`
+2. **To log activities:** *Change value of LOG***
+    - `0` to disable,
+    - `1` to enable.
+3. **BACK_PHONE** is variable to indicate where create backups into your phone.
+4. **DIR_SVG** is variable to indicate where pull backups into your computer.
+
 
 Enjoy-it!
-=========
+---------
 
-!!! It's a beta development!
+!!! It's a development! <br />
 !!! It's really possible not run!!!
+
+Forum
+-----
+
+I can help you sometimes, asap, in French onto [FrAndroid][1], or in English onto [FreakTab][2]!
+
+[2]: http://www.freaktab.com/showthread.php?17985-MT6589-%28Xiaomi-Redmi%29-Root-n-flash-under-Linux
+[1]: http://forum.frandroid.com/topic/205201-redmi-1-outils-sous-linux/
 
