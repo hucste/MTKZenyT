@@ -273,7 +273,7 @@ function destruct() {
 
     write_file "log" "${NOW} ### $FUNCNAME: Destruct variables"
 
-    if [[ -D "${SCRIPT_TMP_DIR}" ]]; then rm -f "${SCRIPT_TMP_DIR}"; fi
+    if [[ -d "${SCRIPT_TMP_DIR}" ]]; then rm -f "${SCRIPT_TMP_DIR}"; fi
 
     unset DIALOG FILE_TMP ZENITY
     unset archive choice mssg
@@ -1055,7 +1055,7 @@ function verify_installed() {
     fi
 
     # Make dir tmp
-    if [[ ! -n "${SCRIPT_TMP_DIR}" ]]; then mkdir "${SCRIPT_TMP_DIR}"; fi
+    if [[ ! -d "${SCRIPT_TMP_DIR}" ]]; then mkdir "${SCRIPT_TMP_DIR}"; fi
 
 }
 
