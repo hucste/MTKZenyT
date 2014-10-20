@@ -2,66 +2,107 @@
 
 function zenity_directory() {
 
-    if [[ "$1" == "d" ]]; then
-        ${zenity} --directory --file-selection --title="$2"
+    local index="$1" title="$2"
+
+    if [[ "${index}" == "d" ]]; then
+        ${zenity} --directory --file-selection --title="${title}"
     else
-        ${zenity} --file-selection --title="$2"
+        ${zenity} --file-selection --title="${title}"
     fi
+
+    unset index title
 
 }
 
 function zenity_error() {
 
-    ${zenity} --error --timeout=7 --text "$1" --title "$2"
+    local text="$1" title="$2"
+
+    ${zenity} --error --timeout=7 --text "${text}" --title "${title}"
+
+    unset text title
 
 }
 
 function zenity_info() {
 
-    ${zenity} --info --text="$1" --title="$2"
+    local text="$1" title="$2"
+
+    ${zenity} --info --text="${text}" --title="${title}"
+
+    unset text title
 
 }
 
 function zenity_list() {
 
+    local text="$1" title="$2" size="$3"
     #height=$(bc <<< "$3 * 45 + 5")
-    height=250
+    local height=250
 
     ${zenity} --column="${text_column_name}" --column="${text_column_description}" \
         --list --height="${height}" --width=500 \
-        --text "$1" --title "$2"
+        --text "${text}" --title "${title}"
+
+    unset text title size height
 
 }
 
 function zenity_list_files() {
 
+    local text="$1" title="$2" size="$3"
     #height=$(bc <<< "$3 * 40 + 5")
-    height=300
+    local height=300
 
     ${zenity} --checklist \
         --column="###" \
         --column="${text_column_name}" --column="${text_column_size}" \
         --column="${text_column_addr}" --column="${text_column_map}" \
         --list --height=${height} --width=620 --separator=' '\
-        --text "$1" --title "$2"
+        --text "${text}" --title "${title}"
+
+    case $? in
+        1|255)
+            display_mssg "q" "${text_gui_cancel}"
+            read=$(<${SCRIPT_TMP_DIR}yesno.tmp)
+            case "${read}" in
+                0) display_menu ;;
+                1|255) display_files ;;
+            esac
+        ;;
+    esac
+
+    unset text title size height
 
 }
 
 function zenity_notify() {
 
-	${zenity} --notification --text="$1" --title="$2" --timeout=3
+    local text="$1" title="$2"
+
+	${zenity} --notification --text "${text}" --title "${title}" --timeout=3
+
+    unset text title
 
 }
 
 function zenity_progress() {
 
+    local text="$1" title="$2"
+
     ${zenity} --auto-close --no-cancel --percentage=0 --progress  --pulsate \
-        --text="$1" --title="$2"
+        --text "${text}" --title "${title}"
+
+    unset text title
 
 }
 
 function zenity_question() {
 
-    ${zenity} --question --text="$1" --title="$2"
+    local text="$1" title="$2"
+
+    ${zenity} --question --text "${text}" --title "${title}"; echo $? > "${SCRIPT_TMP_DIR}yesno.tmp"
+
+    unset text title
 
 }

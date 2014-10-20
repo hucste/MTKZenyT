@@ -9,7 +9,7 @@ function MTKZenyTux() {
     manage_colors
     test_config_file
     build_vars
-    #EXIT
+
     write_file "log" "#################################################"
     write_file "log" "### ### ### ${title_welcome} ### ### ###"
     write_file "log" "#################################################"
@@ -24,14 +24,12 @@ function MTKZenyTux() {
 
 function BACKUP() {
 
-    write_file "log" "${NOW} ### $FUNCNAME: Will try to your backup device !"
+    write_file "log" "${NOW} ### $FUNCNAME: Will try to backup your device!"
 
     in_array "${GUI}" "${GUIS[@]}";
     if [[ $? -eq 1 ]]; then
 
-        mssg="${text_feature_disable}${text_choose_gui}${CONFIG}"
-        mssg="$(printf "${mssg}" "${FUNCNAME}")"
-        display_error "${mssg}"
+        display_feature_with_gui "${FUNCNAME}"
 
     else
 
@@ -41,7 +39,7 @@ function BACKUP() {
             if [[ -z "${DIR_SVG}" ]]; then
 
                 #DIR_SVG=$(choose_directory "d" "${title_dir_svg}")
-                choose_directory "d" "${title_dir_svg}" && DIR_SVG="${dir}"
+                choose_directory "d" "${title_dir_svg}" && DIR_SVG="${DIR_CHOOSED}"
                 write_file "cfg" "DIR_SVG" "${DIR_SVG}"
 
             fi
@@ -65,7 +63,7 @@ function BACKUP() {
 
                         #convert_str_to_array
                         if [[ "${files}" ]]; then
-                            files=($(explode " " "${files}"))
+                            FILES_CHOOSED=($(explode " " "${files}"))
                         fi
 
                         adb_save_partitions
@@ -89,8 +87,7 @@ function BACKUP() {
 
 function CUSTOM() {
 
-    mssg="$(printf "${text_feature_disable}" "${FUNCNAME}")"
-    display_error "${mssg}"
+    display_feature_disable "${FUNCNAME}"
 
 }
 
@@ -182,26 +179,56 @@ function build_vars() {
 
 function choose_directory() {
 
-    #display_mssg "n" "Choose an directory, please:"
+    local index="$1" name="$2"
 
     if [[ "${DIALOG}" -ne 0 ]]; then
 
-        case "$1" in
-            "d") dir=$(dialog_select_dir "$2") ;;
-            "f") dir=$(dialog_select_file "$2") ;;
+        case "${index}" in
+            "d") DIR_CHOOSED=$(dialog_select_dir "${name}") ;;
+            "f")
+                FILE_CHOOSED=$(dialog_select_file "${name}")
+
+                if [[ -z "${FILE_CHOOSED}" ]]; then
+                    display_error "${text_error_not_files} : ${name}"
+                    choose_directory "${index}" "${name}"
+                fi
+            ;;
         esac
 
     elif [[ "${ZENITY}" -ne 0 ]]; then
 
-        dir=$(zenity_directory "$1" "$2");
+        if [[ "${index}" == "d" ]]; then
+            DIR_CHOOSED=$(zenity_directory "${index}" "${name}");
+        else
+
+            FILE_CHOOSED=$(zenity_directory "${index}" "${name}");
+
+            if [[ -z "${FILE_CHOOSED}" ]]; then
+                display_error "${text_error_not_files} : ${name}"
+                choose_directory "${index}" "${name}"
+            fi
+        fi
+
+        #REPLY="$(cat /tmp/zenity_directory.tmp)"
+        #case "${REPLY}" in
+            #1|-1)
+                #unset DIR_CHOOSED FILE_CHOOSED
+                #choose_directory "${index}" "${name}"
+            #;;
+        #esac
+
+        echo "File_choosed: $FILE_CHOOSED"
+        #if [[  ]]; then choose_directory "$1" "$2"
 
     else
 
-        read -p "$2" dir
+        read -p "${name}" DIR_CHOOSED
 
     fi
 
-    write_file "log" "${NOW} ### $FUNCNAME: ${dir}"
+    unset index name
+
+    write_file "log" "${NOW} ### $FUNCNAME: ${DIR_CHOOSED}{FILE_CHOOSED}"
 
 }
 
@@ -246,7 +273,7 @@ function destruct() {
 
     write_file "log" "${NOW} ### $FUNCNAME: Destruct variables"
 
-    if [[ "${DIALOG}" && -f "${FILE_TMP}" ]]; then rm -f "${FILE_TMP}"; fi
+    if [[ -D "${SCRIPT_TMP_DIR}" ]]; then rm -f "${SCRIPT_TMP_DIR}"; fi
 
     unset DIALOG FILE_TMP ZENITY
     unset archive choice mssg
@@ -444,6 +471,17 @@ function extract_info_system() {
 }
 
 function file_to_array_mtd() {
+
+    # init arrays mtd
+    MTD_NAME=()
+    MTD_SIZE=()
+    MTD_ADDR=()
+    MTD_TYPE=()
+    MTD_MAP=()
+    MTD_SIZE_DEC=()
+    MTD_ADDR_DEC=()
+    MTD_SIZE_BLOCK=()
+    MTD_ADDR_BLOCK=()
 
     x=0
     # read file param into array
@@ -931,14 +969,17 @@ function verify_ssu_exists() {
 function verify_archive() {
 
     if [[ -f "${FILE_SSU_ZIP}" ]]; then
+
         local key="$(array_search "${SSU_VERSION}" "${STATS_SSU_VERSION[@]}")"
         local stat="$(stat -c "%s" "${FILE_SSU_ZIP}")"
 
         if [[ "${stat}" -ne "${STATS_SSU_SIZE[${key}]}" ]]; then
+
             mssg="$(printf "${text_error_zip_ssu}" "${stat}" "${STATS_SSU_SIZE[${key}]}")"
             display_error "${mssg}"
 
             dl_yourself
+
         else
 
             extract_archive_zip
@@ -956,8 +997,10 @@ function verify_installed() {
     sleep 1
 
     if [[ "${GUI}" ]]; then
+
         GUI=$(awk '{print tolower($0)}' <<< ${GUI});
         display_detected "GUI: ${GUI}"
+
     fi
 
     in_array "${GUI}" "${GUIS[@]}"
@@ -1006,8 +1049,13 @@ function verify_installed() {
     else
         display_detected "${text_ok_tools}" "ADB"
         write_file "log" "${NOW} *** $FUNCNAME: adb: Yes!"
-        adb=$(which adb)
+        #adb=$(which adb)
+        adb kill-server
+        adb start-server
     fi
+
+    # Make dir tmp
+    if [[ ! -n "${SCRIPT_TMP_DIR}" ]]; then mkdir "${SCRIPT_TMP_DIR}"; fi
 
 }
 

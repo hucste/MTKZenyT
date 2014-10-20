@@ -277,6 +277,12 @@ function adb_root_system() {
 
 }
 
+function adb_flash_partitions() {
+
+    write_file "log" "*** $FUNCNAME: Call ADB to flash partitions "
+
+}
+
 function adb_save_partitions() {
 
     write_file "log" "*** $FUNCNAME: Call ADB to save partitions "
@@ -290,11 +296,11 @@ function adb_save_partitions() {
         for (( x=0 ; x < $(count "${files[@]}"); x++ )); do
 
             if [[ "${ZENITY}" -ne 0 ]]; then
-                key=$(bc <<< "$(array_search "${files[$x]}" "${MTD_NAME[@]}") + 1"); display_detected "key: ${key}"
+                key=$(bc <<< "$(array_search "${FILES_CHOOSED[$x]}" "${MTD_NAME[@]}") + 1"); display_detected "key: ${key}"
             fi
 
             if [[ "${DIALOG}" -ne 0 ]]; then
-                key="${files[$x]}"; display_detected "key: ${key}"
+                key="${FILES_CHOOSED[$x]}"; display_detected "key: ${key}"
             fi
 
             ddname="${MTD_NAME[${key}]}"; display_detected "dd_name: ${ddname}"

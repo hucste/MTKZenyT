@@ -47,6 +47,8 @@ PID[3]="1248" # Redmi MTP with USB Debug
 declare -a COLORS_NAME=('black' 'red' 'green' 'yellow' 'blue' 'magenta' 'cyan' 'white')
 declare -a COLORS_VALUE=('0' '1' '2' '3' '4' '5' '6' '7')
 
+declare -A FILES_CHOOSED
+
 declare -a GUIS=( 'd' 'dialog' 'z' 'zenity')
 
 declare -a INFO_MAP
@@ -77,21 +79,26 @@ declare -a STATS_SSU_VERSION=('2.02' '2.13' '2.14')
 
 # Others variable
 adb_su=""
-dir=""
+#dir=""
 
+DIR_CHOOSED=""
+DIR_TMP="/tmp/"
 DIR_SVG=""
 DIR_SVG_DATED=""
+FILE_CHOOSED=""
 FILE_PARAM="${DIR_TOOLS}/dumchar.info"
 FILE_SSU_ZIP="${DIR_TOOLS}UPDATE-SuperSU-v${SSU_VERSION}.zip"
 GUI=""
 HOME=~
+SCRIPT_NAME=$0
+SCRIPT_TMP_DIR="${DIR_TMP}${SCRIPT_NAME}/"
 
 DAY=$(date +"%d-%m-%Y")
 NOW=$(date +"%d-%m-%Y_%H-%M-%S")
 
-CHOICE=0
-CFG=0
-DIALOG=0
-INODE=4096
-LOG=0
-ZENITY=0
+declare -i CHOICE=0
+declare -i CFG=0
+declare -i DIALOG=0
+declare -i INODE=4096
+declare -i LOG=0
+declare -i ZENITY=0

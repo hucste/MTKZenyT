@@ -39,6 +39,8 @@ text_dl_yourself="Téléchargez vous-même l'application %s !"
 text_error_bckp="!!! Erreur : Il semble que la sauvegarde n'a pas eu lieu : %s n'existe pas !!!"
 text_error_dl="!!! Erreur pendant le téléchargement %s !!!"
 text_error_file="!!! Erreur avec le fichier %s! Vérifiez sa présence et ses droits en lecture ..."
+text_error_not_adb="ADB n'est pas installé. Il est pleinement nécessaire !"
+text_error_not_files="!!! Erreur, vous n'avez choisi aucun fichier ..."
 text_error_not_tools="L'outil %s n'est pas installé. Veuillez faire le nécessaire !"
 text_error_unzip="!!! Erreur (Code: %s) avec l'archive %s!\nIl semble y avoir un problème durant la décompression.\nVeuillez la vérifier !"
 text_error_write_img="!!! Erreur : Le fichier %s ne peut être écrit !"
@@ -53,6 +55,8 @@ text_feature_disable="%s: Cette fonctionnalité est désactivée.\n"
 
 text_goodbye="Au-revoir ..."
 text_goodbye_info="Quand vous serez dans la session Android, veuillez taper sur l'app SuperSU ...\net installer le binaire su quand cela vous sera demandé."
+
+text_gui_cancel="Êtes-vous sûr de vouloir quitter ?\n Si OUI, vous reviendrez au menu ; si NON, vous reviendrez là où vous êtiez !"
 
 text_into_recovery="Vous êtes dans le mode recovery ! Très bien..."
 text_into_tools="Placez-la dans le répertoire tools suivant : %s"

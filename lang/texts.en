@@ -37,9 +37,10 @@ text_dl_file="URL to curl: %s"
 text_dl_yourself="Download yourself the app %s!"
 
 text_error_bckp="!!! ERROR: It seems Backup failed: %s not exists !!!"
-text_error_file="!!! ERROR with file %s! Checks its presence and its readable..."
 text_error_dl="!!! Error during download %s !!!"
+text_error_file="!!! ERROR with file %s! Checks its presence and its readable..."
 text_error_not_adb="ADB isn't install. Do the needful!"
+text_error_not_files="!!! ERROR, we have not selected any file ..."
 text_error_unzip="!!! ERROR (Code: %s) with archive %s!\nIt seems a problem to unzip-it...\nPlease, check-it!"
 text_error_write_img="!!! ERROR during write img %s !!!"
 text_error_write_img_2="!!! Error during write img %s with this other method !!!"
@@ -53,6 +54,8 @@ text_feature_disable="%s: This feature is disable.\n"
 
 text_goodbye="Bye..."
 text_goodbye_info="When you are into Android session, please tap onto SuperSU app...\nand Install su binary when it's ask."
+
+text_gui_cancel="Are you sure you want to quit?\n If YES, you will return to the menu; If NO, you return to where you been!"
 
 text_into_recovery="You're into recovery! Yeahh..."
 text_into_tools="Put into folder tools: %s"

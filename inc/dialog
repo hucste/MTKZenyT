@@ -18,7 +18,7 @@ function dialog_input() {
     # call: display_input text title
     local text="$1" title="$2"
 
-    ${dialog} --stdout --title "${title}" --inputbox "${text}" 10 30 ; echo $? > /tmp/dialog_input.tmp
+    ${dialog} --stdout --title "${title}" --inputbox "${text}" 10 30 ; echo $? > "${SCRIPT_TMP_DIR}input.tmp"
 
     unset text title
 
@@ -32,9 +32,18 @@ function dialog_list_files() {
 
     ${dialog} --backtitle "${title}" --title "${title}" \
         --ok-label "${text_label_ok}" --cancel-label "${text_label_cancel}" \
-        --checklist "${text}" 0 0 ${height} ${items} 2> /tmp/dialog_checklist_reply.tmp
+        --checklist "${text}" 0 0 ${height} ${items} 2> "${SCRIPT_TMP_DIR}checklist_reply.tmp"
 
-    echo $? > /tmp/dialog_checklist.tmp
+    case $? in
+        1|255)
+            display_mssg "q" "${text_gui_cancel}"
+
+            case "${read}" in
+                0) display_menu ;;
+                1|255) display_files ;;
+            esac
+        ;;
+    esac
 
     unset texte title items height
 
@@ -91,7 +100,7 @@ function dialog_yesno() {
     # call: dialog_yesno
     local text="$1" title="$2"
 
-    ${dialog} --clear --title "${title}" --yesno "${text}" 10 30 ; echo $? > /tmp/dialog_yesno.tmp
+    ${dialog} --clear --title "${title}" --yesno "${text}" 10 30 ; echo $? > "${SCRIPT_TMP_DIR}yesno.tmp"
 
     unset text title
 
