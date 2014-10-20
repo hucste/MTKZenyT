@@ -106,7 +106,6 @@ function FLASH() {
 
 }
 
-
 function REBOOT() {
 
     adb_reboot
@@ -273,7 +272,7 @@ function destruct() {
 
     write_file "log" "${NOW} ### $FUNCNAME: Destruct variables"
 
-    if [[ -d "${SCRIPT_TMP_DIR}" ]]; then rm -f "${SCRIPT_TMP_DIR}"; fi
+    if [[ -d "${SCRIPT_TMP_DIR}" ]]; then rm -rf "${SCRIPT_TMP_DIR}"; fi
 
     unset DIALOG FILE_TMP ZENITY
     unset archive choice mssg

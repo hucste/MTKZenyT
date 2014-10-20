@@ -91,7 +91,7 @@ FILE_SSU_ZIP="${DIR_TOOLS}UPDATE-SuperSU-v${SSU_VERSION}.zip"
 GUI=""
 HOME=~
 SCRIPT_NAME=$0
-SCRIPT_TMP_DIR="${DIR_TMP}${SCRIPT_NAME}/"
+SCRIPT_TMP_DIR="${DIR_TMP}${SCRIPT_NAME:2}/"
 
 DAY=$(date +"%d-%m-%Y")
 NOW=$(date +"%d-%m-%Y_%H-%M-%S")
