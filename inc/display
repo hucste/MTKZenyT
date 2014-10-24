@@ -130,13 +130,11 @@ function display_menu() {
             printf "\n${title_menu}\n"
 
             PS3="${text_welcome} "
-            select menu in "${text_menu_description[@]}"; do
-                if [[ "$REPLY" == "q" || "$REPLY" == "Q" ]]; then
-                    choice="${MENU_NAME[${#MENU_NAME[*]}]}"
-                elif [[ -z "${MENU_NAME[$REPLY]}" ]]; then
-                    choice=""
+            select menu in "${MENU_NAME[@]}"; do
+                if [[ "${REPLY}" == "q" || "${REPLY}" == "Q" ]]; then
+                    choice="EXIT"
                 else
-                    choice="${MENU_NAME[$REPLY]}"
+                    choice="${menu}"
                 fi
                 break
             done
@@ -153,9 +151,8 @@ function display_menu() {
             if [[ -z "${key}" ]]; then unset choice; else "${choice}"; fi
             unset array key
 
-            write_file "log" "### $FUNCNAME: choice: ${choice}"
         fi
-
+        write_file "log" "### $FUNCNAME: choice: ${choice}"
     done
 
     if [[ $? -ne 0 ]]; then EXIT; fi
