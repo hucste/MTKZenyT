@@ -1,5 +1,5 @@
-MTKZenyT
-========
+MTKZenyT(ools)
+==============
 
 *(EN/FR project!)*
 
@@ -38,6 +38,9 @@ USE
 1. make script MTK_Shell_Tools executable!
 2. run-it in terminal-console.
 3. answer questions :p
+
+Directory 'tools' is necessary to put Archive ZIP SuperSU. You can unzip her into...
+
 
 Config
 ------
