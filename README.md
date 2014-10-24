@@ -54,7 +54,7 @@ You can rename-it, but in this case, change value into script bash /inc/config
 2. **To log activities:** *Change value of **LOG***
     - `0` to disable,
     - `1` to enable.
-3. **BACK_PHONE** is variable to indicate where create backups into your phone.
+3. **BCPK_PHONE** is variable to indicate where create backups into your phone.
 4. **DIR_SVG** is variable to indicate where pull backups into your computer.
 
 
