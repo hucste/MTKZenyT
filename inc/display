@@ -153,6 +153,7 @@ function display_menu() {
 
         fi
         write_file "log" "### $FUNCNAME: choice: ${choice}"
+
     done
 
     if [[ $? -ne 0 ]]; then EXIT; fi
@@ -275,6 +276,33 @@ function echos_menu() {
 
             echo "${name}";
             echo "${MENU_TEXT[${name}]}";
+
+        done
+
+    fi
+
+}
+
+function echos_menu_reboot() {
+
+    write_file "log" "${NOW} ### $FUNCNAME: Attempt ones echos to choose menu..."
+
+    if [[ "${DIALOG}" -eq 1 ]]; then
+
+        for name in "${MENU_REBOOT[@]}"; do
+
+            menu+=("${name}" "${MENU_TEXT_REBOOT[${name}]}")
+
+        done
+
+        #display_detected "menu: ${menu}"
+
+    else
+
+        for name in "${MENU_REBOOT[@]}"; do
+
+            echo "${name}";
+            echo "${MENU_TEXT_REBOOT[${name}]}";
 
         done
 

@@ -146,7 +146,39 @@ function FLASH() {
 
 function REBOOT() {
 
-    adb_reboot
+    #adb_reboot
+    if [[ -n "${MENU_REBOOT[@]}" ]]; then
+
+        for name in "${MENU_REBOOT[@]}"; do
+            var="text_menu_reboot_$name"
+            MENU_TEXT_REBOOT["${name}"]="${!var}"
+            unset var
+        done
+
+        if [[ "${ZENITY}" -ne 0 ]]; then
+            reboot=$( echos_menu_reboot | zenity_list "${text_reboot}" "${title_reboot}" "$(count ${MENU_REBOOT[@]})")
+        elif  [[ "${DIALOG}" -ne 0 ]]; then
+            echos_menu_reboot
+
+            exec 3>&1;
+            reboot=$(dialog_menu "${text_reboot}" "${title_reboot}" "$(count ${MENU_REBOOT[@]})")
+            exec 3>&-;
+
+            unset menu
+        else
+            printf "\n${title_reboot}\n"
+
+            PS3="${text_reboot} "
+            select menu in "${MENU_REBOOT[@]}"; do
+                reboot="${menu}"
+                break
+            done
+            unset menu
+        fi
+
+        adb_reboot "${reboot}"
+
+    fi
 
 }
 
@@ -193,9 +225,10 @@ function array_search() {
 
     local needle="$1" IFS=" "; shift; read -a array <<< "$@"
 
-    for (( i=0; i < $(count "${array[*]}"); i++ )); do
+    for (( i=0; i < "${#array[*]}"; i++ )); do
         if [[ "${array[$i]}" == "${needle}" ]]; then echo "$i"; fi
     done
+
     return 1
 
     unset array needle IFS
@@ -211,7 +244,6 @@ function build_vars() {
             var="text_menu_$name"
             MENU_TEXT["${name}"]="${!var}"
             unset var
-
         done
 
     fi

@@ -232,8 +232,18 @@ function adb_read_partitions() {
 
 function adb_reboot() {
 
+    local where="$1"
+
     display_mssg "i" "${text_reboot_now}"; sleep 1
-    adb reboot
+
+    case "${where}" in
+        "RECOVERY") where="recovery" ;;
+        *) where="" ;;
+    esac
+
+    adb reboot "${where}"
+
+    unset where
 
 }
 

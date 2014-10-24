@@ -55,7 +55,9 @@ declare -a INFO_MAP
 declare -a INFO_NAME=('name' 'size' 'addr' 'type' 'map')
 
 declare -a MENU_NAME=("BACKUP" "FLASH" "ROOT" "UNROOT" "REBOOT" "EXIT")
+declare -a MENU_REBOOT=("RECOVERY" "SYSTEM")
 declare -A MENU_TEXT
+declare -A MENU_TEXT_REBOOT
 
 declare -a MTD_ADDR
 declare -a MTD_MAP
