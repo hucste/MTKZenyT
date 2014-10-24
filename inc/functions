@@ -53,6 +53,7 @@ function BACKUP() {
 
                 if [[ -d "${DIR_SVG_DATED}" ]]; then
 
+                    adb_restart_server
                     adb_read_partitions
 
                     if [[ -f "${FILE_PARAM}" ]]; then
@@ -93,6 +94,7 @@ function CUSTOM() {
 
 function EXIT() {
 
+    adb kill-server
     display_mssg "n" "${text_goodbye}" "${title_goodbye}" "1"
     destruct
     exit 0
@@ -101,8 +103,44 @@ function EXIT() {
 
 function FLASH() {
 
-    mssg="$(printf "${text_feature_disable}" "${FUNCNAME}")"
-    display_error "${mssg}"
+    write_file "log" "${NOW} ### $FUNCNAME: Will try to flash your device!"
+
+    in_array "${GUI}" "${GUIS[@]}";
+    if [[ $? -eq 1 ]]; then
+
+        display_feature_with_gui "${FUNCNAME}"
+
+    else
+
+        adb_restart_server
+        adb_read_partitions
+
+        if [[ -f "${FILE_PARAM}" ]]; then
+
+            file_to_array_mtd
+
+            display_files
+
+            if [[ "${files}" ]]; then files=($(explode " " "${files}")); fi
+
+            if [[ -n "${files[@]}" ]]; then
+                for file in "${files[@]}"; do
+                    if [[ -n "${file}" ]]; then
+                        if [[ "${DIALOG}" -ne 0 ]]; then file="${MTD_NAME[${file}]}"; fi
+                        choose_directory "f" "${text_choose_file}${file}";
+                        if [[ -n "${FILE_CHOOSED}" ]]; then FILES_CHOOSED["${file}"]="${FILE_CHOOSED}"; fi
+                    fi
+                done
+            else
+                display_error "!!! ERROR: array files is empty !!!"
+            fi
+
+            echo "files: ${!FILES_CHOOSED[@]} ${FILES_CHOOSED[@]}"
+            adb_flash_partitions
+
+        fi
+
+    fi
 
 }
 
@@ -114,11 +152,15 @@ function REBOOT() {
 
 function ROOT() {
 
+    adb_restart_server
+
     root_to_recovery
 
 }
 
 function UNROOT() {
+
+    adb_restart_server
 
     if [[ "${vid}" == "${VID[0]}" ]]; then
 
@@ -135,7 +177,7 @@ function UNROOT() {
 function array_key_exists() {
 
     # equivalent to PHP array_key_exists
-    # call: if [[ $(array_key_exists key array) ]]; then echo "key exists!"; fi
+    # call: if [[ $(array_key_exists key array) -eq 0 ]]; then echo "key exists!"; fi
 
     local key="$1" IFS=" "; shift; read -a array <<< "$@"
     if [[ "${array[$key]}" ]]; then return 0; return 1; fi
@@ -208,17 +250,6 @@ function choose_directory() {
             fi
         fi
 
-        #REPLY="$(cat /tmp/zenity_directory.tmp)"
-        #case "${REPLY}" in
-            #1|-1)
-                #unset DIR_CHOOSED FILE_CHOOSED
-                #choose_directory "${index}" "${name}"
-            #;;
-        #esac
-
-        echo "File_choosed: $FILE_CHOOSED"
-        #if [[  ]]; then choose_directory "$1" "$2"
-
     else
 
         read -p "${name}" DIR_CHOOSED
@@ -227,7 +258,7 @@ function choose_directory() {
 
     unset index name
 
-    write_file "log" "${NOW} ### $FUNCNAME: ${DIR_CHOOSED}{FILE_CHOOSED}"
+    write_file "log" "${NOW} ### $FUNCNAME: ${DIR_CHOOSED}${FILE_CHOOSED}"
 
 }
 
@@ -243,7 +274,7 @@ function convert_str_to_array() {
     write_file "log" "${NOW} ### $FUNCNAME: string: ${files}"
 
     x=0
-    for file in $files; do files[$x]="$file"; let "x = $x + 1"; done
+    for file in $files; do files[$x]="$file"; let x=x+1; done
     unset x
 
     write_file "log" "${NOW} ### $FUNCNAME: array: ${files[*]}"
@@ -307,8 +338,8 @@ function detect_device() {
         display_mssg "n" "${text_exit}"
 
         # if GUI=0|no then display press any key
-        in_array "${GUI}" "${GUIS[@]}"
-        if [[ $? -eq 0 ]]; then press_any_key; fi
+        #in_array "${GUI}" "${GUIS[@]}"
+        #if [[ $? -eq 0 ]]; then press_any_key; fi
 
         EXIT
 
@@ -386,11 +417,13 @@ function explode() {
     # call: array=("$(explode $delimiter $string)")
     # equivalent PHP explode
     local delimiter="$1" string="$2"
+
     write_file "log" "${NOW} ### $FUNCNAME: string: ${string}"
 
     local IFS="${delimiter}"; shift; read -a array <<< "${string}"
 
-    if [[ "${array[*]}" ]]; then echo "${array[*]}"; else return 1; fi
+    if [[ -z "${array[@]}" ]]; then return 1; fi
+    echo "${array[@]}"
 
     write_file "log" "${NOW} ### $FUNCNAME: array: ${array[*]}"
 
@@ -509,7 +542,7 @@ function file_to_array_mtd() {
 
         fi
 
-        let "x = $x + 1";
+        let x=x+1;
 
     done < "${FILE_PARAM}"
     unset x
@@ -526,6 +559,17 @@ function file_to_array_mtd() {
     MTD_ADDR_BLOCK=("${MTD_ADDR_BLOCK[@]}")
 
     write_file "log" "${NOW} ### $FUNCNAME: Create mtd array: MTD_NAME[ ${MTD_NAME[*]} ]"
+
+}
+
+function file_stat() {
+
+    local file="$1"
+    local -i int
+
+    if [[ -f "${file}" ]]; then int=$(stat -c "%s" ${file} | sed 's/\r$//'); fi
+
+    echo ${int}
 
 }
 
@@ -554,7 +598,7 @@ function in_array() {
 
     while [ $i -le ${#array[@]} ]; do
         if [[ "${array[$i]}" == "${needle}" ]]; then return 0; fi # true
-        let "i = $i + 1"
+        let i=i+1
     done
     return 1
 
@@ -604,7 +648,7 @@ function manage_colors() {
 
         fi
 
-        let "i = $i + 1"
+        let i=i+1
 
     done
 
@@ -643,7 +687,7 @@ function manage_fonts() {
 
         fi
 
-        let "i = $i + 1"
+        let i=i+1
 
     done
 
@@ -1049,8 +1093,6 @@ function verify_installed() {
         display_detected "${text_ok_tools}" "ADB"
         write_file "log" "${NOW} *** $FUNCNAME: adb: Yes!"
         #adb=$(which adb)
-        adb kill-server
-        adb start-server
     fi
 
     # Make dir tmp

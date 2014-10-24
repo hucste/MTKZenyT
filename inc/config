@@ -1,7 +1,7 @@
 #!/bin/bash
 
 CONFIG="config.ini" # file to save some variables
-BCKP_PHONE="/sdcard/" # dir to backup into phone
+BCKP_PHONE="/sdcard/BACKUP/" # dir to backup into phone
 
 # Packages names
 SuperSU="Superuser.apk"
@@ -54,7 +54,7 @@ declare -a GUIS=( 'd' 'dialog' 'z' 'zenity')
 declare -a INFO_MAP
 declare -a INFO_NAME=('name' 'size' 'addr' 'type' 'map')
 
-declare -a MENU_NAME=("ROOT" "UNROOT" "FLASH" "BACKUP" "REBOOT" "EXIT")
+declare -a MENU_NAME=("BACKUP" "FLASH" "ROOT" "UNROOT" "REBOOT" "EXIT")
 declare -A MENU_TEXT
 
 declare -a MTD_ADDR

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+title_adb_progress="Step ADB ... Processing"
+
 title_detect_dev="*** Detection Device ***"
 title_dir_svg="In which folder, do you want to save your device?"
 

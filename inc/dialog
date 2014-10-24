@@ -73,6 +73,16 @@ function dialog_mssg() {
 
 }
 
+function dialog_progress() {
+
+    local text="$1" title="$2"
+
+    ${dialog} --title "${title}" --gauge "${text}" 10 60 0
+
+    unset text title
+
+}
+
 function dialog_select_dir() {
 
     # call: dialog_select_dir title

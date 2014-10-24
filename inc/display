@@ -173,6 +173,7 @@ function display_mssg() {
         case "$menu" in
             i) zenity_info "${text}" "${title}" ;;
             n) zenity_notify "${text}" "${title}" ;;
+            p) zenity_progress "${text}" "${title}" ;;
             q) zenity_question "${text}" "${title}" ;;
         esac
 
@@ -181,6 +182,8 @@ function display_mssg() {
         case "$menu" in
             i)
                 dialog_mssg "${text}" ;;
+            p)
+                dialog_progress "${text}" "${title}" ;;
             q)
                 dialog_yesno "${text}" "${title}"
 
