@@ -104,6 +104,14 @@ function display_files() {
 
 }
 
+function display_help() {
+
+    mssg="$(<${DIR_LANG}/help.${lang})"
+
+    printf "${mssg}\n" "${0##*/}"
+
+}
+
 function display_menu() {
 
     write_file "log" "${NOW} ### $FUNCNAME: attempt to display menu..."

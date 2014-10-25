@@ -1,0 +1,28 @@
+### Tool Usage ###
+Usage:  %s [OPTION]
+
+Help:   h|H|-?|--help
+
+*** Main Controls ***
+
+Backup: s|S
+Flash:  f|F
+
+*** Others Commands ***
+
+Reboot: R|-reboot
+Reboot Recovery:    RR|-reboot_recovery
+
+*** Informations ***
+
+If they are not options, the tool will launch menu...
+
+*** Config ***
+
+Remenber to edit the file 'config.ini' to setup values necessaries!
+
+- 'BCKP_PHONE' is the backup directory on your device
+- 'DIR_SVG' is the backup on your computer
+- 'GUI' to indicate the usage GUI. If you run this script with one of the
+    above options, it will not help!
+- 'LOG' to log or not the activity of this tool...

@@ -1,0 +1,29 @@
+### Utilisation ###
+Usage:  %s [OPTION]
+
+Aide:   h|H|-?|--help
+
+*** Commandes Principales ***
+
+Sauvegarde: s|S
+Flash:  f|F
+
+*** Autres Commandes ***
+
+Reboot: R|-reboot
+Reboot Recovery:    RR|-reboot_recovery
+
+*** Informations ***
+
+S'il n'y a pas d'option, l'outil lancera un menu de gestion ...
+
+*** Configuration ***
+
+Pensez à éditer le fichier 'config.ini' pour paramètrer les valeurs
+ nécessaires !
+
+- 'BCKP_PHONE' est le répertoire de sauvegarde dans votre appareil
+- 'DIR_SVG' est celui de sauvegarde dans votre ordinateur
+- 'GUI' pour indiquer l'affiche d'une interface graphique. Si vous lancez ce
+    script avec une des options ci-dessus, elle ne servira à rien !
+- 'LOG' pour journaliser ou non l'activité de cet outil ...

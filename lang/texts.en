@@ -43,6 +43,7 @@ text_error_file="!!! ERROR with file %s! Checks its presence and its readable...
 text_error_not_adb="ADB isn't install. Do the needful!"
 text_error_not_files="!!! ERROR, we have not selected any file ..."
 text_error_size_file="!!! $s ERROR: size files are different %s and %s !"
+text_error_unknown_option="WARN: Unknown option (ignored): %s\n"
 text_error_unzip="!!! ERROR (Code: %s) with archive %s!\nIt seems a problem to unzip-it...\nPlease, check-it!"
 text_error_write_img="!!! ERROR during write img %s !!!"
 text_error_write_img_2="!!! Error during write img %s with this other method !!!"
