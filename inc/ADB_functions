@@ -230,23 +230,6 @@ function adb_read_partitions() {
 
 }
 
-function adb_reboot() {
-
-    local where="$1"
-
-    display_mssg "i" "${text_reboot_now}"; sleep 1
-
-    case "${where}" in
-        "RECOVERY") where="recovery" ;;
-        *) where="" ;;
-    esac
-
-    adb reboot "${where}"
-
-    unset where
-
-}
-
 function adb_reboot_recovery() {
 
     display_mssg "i" "${text_reboot_recovery}"; sleep 1
@@ -256,8 +239,7 @@ function adb_reboot_recovery() {
 
 function adb_reboot_system() {
 
-    mssg=$(printf "${text_goodbye_info}\n${text_goodbye}")
-    display_mssg "i" "${mssg}"
+    display_mssg "i" "${text_reboot_system}"; sleep 1
     adb reboot
 
 }
@@ -401,14 +383,14 @@ function adb_save_partitions() {
 
     if [[ -z "$(adb_test "-d ${BCKP_PHONE}")" ]]; then
 
-        for (( x=0 ; x < $(count "${FILES_CHOOSED[@]}"); x++ )); do
+        for (( x=0 ; x < $(count "${PART_CHOOSED[@]}"); x++ )); do
 
             if [[ "${ZENITY}" -ne 0 ]]; then
-                local key=$(bc <<< "$(array_search "${FILES_CHOOSED[$x]}" "${MTD_NAME[@]}") + 1"); display_detected "key: ${key}"
-            fi
-
-            if [[ "${DIALOG}" -ne 0 ]]; then
-                local key="${FILES_CHOOSED[$x]}"; display_detected "key: ${key}"
+                local key=$(bc <<< "$(array_search "${PART_CHOOSED[$x]}" "${MTD_NAME[@]}")"); display_detected "key: ${key}"
+            elif [[ "${DIALOG}" -ne 0 ]]; then
+                local key="${PART_CHOOSED[$x]}"; display_detected "key: ${key}"
+            else
+                local key=$(bc <<< "$(array_search "${PART_CHOOSED[$x]}" "${MTD_NAME[@]}")"); display_detected "key: ${key}"
             fi
 
             local ddname="${MTD_NAME[${key}]}"; display_detected "dd_name: ${ddname}"
@@ -416,14 +398,14 @@ function adb_save_partitions() {
             local ddif="/dev/${ddname}"; display_detected "dd_if: ${ddif}"
             local ddbs="${MTD_SIZE_DEC[${key}]}"; display_detected "dd_bs: ${ddbs}"
 
-            local -i stat_int=$(adb_stat_file "${ddof}"); display_detected "stat_int: ${stat_int}"
-
             mssg="$(printf "${text_progress_adb_dd}" "${ddif}")"
             (
             adb_write_img "${ddname}" "${ddif}" "${ddof}" "${ddbs}" "${ddskip}"
             ) | display_mssg "p" "${mssg}" "${title_adb_progress}"
 
             if [[ -z "$(adb_test "-f ${ddof}")" ]]; then
+
+                local -i stat_int=$(adb_stat_file "${ddof}"); display_detected "stat_int: ${stat_int}"
 
                 mssg="$(printf "${text_progress_adb_pull}" "${ddof}")"
                 (

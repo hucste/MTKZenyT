@@ -42,6 +42,7 @@ text_error_dl="!!! Error during download %s !!!"
 text_error_file="!!! ERROR with file %s! Checks its presence and its readable..."
 text_error_not_adb="ADB isn't install. Do the needful!"
 text_error_not_files="!!! ERROR, we have not selected any file ..."
+text_error_option_name="!!! ERROR: Name option '%s' is not good!"
 text_error_size_file="!!! $s ERROR: size files are different %s and %s !"
 text_error_unknown_option="WARN: Unknown option (ignored): %s\n"
 text_error_unzip="!!! ERROR (Code: %s) with archive %s!\nIt seems a problem to unzip-it...\nPlease, check-it!"
@@ -97,6 +98,7 @@ text_progress_adb_dd="Wait during ADB write file %s into your device..."
 text_reboot="What reboot do you want?"
 text_reboot_now="Your device reboot... now!"
 text_reboot_recovery="Your device reboot into recovery in 1 second. Needed!"
+text_reboot_system="You device reboot into your system Android!"
 text_reboot_yourself="Reboot yourself the device!"
 
 text_remove="Remove %s"
@@ -104,6 +106,9 @@ text_remove="Remove %s"
 text_see_phone="Please, see your phone to accept ADB shell by SuperSU! (if need...)"
 
 text_sorry="Sorry, but we can't do anything more!"
+
+text_step_end="Step %s ended..."
+text_step_stop="Step %s is stopped!"
 
 text_su_cp="cp SU binary into "
 text_su_inactive="It seems SU is inactive... may-be isn't installed?"
@@ -117,13 +122,13 @@ text_SSU_install_pb="It seems a problem during install SuperSU %s !\n Check..."
 
 text_system_info="System is into: %s (%s)"
 
-text_unroot_end="UNROOT step ENDING... "
-text_unroot_stop="UNROOT step is stopped!"
 text_unzip="Unzip the archive: %s "
 text_unzip_ok="Unzip ok!"
+text_use_help="Please, use Help to know how to do this!"
 
 text_VendorID="VendorID: %s"
 text_verify_errors="Please, verify there are no errors messages!"
+text_verify_file="Please, verify file '%s' is into folder tools '%s'."
 text_verify_installed="The programme will verify all tools needed are installed!"
 
 text_welcome="What action, do you want: "

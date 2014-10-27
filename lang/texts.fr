@@ -43,6 +43,7 @@ text_error_file="!!! Erreur avec le fichier %s! Vérifiez sa présence et ses dr
 text_error_not_adb="ADB n'est pas installé. Il est pleinement nécessaire !"
 text_error_not_files="!!! Erreur, vous n'avez choisi aucun fichier ..."
 text_error_not_tools="L'outil %s n'est pas installé. Veuillez faire le nécessaire !"
+text_error_option_name="!!! Erreur, le nom de l'option '%s' n'est pas le bon !"
 text_error_size_file="!!! Erreur $s : Les tailles de fichiers sont différentes : %s et %s !"
 text_error_unknown_option="ATTENTION : Option inconnue : %s\n"
 text_error_unzip="!!! Erreur (Code: %s) avec l'archive %s!\nIl semble y avoir un problème durant la décompression.\nVeuillez la vérifier !"
@@ -99,6 +100,7 @@ text_progress_adb_dd="Patientez pendant que l'outil ADB écrit le fichier %s dan
 text_reboot="Quel forme de redémarrage, voulez-vous faire ?"
 text_reboot_now="Votre appareil redémarre, maintenant !"
 text_reboot_recovery="Votre appareil redémarre dans une seconde dans le mode recovery.\nC'est nécessaire !"
+text_reboot_system="Votre appareil redémarre dans une seconde dans la session Android."
 text_reboot_yourself="Redémarrez-vous-même l'appareil !"
 
 text_remove="Suppression de %s"
@@ -111,6 +113,9 @@ text_ssu_exists="L'archive de SuperSu est bien sur votre ordinateur ! Bonne chos
 text_SSU_installed="SuperSU %s devrait être installé !"
 text_SSU_install_pb="Il semble y avoir eu un problème durant l'installation de SuperSU %s !\nVérifiez ..."
 
+text_step_end="Étape %s terminée ..."
+text_step_stop="Étape %s est arrêtée !"
+
 text_su_cp="Copie du binaire SU dans "
 text_su_inactive="Il semble que SU ne soit pas actif ... Peut-être n'est-il pas installé ?"
 
@@ -119,13 +124,13 @@ text_supersu_chmod="chmod et chown Superuser "
 
 text_system_info="Le système est positionné dans : %s (%s)"
 
-text_unroot_end="Étape UNROOT terminée ... "
-text_unroot_stop="Étape UNROOT est arrêtée !"
 text_unzip="Décompression de l'archive : %s "
 text_unzip="Décompression terminée correctement !"
+text_use_help="Veuillez utiliser l'aide pour savoir comment faire !"
 
 text_VendorID="VendorID: %s"
 text_verify_errors="SVP, vérifiez qu'il n'y ait pas de messages d'erreurs !"
+text_verify_file="SVP, vérifiez que le fichier '%s' soit bien dans le répertoire '%s'."
 text_verify_installed="Le programme va vérifier que vous ayez bien les différents outils !"
 
 text_welcome="Que voulez-vous faire : "

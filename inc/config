@@ -73,6 +73,7 @@ declare -a MTD_SIZE_DEC
 declare -a PART_NAME=("android" "usrdata")
 declare -a PART_TEXT=("system" "data")
 # files to saved by default
+declare -a PART_CHOOSED
 declare -a PART_DEFAULT=('uboot' 'bootimg' 'recovery' 'logo' 'android' 'usrdata')
 declare -a PART_NOBCKP=('pmt' 'pro_info' 'protect_f' 'protect_s' 'seccfg' 'misc' 'expdb' 'bmtpool')
 
@@ -81,17 +82,18 @@ declare -a STATS_SSU_VERSION=('2.02' '2.13' '2.14')
 
 # Others variable
 adb_su=""
-#dir=""
 
 DIR_CHOOSED=""
 DIR_TMP="/tmp/"
 DIR_SVG=""
 DIR_SVG_DATED=""
 FILE_CHOOSED=""
-FILE_PARAM="${DIR_TOOLS}/dumchar.info"
+FILE_DUMCHAR="dumchar.info"
+FILE_PARAM="${DIR_TOOLS}${FILE_DUMCHAR}"
 FILE_SSU_ZIP="${DIR_TOOLS}UPDATE-SuperSU-v${SSU_VERSION}.zip"
 GUI=""
 HOME=~
+#PART_BCKP=""
 SCRIPT_NAME=$0
 SCRIPT_TMP_DIR="${DIR_TMP}${SCRIPT_NAME:2}/"
 

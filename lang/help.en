@@ -1,17 +1,42 @@
 ### Tool Usage ###
 Usage:  %s [OPTION]
 
-Help:   h|H|-?|--help
+*** Basic Options ***
+
+Help:   -h|-H|-?|--help
 
 *** Main Controls ***
 
-Backup: s|S
-Flash:  f|F
+Backup: -s|-S|-save
+
+    --info
+
+        To save informations about Android partitions.
+        This will backup into file named 'dumchar.info', put in folder tools.
+        Thoses informations helps to know exactly names partitions!
+        Thoses informations are necessary to use option '--name'
+
+    --name=part_name1,part_name2,part_name3,etc...
+
+        'part_name' is name partition into android system.
+
+        Example: --name=bootimg,android,usrdata
+
+Flash:  -f|-F|-flash
+
+    --name=part_name1:file1,part_name2:file2,part_name3:file3, etc...
+
+        'part_name' is name partition into android system.
+        'file' is filename to flash. Indicate his path from your computer
+
+        To know names partitions, use before option '-save --info'...
+
+        Example: --name=nvram:/path/to/file/nvram.img,recovery:/path/to/file/recovery.img
 
 *** Others Commands ***
 
-Reboot: R|-reboot
-Reboot Recovery:    RR|-reboot_recovery
+Reboot: -R|-reboot
+Reboot Recovery:    -RR|-reboot_recovery
 
 *** Informations ***
 

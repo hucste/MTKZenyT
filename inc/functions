@@ -6,17 +6,7 @@ function MTKZenyTux() {
     echo -e "### ${title_welcome} ###"
     echo -e "#################################"
 
-    manage_colors
-    test_config_file
-    build_vars
-
-    write_file "log" "#################################################"
-    write_file "log" "### ### ### ${title_welcome} ### ### ###"
-    write_file "log" "#################################################"
-
-    verify_installed
-
-    detect_device
+    control_system "$FUNCNAME"
 
     display_menu
 
@@ -26,61 +16,87 @@ function BACKUP() {
 
     write_file "log" "${NOW} ### $FUNCNAME: Will try to backup your device!"
 
-    in_array "${GUI}" "${GUIS[@]}";
-    if [[ $? -eq 1 ]]; then
+    if [[ "$1" == "" ]]; then
 
-        display_feature_with_gui "${FUNCNAME}"
+        in_array "${GUI}" "${GUIS[@]}";
+        if [[ $? -eq 1 ]]; then
+            display_feature_with_gui "${FUNCNAME}"
+            display_menu
+        fi
 
     else
 
-        if [[ "$(adb_whoami)" == "root" ]]; then
+        local option="${1:2:4}"
+        case "${option}" in
+            "info")
+                adb_read_partitions
+                mssg="$(printf "${text_verify_file}" "${FILE_DUMCHAR}" "${DIR_TOOLS}")"
+                display_mssg "i" "${mssg}"
+                EXIT
+            ;;
+            "name")
+                if [[ "${1:6:1}" != "=" ]]; then
+                    display_unknown_option "${1:6:1}"
+                    EXIT
+                else
+                    PART_CHOOSED=($(explode "," "${1#*=}"))
+                    echo "PART_CHOOSED: ${PART_CHOOSED[@]}"
+                fi
+            ;;
+        esac
+        unset option
 
-            # obtain dir to save
-            if [[ -z "${DIR_SVG}" ]]; then
+    fi
 
-                #DIR_SVG=$(choose_directory "d" "${title_dir_svg}")
-                choose_directory "d" "${title_dir_svg}" && DIR_SVG="${DIR_CHOOSED}"
-                write_file "cfg" "DIR_SVG" "${DIR_SVG}"
+    if [[ "$(adb_whoami)" == "root" ]]; then
 
-            fi
+        # obtain dir to save
+        if [[ -z "${DIR_SVG}" ]]; then
 
-            write_file "log" "${NOW} *** $FUNCNAME: DIR_SVG=${DIR_SVG}"
+            #DIR_SVG=$(choose_directory "d" "${title_dir_svg}")
+            choose_directory "d" "${title_dir_svg}" && DIR_SVG="${DIR_CHOOSED}"
+            write_file "cfg" "DIR_SVG" "${DIR_SVG}"
 
-            # mkdir dated into DIR_SVG !
-            if [[ -d "${DIR_SVG}" ]]; then
+        fi
 
-                make_dir_dated
+        write_file "log" "${NOW} *** $FUNCNAME: DIR_SVG=${DIR_SVG}"
 
-                if [[ -d "${DIR_SVG_DATED}" ]]; then
+        # mkdir dated into DIR_SVG !
+        if [[ -d "${DIR_SVG}" ]]; then
 
-                    adb_restart_server
-                    adb_read_partitions
+            make_dir_dated
 
-                    if [[ -f "${FILE_PARAM}" ]]; then
+            if [[ -d "${DIR_SVG_DATED}" ]]; then
 
-                        file_to_array_mtd
+                adb_restart_server
+                adb_read_partitions
 
+                if [[ -f "${FILE_PARAM}" ]]; then
+
+                    file_to_array_mtd
+
+                    if [[ "$(count "${PART_CHOOSED}")" -eq 0 ]]; then
                         display_files
 
                         #convert_str_to_array
                         if [[ "${files}" ]]; then
-                            FILES_CHOOSED=($(explode " " "${files}"))
+                            PART_CHOOSED=($(explode " " "${files}"))
                         fi
 
-                        adb_save_partitions
-
                     fi
+
+                    if [[ "$(count "${PART_CHOOSED[@]}")" -gt 0 ]]; then adb_save_partitions; fi
 
                 fi
 
             fi
 
-        else
-
-            mssg=$(printf "%s" "${text_su_inactive}\n${text_unroot_stop}\n")
-            display_error "${mssg}"
-
         fi
+
+    else
+
+        mssg=$(printf "${text_su_inactive}\n${text_step_stop}\n" "$FUNCNAME")
+        display_error "${mssg}\n"
 
     fi
 
@@ -176,7 +192,10 @@ function REBOOT() {
             unset menu
         fi
 
-        adb_reboot "${reboot}"
+        case "${reboot}" in
+            "RECOVERY") adb_reboot_recovery ;;
+            "SYSTEM") adb_reboot ;;
+        esac
 
     fi
 
@@ -325,6 +344,21 @@ function count() {
 
 }
 
+function control_system() {
+
+    manage_colors
+    test_config_file "$1"
+    if [[ "$1" == "MTKZenyTux" ]]; then build_vars; fi
+
+    write_file "log" "#################################################"
+    write_file "log" "### ### ### ${title_welcome} ### ### ###"
+    write_file "log" "#################################################"
+
+    verify_installed
+    detect_device
+
+}
+
 function delete_dir() {
 
     if [[ -d "$1" ]]; then rm -rf "$1"; fi
@@ -343,6 +377,33 @@ function destruct() {
     write_file "log" "##################################################"
     write_file "log" "### ### ### $0 ENDED ! ### #### ###"
     write_file "log" "##################################################"
+
+}
+
+function detect_args() {
+
+    local action="$1" option="${2:2:4}"
+    local -i ERROR=0
+
+    case "${action}" in
+        "BACKUP")
+            if [[ "${option}" != "info" && "${option}" != "name" ]]; then
+                ERROR=1
+            fi
+        ;;
+        "FLASH")
+            if [[ "${option}" != "name" ]]; then
+                ERROR=1
+            fi
+        ;;
+    esac
+
+    if [[ "${ERROR}" -eq 1 ]]; then
+        display_unknown_option "$2"
+        EXIT
+    fi
+
+    unset action option ERROR
 
 }
 
@@ -834,6 +895,7 @@ function reboot_system() {
     while true; do
         case $REPLY in
             y|Y|o|O|0)
+                display_mssg "i" "${text_goodbye_info}\n${text_goodbye}"
                 adb_reboot_system
                 break
             ;;
@@ -910,7 +972,11 @@ function test_config_file() {
         BCKP_PHONE=$(read_config "BCKP_PHONE") && display_detected "BCKP_PHONE=${BCKP_PHONE}"
         CFG=1 && display_detected "CFG=1"
         DIR_SVG=$(read_config "DIR_SVG") && display_detected "DIR_SVG=${DIR_SVG}"
-        GUI=$(read_config "GUI") && display_detected "GUI=${GUI}"
+        if [[ "$1" == "MTKZenyTux" ]]; then
+            GUI=$(read_config "GUI") && display_detected "GUI=${GUI}"
+        else
+            GUI=0 && display_detected "GUI=${GUI}"
+        fi
 
     else
 
@@ -951,7 +1017,7 @@ function unroot_to_recovery() {
 
     adb_umount_partition "system"
 
-    mssg=$(printf "${text_unroot_end}\n${text_verify_errors}\n")
+    mssg=$(printf "${text_step_end}\n${text_verify_errors}\n" "$FUNCNAME")
     display_mssg "n" "${mssg}"
 
 }
@@ -971,7 +1037,7 @@ function unroot_to_system() {
 
         adb_delete_su_system
 
-        mssg=$(printf "${text_unroot_end}\n${text_verify_errors}\n")
+        mssg=$(printf "${text_step_end}\n${text_verify_errors}\n" "$FUNCNAME")
         display_mssg "n" "${mssg}" "" "1"
 
         sleep 3
@@ -980,7 +1046,7 @@ function unroot_to_system() {
 
     else
 
-        mssg=$(printf "%s" "${text_su_inactive}\n${text_unroot_stop}\n")
+        mssg=$(printf "${text_su_inactive}\n${text_step_stop}\n" "$FUNCNAME")
         display_error "${mssg}"
 
         in_array "${GUI}" "${GUIS[@]}"
@@ -1136,7 +1202,7 @@ function verify_installed() {
 function write_file() {
 
     case $1 in
-        "cfg") sed -i -e "#$2=.*# s##$2=$3#g" "${CONFIG}" ;;
+        "cfg") sed -i -e "s#$2=.*#$2=$3#g" "${CONFIG}" ;;
         "log") [[ "${LOG}" -eq 1 ]] && echo "$2" >> "${PWD}/logs/${DAY}.log" ;;
     esac
 

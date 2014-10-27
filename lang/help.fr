@@ -1,17 +1,45 @@
 ### Utilisation ###
-Usage:  %s [OPTION]
+Usage:  %s [OPTION] ... [PART_NAME] ...
 
-Aide:   h|H|-?|--help
+*** Options de Base ***
+
+Aide:   -h|-H|-?|--help
 
 *** Commandes Principales ***
 
-Sauvegarde: s|S
-Flash:  f|F
+Sauvegarde: -s|-S|-save
+
+    --info
+
+        Pour sauvegarder les informations relatives au partitionnement d'Android.
+        Cela sauvegardera dans un fichier nommé 'dumchar.info', dans le
+            répertoire tools.
+        Ces informations permettent de connaître avec certitude le nom des
+            partitions.
+        Ces informations sont nécessaires pour l'usage de l'option '--name'.
+
+    --name=part_name1,part_name2,part_name3,etc...
+
+        'part_name' est le nom de partition à sauvegarder du système Android.
+
+        Exemple : --name=bootimg,android,usrdata
+
+Flash:  -f|-F|-flash
+
+    --name=part_name1:file1,part_name2:file2,part_name3:file3, etc...
+
+        'part_name' est le nom de partition à flasher dans le système Android.
+        'file' est le nom du fichier. Indiquer son chemin depuis votre ordinateur.
+
+        Pour connaître le nom des partitions, utilisez d'abord l'option
+            '--save --info'
+
+        Exemple: --name=nvram:/path/to/file/nvram.img,recovery:/path/to/file/recovery.img
 
 *** Autres Commandes ***
 
-Reboot: R|-reboot
-Reboot Recovery:    RR|-reboot_recovery
+Reboot: -R|-reboot
+Reboot Recovery:    -RR|-reboot_recovery
 
 *** Informations ***
 

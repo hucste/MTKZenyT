@@ -212,6 +212,14 @@ function display_mssg() {
 
 }
 
+function display_unknown_option() {
+
+    mssg="$(printf "${text_error_option_name}" "$1")"
+    mssg="${mssg}\n ${text_use_help}\n ${text_exit}\n"
+    display_error "${mssg}"
+
+}
+
 function echos_files() {
 
     write_file "log" "${NOW} ### $FUNCNAME: Attempt ones echos to choose files..."
