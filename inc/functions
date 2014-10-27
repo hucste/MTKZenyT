@@ -40,7 +40,7 @@ function BACKUP() {
                     EXIT
                 else
                     PART_CHOOSED=($(explode "," "${1#*=}"))
-                    echo "PART_CHOOSED: ${PART_CHOOSED[@]}"
+                    display_detected "PART_CHOOSED: ${PART_CHOOSED[@]}"
                 fi
             ;;
         esac
@@ -48,12 +48,13 @@ function BACKUP() {
 
     fi
 
+    sleep 1
+
     if [[ "$(adb_whoami)" == "root" ]]; then
 
         # obtain dir to save
         if [[ -z "${DIR_SVG}" ]]; then
 
-            #DIR_SVG=$(choose_directory "d" "${title_dir_svg}")
             choose_directory "d" "${title_dir_svg}" && DIR_SVG="${DIR_CHOOSED}"
             write_file "cfg" "DIR_SVG" "${DIR_SVG}"
 
@@ -121,19 +122,60 @@ function FLASH() {
 
     write_file "log" "${NOW} ### $FUNCNAME: Will try to flash your device!"
 
-    in_array "${GUI}" "${GUIS[@]}";
-    if [[ $? -eq 1 ]]; then
+    if [[ "$1" == "" ]]; then
 
-        display_feature_with_gui "${FUNCNAME}"
+        in_array "${GUI}" "${GUIS[@]}";
+        if [[ $? -eq 1 ]]; then
+            display_feature_with_gui "${FUNCNAME}"
+            display_menu
+        fi
 
     else
 
-        adb_restart_server
-        adb_read_partitions
+        local option="${1:2:4}"
+        case "${option}" in
+            "name")
 
-        if [[ -f "${FILE_PARAM}" ]]; then
+            if [[ "${1:6:1}" != "=" ]]; then
 
-            file_to_array_mtd
+                display_unknown_option "${1:6:1}"
+                EXIT
+
+            else
+
+                PART_CHOOSED=($(explode "," "${1#*=}"))
+                display_detected "PART_CHOOSED: ${PART_CHOOSED[@]}"
+
+                for part in "${PART_CHOOSED[@]}"; do
+                    local -i position=$(awk -v search=: '{print index($0,search)}' <<< "${part}")
+                    local name="${part:0:$position-1}"
+                    local file="${part:$position}"
+
+                    FILES_CHOOSED["${name}"]="${file}"
+
+                    unset position name file
+                done
+
+                unset PART_CHOOSED
+
+            fi
+
+            ;;
+        esac
+        unset option
+
+    fi
+
+    sleep 1
+
+    adb_restart_server
+    adb_read_partitions
+
+    if [[ -f "${FILE_PARAM}" ]]; then
+
+        file_to_array_mtd
+
+        if [[ "$(count "${!FILES_CHOOSED[@]}")" -eq 0 ]]; then
 
             display_files
 
@@ -151,10 +193,11 @@ function FLASH() {
                 display_error "!!! ERROR: array files is empty !!!"
             fi
 
-            echo "files: ${!FILES_CHOOSED[@]} ${FILES_CHOOSED[@]}"
-            adb_flash_partitions
-
         fi
+
+        display_detected "files: ${!FILES_CHOOSED[@]} ${FILES_CHOOSED[@]}"
+
+        if [[ "$(count "${!FILES_CHOOSED[@]}")" -gt 0 ]]; then adb_flash_partitions; fi
 
     fi
 

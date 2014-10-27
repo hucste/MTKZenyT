@@ -34,7 +34,7 @@ Flash:  -f|-F|-flash
         Pour connaître le nom des partitions, utilisez d'abord l'option
             '--save --info'
 
-        Exemple: --name=nvram:/path/to/file/nvram.img,recovery:/path/to/file/recovery.img
+        Exemple : --name=nvram:/path/to/file/nvram.img,recovery:/path/to/file/recovery.img
 
 *** Autres Commandes ***
 

@@ -94,10 +94,10 @@ function adb_flash_partitions() {
 
                         if [[ "${ZENITY}" -ne 0 ]]; then
                             local key="$(array_search "${index}" "${MTD_NAME[@]}")"; display_detected "key: ${key}"
-                        fi
-
-                        if [[ "${DIALOG}" -ne 0 ]]; then
+                        elif [[ "${DIALOG}" -ne 0 ]]; then
                             local key="${FILES_CHOOSED[$x]}"; display_detected "key: ${key}"
+                        else
+                            local key="$(array_search "${index}" "${MTD_NAME[@]}")"; display_detected "key: ${key}"
                         fi
 
                         local ddname="${MTD_NAME[${key}]}"; display_detected "dd_name: ${ddname}"
