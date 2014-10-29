@@ -41,6 +41,8 @@ USE
 
 Directory 'tools' is necessary to put Archive ZIP SuperSU. You can unzip her into...
 
+29/10/14: Now, you can use tool into console with options. <br />
+    Launch-it with --help to know more.
 
 Config
 ------
@@ -64,8 +66,8 @@ You can rename-it, but in this case, change value into script bash /inc/config
 Enjoy-it!
 ---------
 
-!!! It's a development! <br />
-!!! It's really possible not run!!!
+!!! It's still into development !!! <br />
+!!! Use at yours personals risks !!!
 
 Forum
 -----

@@ -41,6 +41,9 @@ USAGE
 
 Le répertoire 'tools' est nécessaire pour déposer Archive ZIP SuperSU. Vous pouvez le décompresser ...
 
+29/10/14 : Maintenant, il est possible d'utiliser l'outil en console avec des options.<br />
+    Lancez-le avec l'option '--help' afin d'en savoir plus à ce propos.
+
 
 Configuration
 -------------
@@ -65,7 +68,7 @@ Vous pouvez le renommer, mais dans ce cas-là, vous devrez changer la valeur cor
 -----------
 
 !!! C'est en phase de développement ! <br />
-!!! Il est possible que cela ne fonctionne pas !!!
+!!! Utilisez à vos risques et périls !!!
 
 Forum
 -----
