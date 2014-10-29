@@ -125,6 +125,7 @@ text_system_info="System is into: %s (%s)"
 text_unzip="Unzip the archive: %s "
 text_unzip_ok="Unzip ok!"
 text_use_help="Please, use Help to know how to do this!"
+text_use_otherwise_help="Otherwise, please use this tool as '$0 --help' to know how to do it into console..."
 
 text_VendorID="VendorID: %s"
 text_verify_errors="Please, verify there are no errors messages!"

@@ -68,7 +68,7 @@ function display_feature_disable() {
 
 function display_feature_with_gui() {
 
-    mssg="${text_feature_disable}${text_choose_gui}${CONFIG}"
+    mssg="${text_feature_disable}${text_choose_gui}${CONFIG}\n${text_use_otherwise_help}"
     mssg="$(printf "${mssg}" "$1")"
     display_error "${mssg}"
 

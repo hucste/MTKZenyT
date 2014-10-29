@@ -46,6 +46,7 @@ PID[3]="1248" # Redmi MTP with USB Debug
 # Others
 declare -a COLORS_NAME=('black' 'red' 'green' 'yellow' 'blue' 'magenta' 'cyan' 'white')
 declare -a COLORS_VALUE=('0' '1' '2' '3' '4' '5' '6' '7')
+declare -a CFG
 
 declare -A FILES_CHOOSED
 

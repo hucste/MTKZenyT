@@ -92,9 +92,7 @@ function adb_flash_partitions() {
 
                     if [[ "${stat_ext}" -eq "${stat_int}" ]]; then
 
-                        if [[ "${ZENITY}" -ne 0 ]]; then
-                            local key="$(array_search "${index}" "${MTD_NAME[@]}")"; display_detected "key: ${key}"
-                        elif [[ "${DIALOG}" -ne 0 ]]; then
+                        if [[ "${DIALOG}" -ne 0 ]]; then
                             local key="${FILES_CHOOSED[$x]}"; display_detected "key: ${key}"
                         else
                             local key="$(array_search "${index}" "${MTD_NAME[@]}")"; display_detected "key: ${key}"
@@ -385,9 +383,7 @@ function adb_save_partitions() {
 
         for (( x=0 ; x < $(count "${PART_CHOOSED[@]}"); x++ )); do
 
-            if [[ "${ZENITY}" -ne 0 ]]; then
-                local key=$(bc <<< "$(array_search "${PART_CHOOSED[$x]}" "${MTD_NAME[@]}")"); display_detected "key: ${key}"
-            elif [[ "${DIALOG}" -ne 0 ]]; then
+            if [[ "${DIALOG}" -ne 0 ]]; then
                 local key="${PART_CHOOSED[$x]}"; display_detected "key: ${key}"
             else
                 local key=$(bc <<< "$(array_search "${PART_CHOOSED[$x]}" "${MTD_NAME[@]}")"); display_detected "key: ${key}"

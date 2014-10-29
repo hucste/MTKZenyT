@@ -30,4 +30,44 @@ source "${INC}/ADB_functions"
 source "${INC}/functions"
 
 # Launcher
-MTKZenyTux
+if [[ $# -eq 0 ]]; then
+    MTKZenyTux
+else
+    case "$1" in
+        -f|-F|-flash)
+            control_system
+            detect_args "FLASH" "$2"
+            FLASH "$2"
+        ;;
+        -h|-H|-\?|-help)
+            display_help
+        ;;
+        -R|-reboot)
+            adb_reboot_system
+        ;;
+        -RR|-reboot_recovery)
+            adb_reboot_recovery
+        ;;
+        -root)
+            control_system
+            ROOT
+        ;;
+        -s|-S|-save)
+            control_system
+            detect_args "BACKUP" "$2"
+            BACKUP "$2"
+        ;;
+        -unroot)
+            control_system
+            UNROOT
+        ;;
+        *)
+            manage_fonts
+            mssg=$(printf "${text_error_unknown_option}" "$1")
+            display_error "${mssg}\n"
+            press_any_key
+            display_help
+            exit 1
+        ;;
+    esac
+fi

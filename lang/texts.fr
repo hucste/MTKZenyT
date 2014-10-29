@@ -127,6 +127,7 @@ text_system_info="Le système est positionné dans : %s (%s)"
 text_unzip="Décompression de l'archive : %s "
 text_unzip="Décompression terminée correctement !"
 text_use_help="Veuillez utiliser l'aide pour savoir comment faire !"
+text_use_otherwise_help="Sinon, veuillez utiliser l'outil '$0 --help' pour savoir comment faire en mode console ..."
 
 text_VendorID="VendorID: %s"
 text_verify_errors="SVP, vérifiez qu'il n'y ait pas de messages d'erreurs !"

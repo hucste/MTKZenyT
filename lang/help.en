@@ -37,6 +37,8 @@ Flash:  -f|-F|-flash
 
 Reboot: -R|-reboot
 Reboot Recovery:    -RR|-reboot_recovery
+Root:	-root
+UnRoot:	-unroot
 
 *** Informations ***
 

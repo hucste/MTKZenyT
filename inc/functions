@@ -36,10 +36,18 @@ function BACKUP() {
             ;;
             "name")
                 if [[ "${1:6:1}" != "=" ]]; then
+
                     display_unknown_option "${1:6:1}"
                     EXIT
+
                 else
-                    PART_CHOOSED=($(explode "," "${1#*=}"))
+
+                    if grep "," <<< "${1#*=}"; then
+                        PART_CHOOSED=($(explode "," "${1#*=}"))
+                    else
+                        PART_CHOOSED[0]="${1#*=}"
+                    fi
+
                     display_detected "PART_CHOOSED: ${PART_CHOOSED[@]}"
                 fi
             ;;
@@ -143,18 +151,26 @@ function FLASH() {
 
             else
 
-                PART_CHOOSED=($(explode "," "${1#*=}"))
+                if grep "," <<< "${1#*=}"; then
+                    PART_CHOOSED=($(explode "," "${1#*=}"))
+                else
+                    PART_CHOOSED[0]="${1#*=}"
+                fi
                 display_detected "PART_CHOOSED: ${PART_CHOOSED[@]}"
 
-                for part in "${PART_CHOOSED[@]}"; do
-                    local -i position=$(awk -v search=: '{print index($0,search)}' <<< "${part}")
-                    local name="${part:0:$position-1}"
-                    local file="${part:$position}"
+                if [[ "$(count "${PART_CHOOSED[@]}")" -gt 0 ]]; then
+                    for part in "${PART_CHOOSED[@]}"; do
+                        local -i position=$(awk -v search=: '{print index($0,search)}' <<< "${part}")
+                        if [[ "${position}" -gt 0 ]]; then
+                            local name="${part:0:$position-1}"
+                            local file="${part:$position}"
 
-                    FILES_CHOOSED["${name}"]="${file}"
+                            FILES_CHOOSED["${name}"]="${file}"
+                        fi
 
-                    unset position name file
-                done
+                        unset position name file
+                    done
+                fi
 
                 unset PART_CHOOSED
 
@@ -166,7 +182,7 @@ function FLASH() {
 
     fi
 
-    sleep 1
+    sleep 1; echo "CHOOSED: ${FILES_CHOOSED[@]}"; EXIT
 
     adb_restart_server
     adb_read_partitions
@@ -431,6 +447,11 @@ function detect_args() {
     case "${action}" in
         "BACKUP")
             if [[ "${option}" != "info" && "${option}" != "name" ]]; then
+                ERROR=1
+            fi
+        ;;
+        "CFG")
+            if [[ "${option}" != "info" ]]; then
                 ERROR=1
             fi
         ;;
