@@ -14,7 +14,8 @@ Author
 [2]: http://forum.frandroid.com/user/1514-atpmiui/
 [3]: http://www.freaktab.com/member.php?42437-ATP
 <br />
-*GIT* : <https://github.com/hucste/MTKZenyT>
+*GIT* : https://github.com/hucste/MTKZenyT/
+*Licence* : CC0 http://directory.fsf.org/wiki/License:CC0
 
 ----
 

@@ -122,6 +122,7 @@ function EXIT() {
     adb kill-server
     display_mssg "n" "${text_goodbye}" "${title_goodbye}" "1"
     destruct
+    clear
     exit 0
 
 }
@@ -182,7 +183,7 @@ function FLASH() {
 
     fi
 
-    sleep 1; echo "CHOOSED: ${FILES_CHOOSED[@]}"; EXIT
+    sleep 1; echo "CHOOSED: ${FILES_CHOOSED[@]}"; #EXIT
 
     adb_restart_server
     adb_read_partitions
