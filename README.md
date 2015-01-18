@@ -14,7 +14,7 @@ Author
 [2]: http://forum.frandroid.com/user/1514-atpmiui/
 [3]: http://www.freaktab.com/member.php?42437-ATP
 <br />
-*GIT* : https://github.com/hucste/MTKZenyT/
+*GIT* : https://github.com/hucste/MTKZenyT/<br />
 *Licence* : CC0 http://directory.fsf.org/wiki/License:CC0
 
 ----
@@ -53,11 +53,11 @@ You can rename-it, but in this case, change value into script bash /inc/config
 
 **To use:**
 
-1. **To display a GUI:** *Change value of **GUI***
+1. **To display a GUI:** *Change value of* **GUI**
     - dialog: `GUI=d` or `GUI=dialog`
     - zenity: `GUI=z` or `GUI=zenity`
     - no: `GUI=0` or `GUI=no`
-2. **To log activities:** *Change value of **LOG***
+2. **To log activities:** *Change value of* **LOG**
     - `0` to disable,
     - `1` to enable.
 3. **BCPK_PHONE** is variable to indicate where create backups into your phone.

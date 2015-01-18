@@ -14,7 +14,8 @@ Auteur
 [2]: http://forum.frandroid.com/user/1514-atpmiui/
 [3]: http://www.freaktab.com/member.php?42437-ATP
 <br />
-*GIT* : <https://github.com/hucste/MTKZenyT>
+*GIT* : <https://github.com/hucste/MTKZenyT><br />
+*Licence* : CC0 http://directory.fsf.org/wiki/License:CC0
 
 ----
 
@@ -53,11 +54,11 @@ Vous pouvez le renommer, mais dans ce cas-là, vous devrez changer la valeur cor
 
 **Paramètrages : **
 
-1. **Pour afficher une interface graphique:** *Il faut changer la valeur de **GUI***
+1. **Pour afficher une interface graphique:** *Il faut changer la valeur de* **GUI**
     - dialog: `GUI=d` ou `GUI=dialog`
     - zenity: `GUI=z` ou `GUI=zenity`
     - no: `GUI=0` ou `GUI=no`
-2. **Pour journaliser l'activité :** *Il faut changer la valeur de **LOG***
+2. **Pour journaliser l'activité :** *Il faut changer la valeur de* **LOG**
     - `0` pour désactiver,
     - `1` pour activer.
 3. **BCPK_PHONE** est la variable pour indiquer où créer les sauvegardes dans l'appareil.
