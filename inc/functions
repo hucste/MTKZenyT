@@ -183,7 +183,7 @@ function FLASH() {
 
     fi
 
-    sleep 1; echo "CHOOSED: ${FILES_CHOOSED[@]}"; #EXIT
+    sleep 1; echo "$FUNCNAME: FILES CHOOSED: ${FILES_CHOOSED[@]}"; #EXIT
 
     adb_restart_server
     adb_read_partitions
