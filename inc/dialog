@@ -1,5 +1,7 @@
 #!/bin/bash
 
+if ! ${EXEC}; then exit; fi
+
 function dialog_info() {
 
     # call: display_info

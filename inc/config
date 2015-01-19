@@ -1,65 +1,46 @@
 #!/bin/bash
 
+if ! ${EXEC}; then exit; fi
+
+if [[ -z "${PWD}" ]]; then PWD="$(pwd)"; fi
+if [[ -z "${INC}" ]]; then INC="${PWD}/inc"; fi
+
 CONFIG="config.ini" # file to save some variables
-BCKP_PHONE="/sdcard/BACKUP/" # dir to backup into phone
-
-# Packages names
-SuperSU="Superuser.apk"
-SSU_VERSION="2.14"
-SSUD="99SuperSUDaemon"
-SU="su"
-
-# URL app
-DL_SUPERSU="http://download.chainfire.eu/578/SuperSU/UPDATE-SuperSU-v${SSU_VERSION}.zip?retrieve_file=1"
-URL_SUPERSU="http://download.chainfire.eu/supersu"
-
-# others vars - DONT TOUCH!!!
-PWD=$(pwd)
-
-# Directories where are packages needed into your computer
+DIR_CFG="${INC}/cfg/"
 DIR_TOOLS="${PWD}/tools/"
-DIR_UNZIP="${DIR_TOOLS}UPDATE-SuperSU-v${SSU_VERSION}"
-DIR_SSU_UPD="${DIR_TOOLS}UPDATE-SuperSU-v${SSU_VERSION}/"
-DIR_ARM="${DIR_SSU_UPD}arm/"
-DIR_CMN="${DIR_SSU_UPD}common/"
-DIR_SSU="${DIR_CMN}${SuperSU}"
-DIR_SSUD="${DIR_CMN}${SSUD}"
-DIR_SU="${DIR_ARM}${SU}"
 
-# Directories where are packages into device system
-SYS_APP="/system/app/"
-SYS_BIN="/system/xbin/"
-SYS_ETC="/system/etc/"
+###
+# source config files needed
+###
+source "${DIR_CFG}/cfg_partitions"
+source "${DIR_CFG}/cfg_SuperSU"
+source "${DIR_CFG}/cfg_time"
 
-# VendorIDs
-VID[0]="0bb4" # recognized as HTC (High Tech Computer Corp.)
-VID[1]="2717" # Xiaomi
-VID[2]="2717" # Xiaomi
-VID[3]="2717" # Xiaomi
+###
+# Arrays
+###
 
-# ProductIDs
-PID[0]="0c03" # recognized as Android Phone [Fairphone First Edition (FP1)]
-PID[1]="1218" # Redmi PTP with USB Debug
-PID[2]="1228" # Redmi UMS with USB Debug
-PID[3]="1248" # Redmi MTP with USB Debug
-
-# Others
+# arrays to build informations colored
 declare -a COLORS_NAME=('black' 'red' 'green' 'yellow' 'blue' 'magenta' 'cyan' 'white')
 declare -a COLORS_VALUE=('0' '1' '2' '3' '4' '5' '6' '7')
-declare -a CFG
+
+#declare -a CFG
 
 declare -A FILES_CHOOSED
 
 declare -a GUIS=( 'd' 'dialog' 'z' 'zenity')
 
+# arrays to build mapping informations
 declare -a INFO_MAP
 declare -a INFO_NAME=('name' 'size' 'addr' 'type' 'map')
 
+# arrays to build menu
 declare -a MENU_NAME=("BACKUP" "FLASH" "ROOT" "UNROOT" "REBOOT" "EXIT")
 declare -a MENU_REBOOT=("RECOVERY" "SYSTEM")
 declare -A MENU_TEXT
 declare -A MENU_TEXT_REBOOT
 
+# arrays to get MTD informations
 declare -a MTD_ADDR
 declare -a MTD_MAP
 declare -a MTD_NAME
@@ -70,20 +51,34 @@ declare -a MTD_ADDR_DEC
 declare -a MTD_SIZE_BLOCK
 declare -a MTD_SIZE_DEC
 
-# Partitions
-declare -a PART_NAME=("android" "usrdata")
-declare -a PART_TEXT=("system" "data")
-# files to saved by default
-declare -a PART_CHOOSED
-declare -a PART_DEFAULT=('uboot' 'bootimg' 'recovery' 'logo' 'android' 'usrdata')
-declare -a PART_NOBCKP=('pmt' 'pro_info' 'protect_f' 'protect_s' 'seccfg' 'misc' 'expdb' 'bmtpool')
+# ProductIDs
+PID[0]="0c03" # recognized as Android Phone [Fairphone First Edition (FP1)]
+PID[1]="1218" # Redmi PTP with USB Debug
+PID[2]="1228" # Redmi UMS with USB Debug
+PID[3]="1248" # Redmi MTP with USB Debug
 
-declare -a STATS_SSU_SIZE=('5864' '2647595' '2647622')
-declare -a STATS_SSU_VERSION=('2.02' '2.13' '2.14')
+# VendorIDs
+VID[0]="0bb4" # recognized as HTC (High Tech Computer Corp.)
+VID[1]="2717" # Xiaomi
+#VID[2]="2717" # Xiaomi
+#VID[3]="2717" # Xiaomi
 
-# Others variable
+###
+# Int variables
+###
+declare -i CHOICE=0
+declare -i CFG=0
+declare -i DIALOG=0
+declare -i INODE=4096
+declare -i LOG=0
+declare -i ZENITY=0
+
+###
+# String variables
+###
 adb_su=""
 
+BCKP_PHONE="/sdcard/BACKUP/" # dir to backup into phone
 DIR_CHOOSED=""
 DIR_TMP="/tmp/"
 DIR_SVG=""
@@ -91,19 +86,14 @@ DIR_SVG_DATED=""
 FILE_CHOOSED=""
 FILE_DUMCHAR="dumchar.info"
 FILE_PARAM="${DIR_TOOLS}${FILE_DUMCHAR}"
-FILE_SSU_ZIP="${DIR_TOOLS}UPDATE-SuperSU-v${SSU_VERSION}.zip"
 GUI=""
-HOME=~
+HOME="/home/$USER"  #HOME=~
+MODE=""
 #PART_BCKP=""
 SCRIPT_NAME=$0
 SCRIPT_TMP_DIR="${DIR_TMP}${SCRIPT_NAME:2}/"
 
-DAY=$(date +"%d-%m-%Y")
-NOW=$(date +"%d-%m-%Y_%H-%M-%S")
-
-declare -i CHOICE=0
-declare -i CFG=0
-declare -i DIALOG=0
-declare -i INODE=4096
-declare -i LOG=0
-declare -i ZENITY=0
+# Directories where are packages into device system
+SYS_APP="/system/app/"
+SYS_BIN="/system/xbin/"
+SYS_ETC="/system/etc/"

@@ -1,0 +1,40 @@
+#!/bin/bash
+
+if ! ${EXEC}; then exit; fi
+
+###
+# file config: informations about SuperSU
+###
+
+# Packages names
+#SuperSU="Superuser.apk"
+SSU_APK="Superuser.apk"
+#SSUD="99SuperSUDaemon"
+SSU_SSUD="99SuperSUDaemon"
+SSU_SU="su"
+SSU_VERSION="2.14"
+
+# Directories where are packages needed into your computer
+#DIR_UNZIP="${DIR_TOOLS}UPDATE-SuperSU-v${SSU_VERSION}"
+#DIR_SSU_UPD="${DIR_TOOLS}UPDATE-SuperSU-v${SSU_VERSION}/"
+SSU_DIR="${DIR_TOOLS}UPDATE-SuperSU-v${SSU_VERSION}/"
+SSU_DIR_ARM="${SSU_DIR}arm/"
+SSU_DIR_CMN="${SSU_DIR}common/"
+SSU_DIR_APK="${SSU_DIR_CMN}${SSU_APK}"
+SSU_DIR_SSUD="${SSU_DIR_CMN}${SSU_SSUD}"
+SSU_DIR_SU="${SSU_DIR_ARM}${SSU_SU}"
+#SSU_DIR_UNZIP="${DIR_TOOLS}UPDATE-SuperSU-v${SSU_VERSION}"
+SSU_DIR_UNZIP="${SSU_DIR%?}"
+
+#SSU_FILE_ZIP="${DIR_TOOLS}UPDATE-SuperSU-v${SSU_VERSION}.zip"
+SSU_FILE_ZIP="${SSU_DIR%?}.zip"
+
+# URL app
+#DL_SUPERSU="http://download.chainfire.eu/578/SuperSU/UPDATE-SuperSU-v${SSU_VERSION}.zip?retrieve_file=1"
+#URL_SUPERSU="http://download.chainfire.eu/supersu"
+SSU_DL="http://download.chainfire.eu/578/SuperSU/UPDATE-SuperSU-v${SSU_VERSION}.zip?retrieve_file=1"
+SSU_URL="http://download.chainfire.eu/supersu"
+
+# arrays about SuperSU informations
+declare -a SSU_STATS_SIZE=('5864' '2647595' '2647622')
+declare -a SSU_STATS_VERSION=('2.02' '2.13' '2.14')

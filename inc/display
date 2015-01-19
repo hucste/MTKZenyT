@@ -1,5 +1,7 @@
 #!/bin/bash
 
+if ! ${EXEC}; then exit; fi
+
 function display_detected() {
 
     # call: display_detected mssg
@@ -118,17 +120,23 @@ function display_menu() {
 
     while true; do
         choice=""
+        local info_product="" info_text=""
 
         if [[ "${ZENITY}" -ne 0 ]]; then
 
-            choice=$( echos_menu | zenity_list "${text_welcome}" "${title_welcome}" "$(count ${MENU_NAME[@]})")
+            info_product="$(printf "<span color=\"${green}\"><b>${text_VendorID} - ${text_ProductID} - ${MODE} -</b></span>" "${vid}" "${pid}")"
+            info_text="$(printf "%s" "${info_product}\n${text_menu_action}")"
+            choice=$( echos_menu | zenity_list "${info_text}" "${title_welcome}" "$(count ${MENU_NAME[@]})")
 
         elif  [[ "${DIALOG}" -ne 0 ]]; then
 
             echos_menu
 
+            info_product="$(printf "${text_VendorID} - ${text_ProductID} - ${MODE} -" "${vid}" "${pid}")"
+            info_text="$(printf "%s" "${info_product}\n${text_menu_action}")"
+
             exec 3>&1;
-            choice=$(dialog_menu "${text_welcome}" "${title_welcome}" "$(count ${MENU_NAME[@]})")
+            choice=$(dialog_menu "${info_text}" "${title_welcome}" "$(count ${MENU_NAME[@]})")
             exec 3>&-;
 
             unset menu
@@ -137,7 +145,7 @@ function display_menu() {
 
             printf "\n${title_menu}\n"
 
-            PS3="${text_welcome} "
+            PS3="${text_menu_action} "
             select menu in "${MENU_NAME[@]}"; do
                 if [[ "${REPLY}" == "q" || "${REPLY}" == "Q" ]]; then
                     choice="EXIT"
@@ -150,6 +158,8 @@ function display_menu() {
             unset menu
 
         fi
+
+        unset info_product info_text
 
         # if choice exists, then run-it!
         if [[ "$choice" ]]; then

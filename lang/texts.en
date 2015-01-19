@@ -67,6 +67,7 @@ text_into_tools="Put into folder tools: %s"
 text_label_cancel="Quit"
 text_label_ok="Validate"
 
+text_menu_action="What action, do you want: "
 text_menu_cancel="Are you sure than cancel-it?"
 text_menu_files="Which files do you want to flash?"
 
@@ -132,6 +133,6 @@ text_verify_errors="Please, verify there are no errors messages!"
 text_verify_file="Please, verify file '%s' is into folder tools '%s'."
 text_verify_installed="The programme will verify all tools needed are installed!"
 
-text_welcome="What action, do you want: "
+#text_welcome="What action, do you want: "
 
 text_yes_no=" (Y:yes ; N:no) "

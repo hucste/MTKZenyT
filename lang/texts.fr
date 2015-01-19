@@ -68,8 +68,8 @@ text_into_tools="Placez-la dans le répertoire tools suivant : %s"
 text_label_cancel="Quitter"
 text_label_ok="Valider"
 
+text_menu_action="Que voulez-vous faire : "
 text_menu_cancel="Êtes-vous sûr de vouloir annuler ?"
-
 text_menu_files="Quels fichiers désirez-vous flasher ?"
 
 text_menu_BACKUP="Sauvegarder votre appareil"
@@ -134,7 +134,7 @@ text_verify_errors="SVP, vérifiez qu'il n'y ait pas de messages d'erreurs !"
 text_verify_file="SVP, vérifiez que le fichier '%s' soit bien dans le répertoire '%s'."
 text_verify_installed="Le programme va vérifier que vous ayez bien les différents outils !"
 
-text_welcome="Que voulez-vous faire : "
+#text_welcome="Que voulez-vous faire : "
 
 text_yes_no=" (O:oui ; N:non) "
 

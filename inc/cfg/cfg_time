@@ -1,0 +1,10 @@
+#!/bin/bash
+
+if ! ${EXEC}; then exit; fi
+
+###
+# file config: get time informations
+###
+
+DAY=$(date +"%d-%m-%Y")
+NOW=$(date +"%d-%m-%Y_%H-%M-%S")

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+if ! ${EXEC}; then exit; fi
+
 function MTKZenyTux() {
 
     echo -e "#################################"
@@ -19,6 +21,7 @@ function BACKUP() {
     if [[ "$1" == "" ]]; then
 
         in_array "${GUI}" "${GUIS[@]}";
+
         if [[ $? -eq 1 ]]; then
             display_feature_with_gui "${FUNCNAME}"
             display_menu
@@ -157,11 +160,14 @@ function FLASH() {
                 else
                     PART_CHOOSED[0]="${1#*=}"
                 fi
+
                 display_detected "PART_CHOOSED: ${PART_CHOOSED[@]}"
 
                 if [[ "$(count "${PART_CHOOSED[@]}")" -gt 0 ]]; then
+
                     for part in "${PART_CHOOSED[@]}"; do
                         local -i position=$(awk -v search=: '{print index($0,search)}' <<< "${part}")
+
                         if [[ "${position}" -gt 0 ]]; then
                             local name="${part:0:$position-1}"
                             local file="${part:$position}"
@@ -199,11 +205,17 @@ function FLASH() {
             if [[ "${files}" ]]; then files=($(explode " " "${files}")); fi
 
             if [[ -n "${files[@]}" ]]; then
+
                 for file in "${files[@]}"; do
+
                     if [[ -n "${file}" ]]; then
+
                         if [[ "${DIALOG}" -ne 0 ]]; then file="${MTD_NAME[${file}]}"; fi
+
                         choose_directory "f" "${text_choose_file}${file}";
+
                         if [[ -n "${FILE_CHOOSED}" ]]; then FILES_CHOOSED["${file}"]="${FILE_CHOOSED}"; fi
+
                     fi
                 done
             else
@@ -233,6 +245,7 @@ function REBOOT() {
 
         if [[ "${ZENITY}" -ne 0 ]]; then
             reboot=$( echos_menu_reboot | zenity_list "${text_reboot}" "${title_reboot}" "$(count ${MENU_REBOOT[@]})")
+
         elif  [[ "${DIALOG}" -ne 0 ]]; then
             echos_menu_reboot
 
@@ -478,12 +491,19 @@ function detect_device() {
         display_mssg "n" "${text_detect_dev}" "" "1";
     fi
 
-    for (( x=0; x < $(count "${VID[@]}") ; x++ )); do
-        lsusb=$(lsusb | egrep "${VID[$x]}")
+    for (( x=0; x < $(count "${PID[@]}") ; x++ )); do
+
+        if [[ $x -eq 0 ]]; then
+            vid="${VID[$x]}"
+        else
+            vid="${VID[1]}"
+        fi
+
+        lsusb=$(lsusb | egrep "${vid}")
 
         if [[ "${lsusb}" ]]; then
-            pid=${PID[$x]}
-            vid=${VID[$x]}
+            pid="${PID[$x]}"
+            #vid="${VID[$x]}"
             break;
         fi
 
@@ -503,32 +523,33 @@ function detect_device() {
 
     else
 
-        local mode=""
-
         display_detected "${text_VendorID}" "${vid}"
         display_detected "${text_ProductID}" "${pid}"
 
         if [[ "${vid}" == "${VID[0]}" ]]; then
-            mode="Mode: Recovery"
+            MODE="${MENU_REBOOT[0]}"
         else
-            mode="Mode: Session"
+            MODE="${MENU_REBOOT[1]}"
         fi
 
-        display_detected "${mode}"
+        local mssg="Mode: ${MODE}"
+        display_detected "${mssg}"
 
         if [[ "${DIALOG}" -ne 0 ]]; then
-            mssg="$(printf "%s" "\Z${bold}\Z${green}${text_VendorID}\n${text_ProductID}\n${mode}\Z${neutral}\Z${unbold}")"
+
+            mssg="$(printf "%s" "\Z${bold}\Z${green}${text_VendorID}\n${text_ProductID}\n${mssg}\Z${neutral}\Z${unbold}")"
             mssg="$(printf "${mssg}" "${vid}" "${pid}")";
             display_mssg "n" "${mssg}";
+
         elif [[ "${ZENITY}" -ne 0 ]]; then
-            mssg="$(printf "%s" "<span color=\"${green}\"><b>${text_VendorID}\n${text_ProductID}\n${mode}</b></span>")"
+
+            mssg="$(printf "%s" "<span color=\"${green}\"><b>${text_VendorID}\n${text_ProductID}\n${mssg}</b></span>")"
             mssg="$(printf "${mssg}" "${vid}" "${pid}")";
             display_mssg "i" "${mssg}" "${text_detect_dev}" "${title_detect_dev}";
+
         fi
 
-        if [[ "${mssg}" ]]; then
-            unset mssg
-        fi
+        if [[ "${mssg}" ]]; then unset mssg; fi
 
     fi
 
@@ -589,21 +610,25 @@ function explode() {
 
 function extract_archive_zip() {
 
-    if [[ -d "${DIR_SSU_UPD}" ]]; then
+    if [[ -d "${DIR_SSU}" ]]; then
 
         display_mssg "q" "${text_dir_ssu_upd}"
 
         if [[ "${ZENITY}" -ne 0 ]]; then
+
             REPLY=$?
+
         elif [[ "${DIALOG}" -ne 0 ]]; then
+
             REPLY="${read}"
+
         fi
 
         case "${REPLY}" in
             o|O|y|Y|0)
                 sleep 1 ;;
             n|N|1)
-                delete_dir "${DIR_SSU_UPD}"; sleep 3 ;;
+                delete_dir "${DIR_SSU}"; sleep 3 ;;
             *)
                 display_error "${text_choice_invalid}"
                 press_any_key
@@ -613,24 +638,24 @@ function extract_archive_zip() {
 
     fi
 
-    if [[ ! -d "${DIR_SSU_UPD}" ]]; then
+    if [[ ! -d "${DIR_SSU}" ]]; then
 
-        if [[ -f "${FILE_SSU_ZIP}" ]]; then
+        if [[ -f "${SSU_FILE_ZIP}" ]]; then
 
-            mssg=$(printf "\n${text_unzip}\n" "${FILE_SSU_ZIP}")
+            mssg=$(printf "\n${text_unzip}\n" "${SSU_FILE_ZIP}")
             display_mssg "n" "${mssg}"
             unzip -o "${DIR_UNZIP}" -d "${DIR_UNZIP}"
 
             if [[ $? -eq 0 ]]; then
-                mssg="$(printf "${text_unzip_ok}" "${FILE_SSU_ZIP}")"
+                mssg="$(printf "${text_unzip_ok}" "${SSU_FILE_ZIP}")"
                 display_mssg "n" "${mssg}"
 
-                write_file "log" "${NOW} ### $FUNCNAME: Unzip OK: ${DIR_TOOLS}UPDATE-SuperSU-${SSU_VERSION}"
+                write_file "log" "${NOW} ### $FUNCNAME: Unzip OK: ${SSU_DIR_UNZIP}"
             else
-                mssg="$(printf "${text_error_unzip}" "$?" "${FILE_SSU_ZIP}")"
+                mssg="$(printf "${text_error_unzip}" "$?" "${SSU_FILE_ZIP}")"
                 display_error "${mssg}"
 
-                write_file "log" "${NOW} ### $FUNCNAME: Unzip KO: ${DIR_TOOLS}UPDATE-SuperSU-${SSU_VERSION}"
+                write_file "log" "${NOW} ### $FUNCNAME: Unzip KO: ${SSU_DIR_UNZIP}"
 
                 press_any_key
                 EXIT
@@ -734,7 +759,6 @@ function file_stat() {
 function get_info_system() {
 
     # call: get_info_system partition_name
-
     adb_read_partitions
 
     extract_info_system "$1"
@@ -1125,10 +1149,10 @@ function unroot_to_system() {
 
 function verify_ssu_exists() {
 
-    if [[ ! -f "${FILE_SSU_ZIP}" ]]; then
+    if [[ ! -f "${SSU_FILE_ZIP}" ]]; then
 
-        mssg=$(printf "\n${text_app_inexistant}\n" "${SuperSU}")
-        mssg="${mssg}"$(printf "${text_app_dl}\n" "${SuperSU}" "${URL_SUPERSU}")
+        mssg=$(printf "\n${text_app_inexistant}\n" "${SSU_APK}")
+        mssg="${mssg}"$(printf "${text_app_dl}\n" "${SSU_APK}" "${SSU_URL}")
         mssg="${mssg}"$(printf "\n${text_ask_dl} ${text_yes_no}")
 
         display_mssg "q" "${mssg}" ""
@@ -1146,11 +1170,11 @@ function verify_ssu_exists() {
         while true; do
             case $REPLY in
                 y|Y|o|O|0)
-                    dl_file "${DL_SUPERSU}" "${FILE_SSU_ZIP}"
+                    dl_file "${SSU_DL}" "${SSU_FILE_ZIP}"
                     break
                 ;;
                 n|N|1)
-                    dl_yourself "${SuperSU}"
+                    dl_yourself "${SSU_APK}"
                 ;;
                 *)
                     display_error "${text_choice_invalid}"
@@ -1174,14 +1198,14 @@ function verify_ssu_exists() {
 
 function verify_archive() {
 
-    if [[ -f "${FILE_SSU_ZIP}" ]]; then
+    if [[ -f "${SSU_FILE_ZIP}" ]]; then
 
-        local key="$(array_search "${SSU_VERSION}" "${STATS_SSU_VERSION[@]}")"
-        local stat="$(stat -c "%s" "${FILE_SSU_ZIP}")"
+        local key="$(array_search "${SSU_VERSION}" "${SSU_STATS_VERSION[@]}")"
+        local stat="$(stat -c "%s" "${SSU_FILE_ZIP}")"
 
-        if [[ "${stat}" -ne "${STATS_SSU_SIZE[${key}]}" ]]; then
+        if [[ "${stat}" -ne "${SSU_STATS_SIZE[${key}]}" ]]; then
 
-            mssg="$(printf "${text_error_zip_ssu}" "${stat}" "${STATS_SSU_SIZE[${key}]}")"
+            mssg="$(printf "${text_error_zip_ssu}" "${stat}" "${SSU_STATS_SIZE[${key}]}")"
             display_error "${mssg}"
 
             dl_yourself

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+if ! ${EXEC}; then exit; fi
+
 function adb_delete_su_datas() {
 
     adb_su
@@ -32,16 +34,16 @@ function adb_delete_su_system() {
 
     adb_su
 
-    mssg=$(printf "${text_remove}\n" "${SU}")
+    mssg=$(printf "${text_remove}\n" "${SSU_SU}")
     display_mssg "n" "${mssg}" "" "2"
 
     adb shell "${adb_su}find /system/bin/.ext/ -type f -name '*su' -delete"
     adb shell "${adb_su}find '${SYS_BIN}' -type f -name 'sugote*' -delete"
-    adb shell "${adb_su}find '${SYS_BIN}' -type f -name '${SSUD}' -delete"
+    adb shell "${adb_su}find '${SYS_BIN}' -type f -name '${SSU_SSUD}' -delete"
     adb shell "${adb_su}find '${SYS_ETC}init.d' -type f -name 'daemonsu' -delete"
     adb shell "${adb_su}find '${SYS_ETC}' -type f -name '*installed_su_daemon' -delete"
     adb shell "${adb_su}find /system/bin/ -name 'su' -delete"
-    adb shell "${adb_su}find '${SYS_BIN}' -type f -name '${SU}' -delete"
+    adb shell "${adb_su}find '${SYS_BIN}' -type f -name '${SSU_SU}' -delete"
 
     mssg=$(printf "${text_datas_removed}\n" "system")
     display_mssg "n" "${mssg}"
@@ -52,7 +54,7 @@ function adb_delete_supersu() {
 
     adb_su
 
-    mssg=$(printf "${text_remove}\n" "${SuperSU}")
+    mssg=$(printf "${text_remove}\n" "${SSU_APK}")
     display_mssg "n" "${mssg}"
 
     adb shell "${adb_su}find '${SYS_APP}' -iname 'superuser*' -delete"
@@ -264,56 +266,64 @@ function adb_root_system() {
         sleep 1
         local ERROR=0
 
-        if [[ -f "${DIR_SSU}" ]]; then
+        if [[ -f "${SSU_DIR_APK}" ]]; then
+
             display_mssg "n" "${text_supersu_cp}${SYS_APP}"
-            adb push "${DIR_SSU}" "${SYS_APP}"
+            adb push "${SSU_DIR_APK}" "${SYS_APP}"
 
             display_mssg "n" "${text_supersu_chmod}${SYS_APP}"
-            adb shell 'if [[ -f "${SYS_APP}${SuperSU}" ]]; then chmod 0644 "${SYS_APP}${SuperSU}"; fi'
-            adb shell 'if [[ -f "${SYS_APP}${SuperSU}" ]]; then chown 0:0 "${SYS_APP}${SuperSU}"; fi'
+            adb shell 'if [[ -f "${SYS_APP}${SSU_APK}" ]]; then chmod 0644 "${SYS_APP}${SSU_APK}"; fi'
+            adb shell 'if [[ -f "${SYS_APP}${SSU_APK}" ]]; then chown 0:0 "${SYS_APP}${SSU_APK}"; fi'
             sleep 1
+
         else
-            mssg="$(printf "${text_error_file}" "${DIR_SSU}")"
+
+            mssg="$(printf "${text_error_file}" "${SSU_DIR_APK}")"
             display_error "${mssg}"
             ERROR=1
+
         fi
 
-        if [[ -f "${DIR_SU}" ]]; then
+        if [[ -f "${SSU_DIR_SU}" ]]; then
+
             display_mssg "n" "${text_su_cp}${SYS_BIN}"
-            adb push "${DIR_SU}" "${SYS_BIN}"
-            #adb shell cp "${SYS_BIN}${SU}" "${SYS_BIN}daemonsu"
-            #adb shell cp "${SYS_BIN}${SU}" "/system/bin/.ext/.${SU}"
+            adb push "${SSU_DIR_SU}" "${SYS_BIN}"
+            #adb shell cp "${SYS_BIN}${SSU_SU}" "${SYS_BIN}daemonsu"
+            #adb shell cp "${SYS_BIN}${SSU_SU}" "/system/bin/.ext/.${SSU_SU}"
             sleep 1
 
-            display_mssg "n" "chmod and chown ${SYS_BIN}${SU}"
+            display_mssg "n" "chmod and chown ${SYS_BIN}${SSU_SU}"
 
-            SDK=$(adb shell egrep ro.build.version.sdk /system/build.prop | dd bs=1 skip=21 count=2)
+            local SDK=$(adb shell egrep ro.build.version.sdk /system/build.prop | dd bs=1 skip=21 count=2)
             #SDK="$(adb shell grep ro.build.version.sdk /system/build.prop)"
             #echo "SDK: $SDK"
             #SDK="${SDK##*=}"
             echo "SDK: ${SDK}"
             if [[ "${SDK}" -gt 17 ]]; then
                 display_detected "SDK: ${SDK} > 17"
-                adb shell 'if [[ -f "${SYS_BIN}${SU}" ]]; then chmod 0755 "${SYS_BIN}${SU}"; fi'
-                #adb shell chmod 0755 "/system/bin/.ext/.${SU}"
+                adb shell 'if [[ -f "${SYS_BIN}${SSU_SU}" ]]; then chmod 0755 "${SYS_BIN}${SSU_SU}"; fi'
+                #adb shell chmod 0755 "/system/bin/.ext/.${SSU_SU}"
             else
                 display_detected "SDK: ${SDK} <= 17"
-                #adb shell 'if [[ -f "${SYS_BIN}${SU}" ]]; then chmod 06755 "${SYS_BIN}${SU}"; fi'
+                #adb shell 'if [[ -f "${SYS_BIN}${SSU_SU}" ]]; then chmod 06755 "${SYS_BIN}${SSU_SU}"; fi'
                 adb shell 'if [[ -f /system/xbin/su ]]; then chmod 06755 /system/xbin/su; fi'
-                #adb shell chmod 06755 "/system/bin/.ext/.${SU}"
+                #adb shell chmod 06755 "/system/bin/.ext/.${SSU_SU}"
             fi
             unset SDK
 
-            adb shell 'if [[ -f "${SYS_BIN}${SU}" ]]; then chown 0:0 "${SYS_BIN}${SU}"; fi'
-            adb shell "if [[ ! -h '/system/bin/${SU}' ]]; then ln -s ${SYS_BIN}${SU} /system/bin/${SU}; fi"
+            adb shell 'if [[ -f "${SYS_BIN}${SSU_SU}" ]]; then chown 0:0 "${SYS_BIN}${SSU_SU}"; fi'
+            adb shell "if [[ ! -h '/system/bin/${SSU_SU}' ]]; then ln -s ${SYS_BIN}${SSU_SU} /system/bin/${SSU_SU}; fi"
+
         else
-            mssg="$(printf "${text_error_file}" "${DIR_SU}")"
+
+            mssg="$(printf "${text_error_file}" "${SSU_DIR_SU}")"
             display_error "${mssg}"
             ERROR=1
+
         fi
 
         #adb shell chmod 0755 "${SYS_BIN}daemonsu"
-        #adb shell chown 0:0 "/system/bin/.ext/.${SU}"
+        #adb shell chown 0:0 "/system/bin/.ext/.${SSU_SU}"
 
         #display_mssg "n" "cp busybox into /tmp"
         #adb shell cp "${SYS_BIN}busybox" /tmp/busybox
@@ -330,10 +340,10 @@ function adb_root_system() {
 
         #display_mssg "i" "Verify ${SYS_ETC}init.d and create if not exists!"
             #adb shell "if [[ ! -d '${SYS_ETC}init.d' ]]; then mkdir '${SYS_ETC}init.d'; fi"
-            #adb push "${DIR_SSUD}" "${SYS_ETC}init.d"
+            #adb push "${SSU_DIR_SSUD}" "${SYS_ETC}init.d"
 
-            #adb shell chmod 0755 "${SYS_ETC}init.d/${SSUD}"
-            #adb shell chown 0:0 "${SYS_ETC}init.d/${SSUD}"
+            #adb shell chmod 0755 "${SYS_ETC}init.d/${SSU_SSUD}"
+            #adb shell chown 0:0 "${SYS_ETC}init.d/${SSU_SSUD}"
 
             #adb shell "if [[ ! -f '${SYS_ETC}.installed_su_daemon' ]]; then touch '${SYS_ETC}.installed_su_daemon'; fi"
             #adb shell "echo 1 > ${SYS_ETC}.installed_su_daemon"
@@ -341,7 +351,7 @@ function adb_root_system() {
             #adb shell chmod 0644 "${SYS_ETC}.installed_su_daemon"
             #adb shell chown 0:0 "${SYS_ETC}.installed_su_daemon"
 
-        #adb shell "${SYS_BIN}${SU} --install"
+        #adb shell "${SYS_BIN}${SSU_SU} --install"
 
         #adb shell chmod 04755 /system/xbin/busybox
         #adb shell chown 0:0 /system/xbin/busybox
@@ -365,6 +375,7 @@ function adb_root_system() {
         unset mssg ERROR
 
     fi
+
     unset search
 
 }
@@ -426,19 +437,24 @@ function adb_save_partitions() {
                 fi
 
             else
+
                 mssg="$(printf "${text_error_bckp}" "${ddof}")"
                 display_error "${mssg}"
 
                 write_file "log" "### $FUNCNAME: CANT saving Partition: ${DIR_SVG_DATED}/${MTD_NAME[${key}]}.img"
+
             fi
 
             if [[ "${ddname}" == "nvram" ]]; then
+
                 if [[ -z "$(adb_test "-f ${BCKP_PHONE}nvram.tgz")" ]]; then
+
                     adb pull "${BCKP_PHONE}nvram.tgz" "${DIR_SVG_DATED}"
                     adb shell rm -r "${BCKP_PHONE}nvram.tgz"
-                fi
-            fi
 
+                fi
+
+            fi
 
             sleep 1
 
@@ -494,12 +510,16 @@ function adb_write_img() {
         adb shell "${adb_su}dd if=${ddif} of=${ddof} bs=4096 count=${ddbs} skip=${ddskip}"
 
         if [[ $? -eq 0 ]]; then
+
             display_mssg "n" "dd if=${ddif} of=${ddof} bs=4096 count=${ddbs} skip=${ddskip}"
             write_file "log" "### $FUNCNAME: dd ${ddif} into ${ddof} [bs: 4096 | count: ${ddbs} | skip: ${ddskip}]"
+
         else
+
             mssg="$(printf "" "${ddif}")"
             display_error "${mssg}"
             display_mssg "n" "${text_sorry}"
+
         fi
 
     fi
@@ -513,9 +533,13 @@ function adb_stat_file() {
     local file="$1"
 
     if [[ "${vid}" != "${VID[0]}" ]]; then
+
         echo $( sed 's/\r$//' <<< $(adb shell stat -c "%s" "${file}") )
+
     else
+
         echo $( sed 's/\r$//' <<< $(adb shell ls -l "${file}" | awk '{print $5}') )
+
     fi
 
     unset file
@@ -526,9 +550,7 @@ function adb_su() {
 
     adb_su=""
 
-    if [[ "${vid}" != "${VID[0]}" ]]; then
-        adb_su="su -c "
-    fi
+    if [[ "${vid}" != "${VID[0]}" ]]; then adb_su="su -c "; fi
 
 }
 

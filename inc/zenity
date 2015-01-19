@@ -1,5 +1,7 @@
 #!/bin/bash
 
+if ! ${EXEC}; then exit; fi
+
 function zenity_directory() {
 
     local index="$1" title="$2"
