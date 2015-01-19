@@ -535,25 +535,32 @@ function detect_device() {
         local mssg="Mode: ${MODE}"
         display_detected "${mssg}"
 
-        if [[ "${DIALOG}" -ne 0 ]]; then
-
-            mssg="$(printf "%s" "\Z${bold}\Z${green}${text_VendorID}\n${text_ProductID}\n${mssg}\Z${neutral}\Z${unbold}")"
-            mssg="$(printf "${mssg}" "${vid}" "${pid}")";
-            display_mssg "n" "${mssg}";
-
-        elif [[ "${ZENITY}" -ne 0 ]]; then
-
-            mssg="$(printf "%s" "<span color=\"${green}\"><b>${text_VendorID}\n${text_ProductID}\n${mssg}</b></span>")"
-            mssg="$(printf "${mssg}" "${vid}" "${pid}")";
-            display_mssg "i" "${mssg}" "${text_detect_dev}" "${title_detect_dev}";
-
+        ANDROID_SERIAL="$(adb_detect_device)"
+        if [[ -z "${ANDROID_SERIAL}" ]]; then
+            display_error "${text_error_not_usb_debug}"
+            EXIT
         fi
+        display_detected "${text_serial_number}${ANDROID_SERIAL}"
+
+        #if [[ "${DIALOG}" -ne 0 ]]; then
+
+            #mssg="$(printf "%s" "\Z${bold}\Z${green}${text_VendorID}\n${text_ProductID}\n${mssg}\Z${neutral}\Z${unbold}")"
+            #mssg="$(printf "${mssg}" "${vid}" "${pid}")";
+            #display_mssg "n" "${mssg}";
+
+        #elif [[ "${ZENITY}" -ne 0 ]]; then
+
+            #mssg="$(printf "%s" "<span color=\"${green}\"><b>${text_VendorID}\n${text_ProductID}\n${mssg}</b></span>")"
+            #mssg="$(printf "${mssg}" "${vid}" "${pid}")";
+            #display_mssg "i" "${mssg}" "${text_detect_dev}" "${title_detect_dev}";
+
+        #fi
 
         if [[ "${mssg}" ]]; then unset mssg; fi
 
     fi
 
-    write_file "log" "${NOW} ### $FUNCNAME: VID:${vid} and PID:${pid} "
+    write_file "log" "${NOW} ### $FUNCNAME: VID:${vid} ; PID:${pid} ; ANDROID_SERIAL:${ANDROID_SERIAL} ; MODE:${MODE}"
 
 }
 

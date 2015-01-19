@@ -78,6 +78,7 @@ declare -i ZENITY=0
 ###
 adb_su=""
 
+ANDROID_SERIAL=""
 BCKP_PHONE="/sdcard/BACKUP/" # dir to backup into phone
 DIR_CHOOSED=""
 DIR_TMP="/tmp/"

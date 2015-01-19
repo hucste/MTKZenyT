@@ -62,6 +62,12 @@ function adb_delete_supersu() {
 
 }
 
+function adb_detect_device() {
+
+    adb devices -l | awk '/2013023/ { print $1 }'
+
+}
+
 function adb_flash_partitions() {
 
     write_file "log" "*** $FUNCNAME: Call ADB to flash partitions "

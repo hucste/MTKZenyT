@@ -1,5 +1,7 @@
 #!/bin/bash
 
+if ! ${EXEC}; then exit; fi
+
 text_app_dl="Téléchargement de %s depuis %s"
 text_app_inexistant="Il semble que l'application %s n'existe pas dans votre système de fichiers !"
 
@@ -31,6 +33,9 @@ text_dev_mode="Votre montage est en mode %s ..."
 text_dev_not_recovery="Votre appareil n'est pas dans le mode recovery nécessaire !"
 text_dev_unrecognized="Il semble que votre appareil ne soit pas reconnu par votre système d'exploitation !\nCherchez la raison ..."
 
+text_device="Périphérique : %s"
+text_device_mode="Dans le mode : %s"
+
 text_dir_ok="Ce répertoire a bien été créé : %s"
 text_dir_ssu_upd="Il semble que l'archive a déjà été décompressée. \nLe répertoire relatif existe !\n Voulez-vous le garder (OUI) ou le supprimer (NON) ?"
 
@@ -43,6 +48,7 @@ text_error_file="!!! Erreur avec le fichier %s! Vérifiez sa présence et ses dr
 text_error_not_adb="ADB n'est pas installé. Il est pleinement nécessaire !"
 text_error_not_files="!!! Erreur, vous n'avez choisi aucun fichier ..."
 text_error_not_tools="L'outil %s n'est pas installé. Veuillez faire le nécessaire !"
+text_error_not_usb_debug="!!! Erreur: Votre appareil n'est pas configuré pour l'USB Deboguage ! \n Veuillez paramètrer l'option dans le menu Paramètres > Options de Développeur, de votre appareil, sous Android !"
 text_error_option_name="!!! Erreur, le nom de l'option '%s' n'est pas le bon !"
 text_error_size_file="!!! Erreur $s : Les tailles de fichiers sont différentes : %s et %s !"
 text_error_unknown_option="ATTENTION : Option inconnue : %s\n"
@@ -106,6 +112,7 @@ text_reboot_yourself="Redémarrez-vous-même l'appareil !"
 text_remove="Suppression de %s"
 
 text_see_phone="SVP, regardez votre téléphone pour accepter l'accès à ADB Shell par SuperSU ! (si besoin)"
+text_serial_number="Numéro de Série : "
 
 text_sorry="Désolé, mais nous ne pouvons rien faire de plus !"
 

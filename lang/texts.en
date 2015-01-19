@@ -1,5 +1,7 @@
 #!/bin/bash
 
+if ! ${EXEC}; then exit; fi
+
 text_app_dl="Download %s: %s"
 text_app_inexistant="It seems the app %s not exists under your filesystem!"
 
@@ -12,6 +14,7 @@ text_bckp_method2="We trying another method to backup your partition : "
 text_bckp_phone_inexists="%s seems not be accessible.\n The backup can't be create..."
 
 text_choice_invalid="This choice isn't valid. By 'y' or 'n'..."
+
 text_choose_gui="Please, choose a GUI to use: dialog, or zenity...\n Configure file config: "
 text_choose_file="Please, choose the file : "
 
@@ -30,6 +33,8 @@ text_detect_dev="*** Detect your device: "
 text_dev_mode="Your mount is into %s mode..."
 text_dev_not_recovery="Your device isn't into needed recovery mode!"
 text_dev_unrecognized="It seems your device isn't recognized by your OS! Please, search reason..."
+text_device="Device: %s"
+text_device_mode="Into mode: %s"
 
 text_dir_ok="This folder has been maked: %s"
 text_dir_ssu_upd="It seems that the archive has been unpacked. \nThe relative folder exists!\n Do you want to keep (YES) or delete (NO)?"
@@ -42,6 +47,7 @@ text_error_dl="!!! Error during download %s !!!"
 text_error_file="!!! ERROR with file %s! Checks its presence and its readable..."
 text_error_not_adb="ADB isn't install. Do the needful!"
 text_error_not_files="!!! ERROR, we have not selected any file ..."
+text_error_not_usb_debug="!!! ERROR: Your device is not configured to USB debugging! \n Please, set option in the menu Settings > Developer options!"
 text_error_option_name="!!! ERROR: Name option '%s' is not good!"
 text_error_size_file="!!! $s ERROR: size files are different %s and %s !"
 text_error_unknown_option="WARN: Unknown option (ignored): %s\n"
@@ -105,6 +111,7 @@ text_reboot_yourself="Reboot yourself the device!"
 text_remove="Remove %s"
 
 text_see_phone="Please, see your phone to accept ADB shell by SuperSU! (if need...)"
+text_serial_number="Serial Number: "
 
 text_sorry="Sorry, but we can't do anything more!"
 
