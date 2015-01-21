@@ -1,0 +1,26 @@
+#!/bin/bash
+
+if ! ${EXEC}; then exit; fi
+
+###
+# file config: informations about VendorID and ProductID
+###
+
+## recognized as Android Phone [Fairphone First Edition (FP1)]
+#0bb4:0c03
+## Xiaomi Redmi PTP with USB Debug
+#2717:1218
+## Xiaomi Redmi UMS with USB Debug
+#2717:1228
+## Xiaomi Redmi MTP with USB Debug
+#2717:1248
+
+# ProductIDs
+PID[0]="0c03" # recognized as Android Phone [Fairphone First Edition (FP1)]
+PID[1]="1218" # Redmi PTP with USB Debug
+PID[2]="1228" # Redmi UMS with USB Debug
+PID[3]="1248" # Redmi MTP with USB Debug
+
+# VendorIDs
+VID[0]="0bb4" # recognized as HTC (High Tech Computer Corp.)
+VID[1]="2717" # Xiaomi

@@ -64,6 +64,8 @@ function dialog_menu() {
         1|255)
             EXIT
         ;;
+        #2)
+        #;;
     esac
 
     unset text title height

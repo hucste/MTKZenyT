@@ -2,6 +2,11 @@
 
 if ! ${EXEC}; then exit; fi
 
+text_ANDROID_DEVICE="Appareil : "
+text_ANDROID_MODEL="Modèle du produit : "
+text_ANDROID_PRODUCT="Nom du produit : "
+text_ANDROID_SERIAL="Numéro de Série : "
+
 text_app_dl="Téléchargement de %s depuis %s"
 text_app_inexistant="Il semble que l'application %s n'existe pas dans votre système de fichiers !"
 
@@ -43,6 +48,7 @@ text_dl_file="URL pour curl: %s"
 text_dl_yourself="Téléchargez vous-même l'application %s !"
 
 text_error_bckp="!!! Erreur : Il semble que la sauvegarde n'a pas eu lieu : %s n'existe pas !!!"
+text_error_device_offline="!!! Erreur : Votre appareil est en mode 'offline' ! \n Veuillez désactiver l'option 'Deboguage USB' dans votre appareil ; déconnectez le câble USB, attendre trois secondes et reconnectez l'appareil à votre ordinateur ; puis réactivez l'option 'Deboguage USB' ..."
 text_error_dl="!!! Erreur pendant le téléchargement %s !!!"
 text_error_file="!!! Erreur avec le fichier %s! Vérifiez sa présence et ses droits en lecture ..."
 text_error_not_adb="ADB n'est pas installé. Il est pleinement nécessaire !"
@@ -99,6 +105,7 @@ text_ok_tools="L'outil %s est bien installé !"
 
 text_press_key="Appuyez sur n'importe quelle touche ..."
 text_press_key_after_reboot="Appuyez sur n'importe quelle touche, quand l'appareil a redemarré ..."
+text_press_key_when_ready="Appuyez sur n'importe quelle touche, quand l'appareil est prêt ..."
 text_ProductID="ProductID: %s"
 text_progress_adb_pull="Patientez pendant que l'outil ADB copie le fichier %s dans votre appareil ..."
 text_progress_adb_dd="Patientez pendant que l'outil ADB écrit le fichier %s dans votre appareil ..."
@@ -112,7 +119,6 @@ text_reboot_yourself="Redémarrez-vous-même l'appareil !"
 text_remove="Suppression de %s"
 
 text_see_phone="SVP, regardez votre téléphone pour accepter l'accès à ADB Shell par SuperSU ! (si besoin)"
-text_serial_number="Numéro de Série : "
 
 text_sorry="Désolé, mais nous ne pouvons rien faire de plus !"
 

@@ -535,12 +535,9 @@ function detect_device() {
         local mssg="Mode: ${MODE}"
         display_detected "${mssg}"
 
-        ANDROID_SERIAL="$(adb_detect_device)"
-        if [[ -z "${ANDROID_SERIAL}" ]]; then
-            display_error "${text_error_not_usb_debug}"
-            EXIT
-        fi
-        display_detected "${text_serial_number}${ANDROID_SERIAL}"
+        write_file "log" "${NOW} ### $FUNCNAME: VID:${vid} ; PID:${pid} ; MODE:${MODE}"
+
+        adb_detect_device
 
         #if [[ "${DIALOG}" -ne 0 ]]; then
 
@@ -559,8 +556,6 @@ function detect_device() {
         if [[ "${mssg}" ]]; then unset mssg; fi
 
     fi
-
-    write_file "log" "${NOW} ### $FUNCNAME: VID:${vid} ; PID:${pid} ; ANDROID_SERIAL:${ANDROID_SERIAL} ; MODE:${MODE}"
 
 }
 
@@ -896,8 +891,22 @@ function modify_system() {
 
 function press_any_key() {
 
-    read -p "${text_press_key}" -n1 -s
+    local action="$1"
+
+    case "${action}" in
+        "ready")
+            read -p "${text_press_key_when_ready}" -n1 -s
+        ;;
+        "reboot")
+            read -p "${text_press_key_after_reboot}" -n1 -s
+        ;;
+        *)
+            read -p "${text_press_key}" -n1 -s
+        ;;
+    esac
+
     echo " "
+    unset action
 
 }
 

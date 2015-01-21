@@ -51,17 +51,7 @@ declare -a MTD_ADDR_DEC
 declare -a MTD_SIZE_BLOCK
 declare -a MTD_SIZE_DEC
 
-# ProductIDs
-PID[0]="0c03" # recognized as Android Phone [Fairphone First Edition (FP1)]
-PID[1]="1218" # Redmi PTP with USB Debug
-PID[2]="1228" # Redmi UMS with USB Debug
-PID[3]="1248" # Redmi MTP with USB Debug
-
-# VendorIDs
-VID[0]="0bb4" # recognized as HTC (High Tech Computer Corp.)
-VID[1]="2717" # Xiaomi
-#VID[2]="2717" # Xiaomi
-#VID[3]="2717" # Xiaomi
+source "${DIR_CFG}/cfg_vid_pid"
 
 ###
 # Int variables
@@ -78,7 +68,11 @@ declare -i ZENITY=0
 ###
 adb_su=""
 
+ANDROID_DEVICE=""
+ANDROID_MODEL=""
+ANDROID_PRODUCT=""
 ANDROID_SERIAL=""
+
 BCKP_PHONE="/sdcard/BACKUP/" # dir to backup into phone
 DIR_CHOOSED=""
 DIR_TMP="/tmp/"

@@ -120,19 +120,25 @@ function display_menu() {
 
     while true; do
         choice=""
-        local info_product="" info_text=""
+        local info_mode="" info_product="" info_text=""
+
+        case "${MODE}" in
+            "${MENU_REBOOT[0]}") info_mode="${text_menu_reboot_RECOVERY}" ;;
+            "${MENU_REBOOT[1]}") info_mode="${text_menu_reboot_SYSTEM}" ;;
+        esac
 
         if [[ "${ZENITY}" -ne 0 ]]; then
 
-            info_product="$(printf "<span color=\"${green}\"><b>${text_device} - ${text_device_mode}</b></span>" "${ANDROID_SERIAL}" "${MODE}")"
+            info_product="$(printf "<span color=\"${green}\"><b>${text_device} - ${info_mode}</b></span>" "${ANDROID_SERIAL}" "${MODE}")"
             info_text="$(printf "%s" "${info_product}\n${text_menu_action}")"
+
             choice=$( echos_menu | zenity_list "${info_text}" "${title_welcome}" "$(count ${MENU_NAME[@]})")
 
         elif  [[ "${DIALOG}" -ne 0 ]]; then
 
             echos_menu
 
-            info_product="$(printf "${text_device} - ${text_device_mode}" "${ANDROID_SERIAL}" "${MODE}")"
+            info_product="$(printf "${text_device} - ${text_device_mode}" "${ANDROID_SERIAL}" "${info_mode}")"
             info_text="$(printf "%s" "${info_product}\n${text_menu_action}")"
 
             #exec 3>&1;
@@ -163,7 +169,7 @@ function display_menu() {
         fi
 
         write_file "log" "$FUNCNAME: choice=${choice}"
-        unset info_product info_text
+        unset info_mode info_product info_text
 
         # if choice exists, then run-it!
         if [[ "$choice" ]]; then

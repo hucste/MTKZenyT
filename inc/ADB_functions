@@ -64,7 +64,42 @@ function adb_delete_supersu() {
 
 function adb_detect_device() {
 
-    adb devices -l | awk '/2013023/ { print $1 }'
+    local search="$(adb devices -l | awk '/model/ { print }')"
+    if [[ -z "${search}" ]]; then
+
+        display_error "${text_error_not_usb_debug}"
+        EXIT
+
+    else
+
+        ANDROID_SERIAL="$(awk '{ print $1 }' <<< "$search")"
+        if [[ "${ANDROID_SERIAL}" == "????????????" ]]; then
+
+            adb_restart_server
+
+        elif [[ "$(awk '{ print $2 }' <<< "$search")" == "offline" ]]; then
+
+            display_error "${text_error_device_offline}"
+
+            press_any_key "ready"
+            adb_detect_device
+
+        else
+
+            ANDROID_DEVICE="$(awk '/device/ { print substr($6, length("device: ")) }' <<< "$search")"; display_detected "${text_ANDROID_DEVICE}${ANDROID_DEVICE}"
+            ANDROID_MODEL="$(awk '/model/ { print substr($5, length("model: ")) }' <<< "$search")"; display_detected "${text_ANDROID_MODEL}${ANDROID_MODEL}"
+            ANDROID_PRODUCT="$(awk '/product/ { print substr($4, length("product: ")) }' <<< "$search")"; display_detected "${text_ANDROID_PRODUCT}${ANDROID_PRODUCT}"
+            display_detected "${text_ANDROID_SERIAL}${ANDROID_SERIAL}"
+
+            sleep 1
+
+            write_file "log" "${NOW} ### $FUNCNAME: ANDROID_DEVICE:${ANDROID_DEVICE} ; ANDROID_MODEL:${ANDROID_MODEL} ; ANDROID_PRODUCT:${ANDROID_PRODUCT} ; ANDROID_SERIAL:${ANDROID_SERIAL}"
+
+        fi
+
+    fi
+
+    unset search
 
 }
 
