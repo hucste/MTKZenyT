@@ -75,7 +75,10 @@ function adb_detect_device() {
         ANDROID_SERIAL="$(awk '{ print $1 }' <<< "$search")"
         if [[ "${ANDROID_SERIAL}" == "????????????" ]]; then
 
-            adb_restart_server
+            #adb_restart_server
+
+            display_error "${text_error_device_no_perm}"
+            EXIT
 
         elif [[ "$(awk '{ print $2 }' <<< "$search")" == "offline" ]]; then
 
