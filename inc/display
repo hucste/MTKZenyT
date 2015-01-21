@@ -118,19 +118,27 @@ function display_menu() {
 
     write_file "log" "${NOW} ### $FUNCNAME: attempt to display menu..."
 
+    local info_device="" info_mode=""
+
+    if [[ "${ANDROID_MANUFACTURER}" != "" ]]; then
+        info_device="${text_ANDROID_MANUFACTURER} ${ANDROID_MANUFACTURER}\n${text_ANDROID_PRODUCT} ${ANDROID_PRODUCT}\n${text_ANDROID_SERIAL} ${ANDROID_SERIAL}"
+    else
+        info_device="${text_ANDROID_DEVICE} ${ANDROID_DEVICE}\n${text_ANDROID_PRODUCT} ${ANDROID_PRODUCT}\n${text_ANDROID_SERIAL} ${ANDROID_SERIAL}"
+    fi
+
+    case "${MODE}" in
+        "${MENU_REBOOT[0]}") info_mode="${text_menu_reboot_RECOVERY}" ;;
+        "${MENU_REBOOT[1]}") info_mode="${text_menu_reboot_SYSTEM}" ;;
+    esac
+
     while true; do
         choice=""
-        local info_mode="" info_product="" info_text=""
-
-        case "${MODE}" in
-            "${MENU_REBOOT[0]}") info_mode="${text_menu_reboot_RECOVERY}" ;;
-            "${MENU_REBOOT[1]}") info_mode="${text_menu_reboot_SYSTEM}" ;;
-        esac
+        local info_product="" info_text=""
 
         if [[ "${ZENITY}" -ne 0 ]]; then
 
-            info_product="$(printf "<span color=\"${green}\"><b>${text_device} - ${info_mode}</b></span>" "${ANDROID_SERIAL}" "${MODE}")"
-            info_text="$(printf "%s" "${info_product}\n${text_menu_action}")"
+            #info_product="$(printf "<span color=\"${green}\"><b>${text_device} - ${info_mode}</b></span>" "${info_device}" "${MODE}")"
+            info_text="$(printf "%s" "${info_device}\n${text_menu_action}")"
 
             choice=$( echos_menu | zenity_list "${info_text}" "${title_welcome}" "$(count ${MENU_NAME[@]})")
 
@@ -138,8 +146,8 @@ function display_menu() {
 
             echos_menu
 
-            info_product="$(printf "${text_device} - ${text_device_mode}" "${ANDROID_SERIAL}" "${info_mode}")"
-            info_text="$(printf "%s" "${info_product}\n${text_menu_action}")"
+            #info_product="$(printf "${text_device} - ${text_device_mode}" "${info_device}" "${info_mode}")"
+            info_text="$(printf "%s" "${info_device}\n${text_menu_action}")"
 
             #exec 3>&1;
             #choice=$(dialog_menu "${info_text}" "${title_welcome}" "$(count ${MENU_NAME[@]})")
@@ -169,7 +177,7 @@ function display_menu() {
         fi
 
         write_file "log" "$FUNCNAME: choice=${choice}"
-        unset info_mode info_product info_text
+        unset info_product info_text
 
         # if choice exists, then run-it!
         if [[ "$choice" ]]; then
@@ -183,6 +191,7 @@ function display_menu() {
         write_file "log" "### $FUNCNAME: choice: ${choice}"
 
     done
+    unset info_device info_mode
 
     if [[ $? -ne 0 ]]; then EXIT; fi
 

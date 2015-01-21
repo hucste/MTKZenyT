@@ -3,6 +3,7 @@
 if ! ${EXEC}; then exit; fi
 
 text_ANDROID_DEVICE="Device: "
+text_ANDROID_MANUFACTURER="Manufacturer: "
 text_ANDROID_MODEL="Model: "
 text_ANDROID_PRODUCT="Product: "
 text_ANDROID_SERIAL="Serial Number: "

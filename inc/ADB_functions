@@ -72,8 +72,8 @@ function adb_detect_device() {
 
     else
 
-        ANDROID_SERIAL="$(awk '{ print $1 }' <<< "$search")"
-        if [[ "${ANDROID_SERIAL}" == "????????????" ]]; then
+        s2="$(awk '{ print $1 }' <<< "$search")"
+        if [[ "${s2}" == "????????????" ]]; then
 
             #adb_restart_server
 
@@ -91,7 +91,14 @@ function adb_detect_device() {
 
             ANDROID_DEVICE="$(awk '/device/ { print substr($6, length("device: ")) }' <<< "$search")"; display_detected "${text_ANDROID_DEVICE}${ANDROID_DEVICE}"
             ANDROID_MODEL="$(awk '/model/ { print substr($5, length("model: ")) }' <<< "$search")"; display_detected "${text_ANDROID_MODEL}${ANDROID_MODEL}"
-            ANDROID_PRODUCT="$(awk '/product/ { print substr($4, length("product: ")) }' <<< "$search")"; display_detected "${text_ANDROID_PRODUCT}${ANDROID_PRODUCT}"
+            if [[ -z "${ANDROID_PRODUCT}" ]]; then
+                ANDROID_PRODUCT="$(awk '/product/ { print substr($4, length("product: ")) }' <<< "$search")";
+            fi
+            display_detected "${text_ANDROID_PRODUCT}${ANDROID_PRODUCT}"
+
+            if [[ -z "${ANDROID_SERIAL}" ]]; then
+                ANDROID_SERIAL="${s2}"
+            fi
             display_detected "${text_ANDROID_SERIAL}${ANDROID_SERIAL}"
 
             sleep 1
@@ -99,6 +106,7 @@ function adb_detect_device() {
             write_file "log" "${NOW} ### $FUNCNAME: ANDROID_DEVICE:${ANDROID_DEVICE} ; ANDROID_MODEL:${ANDROID_MODEL} ; ANDROID_PRODUCT:${ANDROID_PRODUCT} ; ANDROID_SERIAL:${ANDROID_SERIAL}"
 
         fi
+        unset s2
 
     fi
 

@@ -491,24 +491,7 @@ function detect_device() {
         display_mssg "n" "${text_detect_dev}" "" "1";
     fi
 
-    for (( x=0; x < $(count "${PID[@]}") ; x++ )); do
-
-        if [[ $x -eq 0 ]]; then
-            vid="${VID[$x]}"
-        else
-            vid="${VID[1]}"
-        fi
-
-        lsusb=$(lsusb | egrep "${vid}")
-
-        if [[ "${lsusb}" ]]; then
-            pid="${PID[$x]}"
-            #vid="${VID[$x]}"
-            break;
-        fi
-
-        unset lsusb
-    done
+    detect_usb_connection
 
     if [[ -z "${pid}" ]]; then
 
@@ -556,6 +539,41 @@ function detect_device() {
         if [[ "${mssg}" ]]; then unset mssg; fi
 
     fi
+
+}
+
+function detect_usb_connection() {
+
+    local file="${SCRIPT_TMP_DIR}dmesg.tmp"
+
+    # attempt to dectect automatically by dmesg.
+    dmesg | grep -i "usb 2-1" | tail -6 > "${file}"
+
+    if [[ -f "${SCRIPT_TMP_DIR}dmesg.tmp" ]]; then
+        ANDROID_MANUFACTURER="$(awk '/Manufacturer:/ { print $5 }' ${file})"
+        ANDROID_PRODUCT="$(awk '/Product:/ { print $5,$6,$7 }' ${file})"
+        ANDROID_SERIAL="$(awk '/SerialNumber:/ { print $5 }' ${file})"
+        pid="$(awk '/idVendor/ { print substr($9, length("idProduct= "), 4) }' ${file})"
+        vid="$(awk '/idVendor/ { print substr($8, length("idVendor= "), 4) }' ${file})"
+    fi
+    unset file
+
+    # if not auto-detect, config vid and pid by config file
+    if [[ -z "${vid}" ]]; then
+        local lsusb=""
+        for (( x=0; x < $(count "${VID[@]}") ; x++ )); do
+            vid="${VID[$x]}"
+            lsusb=$(lsusb | egrep "${vid}")
+        done
+
+        if [[ "${lsusb}" ]]; then
+            pid=$(awk '/'"${vid}"'/ { print substr($6, length("'"${vid}"': ")) } ' <<< "${lsusb}")
+        fi
+        unset lsusb
+    fi
+
+    write_file "log" "$FUNCNAME: ANDROID_MANUFACTURER:${ANDROID_MANUFACTURER} ; ANDROID_PRODUCT:${ANDROID_PRODUCT} ; ANDROID_SERIAL:${ANDROID_SERIAL}"
+    write_file "log" "$FUNCNAME: VID=${vid} ; PID=${pid}"
 
 }
 
