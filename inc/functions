@@ -545,16 +545,17 @@ function detect_device() {
 function detect_usb_connection() {
 
     local file="${SCRIPT_TMP_DIR}dmesg.tmp"
-
     # attempt to dectect automatically by dmesg.
-    dmesg | grep -i "usb 2-1" | tail -6 > "${file}"
+    dmesg | grep -i "usb" | tail -5 > "${file}"
 
-    if [[ -f "${SCRIPT_TMP_DIR}dmesg.tmp" ]]; then
+    if [[ -f "${file}" ]]; then
         ANDROID_MANUFACTURER="$(awk '/Manufacturer:/ { print $5 }' ${file})"
         ANDROID_PRODUCT="$(awk '/Product:/ { print $5,$6,$7 }' ${file})"
         ANDROID_SERIAL="$(awk '/SerialNumber:/ { print $5 }' ${file})"
         pid="$(awk '/idVendor/ { print substr($9, length("idProduct= "), 4) }' ${file})"
         vid="$(awk '/idVendor/ { print substr($8, length("idVendor= "), 4) }' ${file})"
+
+        write_file "log" "$FUNCNAME: ANDROID_MANUFACTURER=${ANDROID_MANUFACTURER} ; ANDROID_PRODUCT=${ANDROID_PRODUCT} ; ANDROID_SERIAL=${ANDROID_SERIAL}"
     fi
     unset file
 
@@ -570,10 +571,9 @@ function detect_usb_connection() {
             pid=$(awk '/'"${vid}"'/ { print substr($6, length("'"${vid}"': ")) } ' <<< "${lsusb}")
         fi
         unset lsusb
-    fi
 
-    write_file "log" "$FUNCNAME: ANDROID_MANUFACTURER:${ANDROID_MANUFACTURER} ; ANDROID_PRODUCT:${ANDROID_PRODUCT} ; ANDROID_SERIAL:${ANDROID_SERIAL}"
-    write_file "log" "$FUNCNAME: VID=${vid} ; PID=${pid}"
+        write_file "log" "$FUNCNAME: VID=${vid} ; PID=${pid}"
+    fi
 
 }
 
