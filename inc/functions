@@ -61,7 +61,7 @@ function BACKUP() {
 
     sleep 1
 
-    if [[ "$(adb_whoami)" == "root" ]]; then
+    if [[ "$(adb_whoami)" == "0" ]]; then
 
         # obtain dir to save
         if [[ -z "${DIR_SVG}" ]]; then
@@ -1161,9 +1161,9 @@ function unroot_to_recovery() {
 function unroot_to_system() {
 
     ##id=$(${adb} shell su -c busybox id -un | sed 's/\r$//'); display_detected "${id}"
-    whoami="$(adb_whoami)"; display_detected "id: ${whoami}"
+    #whoami="$(adb_whoami)"; display_detected "id: ${whoami}"
 
-    if [[ "${whoami}" == "root" ]]; then
+    if [[ "$(adb_whoami)" == "0" ]]; then
 
         adb_mount_partition "w"
 
