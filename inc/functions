@@ -544,13 +544,34 @@ function detect_device() {
 
 function detect_usb_connection() {
 
-    local file="${SCRIPT_TMP_DIR}lsusb.tmp"
     # attempt to dectect automatically by dmesg, only vid and pid
     local info="$(dmesg | grep -i "usb .* idVendor" | tail -1 | sed 's/\[ /\[/g')"
-    pid="$(awk '{ print substr($9, length("idProduct= "), 4) }' <<< ${info})"
-    vid="$(awk '{ print substr($8, length("idVendor= "), 4) }' <<< ${info})"
+
+    if [[ -n "${info}" ]]; then
+        pid="$(awk '{ print substr($9, length("idProduct= "), 4) }' <<< ${info})"
+        vid="$(awk '{ print substr($8, length("idVendor= "), 4) }' <<< ${info})"
+    fi
     unset info
 
+    # if not auto-detect, config vid and pid by config file
+    if [[ -z "${vid}" ]]; then
+        local lsusb=""
+        for (( x=0; x < $(count "${VID[@]}") ; x++ )); do
+            vid="${VID[$x]}"
+            lsusb=$(lsusb | egrep "${vid}")
+        done
+
+        if [[ "${lsusb}" ]]; then
+            pid=$(awk '/'"${vid}"'/ { print substr($6, length("'"${vid}"': ")) } ' <<< "${lsusb}")
+        fi
+        unset lsusb
+    fi
+    write_file "log" "$FUNCNAME: VID=${vid} ; PID=${pid}"
+
+    ###
+    # Using lsusb to obtain good informations about device
+    ###
+    local file="${SCRIPT_TMP_DIR}lsusb.tmp"
     # examine lsusb to detect device segun vid
     local dev_usb="$(lsusb | grep "${vid}" | awk '{ print $2"/"substr($4,0,3)}')"
     # obtain all informations about device by lsusb -D
@@ -566,22 +587,6 @@ function detect_usb_connection() {
     fi
     rm "${file}"
     unset file
-
-    # if not auto-detect, config vid and pid by config file
-    if [[ -z "${vid}" ]]; then
-        local lsusb=""
-        for (( x=0; x < $(count "${VID[@]}") ; x++ )); do
-            vid="${VID[$x]}"
-            lsusb=$(lsusb | egrep "${vid}")
-        done
-
-        if [[ "${lsusb}" ]]; then
-            pid=$(awk '/'"${vid}"'/ { print substr($6, length("'"${vid}"': ")) } ' <<< "${lsusb}")
-        fi
-        unset lsusb
-
-        write_file "log" "$FUNCNAME: VID=${vid} ; PID=${pid}"
-    fi
 
 }
 
