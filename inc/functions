@@ -444,7 +444,7 @@ function destruct() {
 
     if [[ -d "${SCRIPT_TMP_DIR}" ]]; then rm -rf "${SCRIPT_TMP_DIR}"; fi
 
-    unset DIALOG FILE_TMP ZENITY
+    unset DIALOG ZENITY
     unset archive choice mssg
 
     write_file "log" "##################################################"
@@ -544,19 +544,27 @@ function detect_device() {
 
 function detect_usb_connection() {
 
-    local file="${SCRIPT_TMP_DIR}dmesg.tmp"
-    # attempt to dectect automatically by dmesg.
-    dmesg | grep -i "usb" | tail -5 > "${file}"
+    local file="${SCRIPT_TMP_DIR}lsusb.tmp"
+    # attempt to dectect automatically by dmesg, only vid and pid
+    local info="$(dmesg | grep -i "usb .* idVendor" | tail -1 | sed 's/\[ /\[/g')"
+    pid="$(awk '{ print substr($9, length("idProduct= "), 4) }' <<< ${info})"
+    vid="$(awk '{ print substr($8, length("idVendor= "), 4) }' <<< ${info})"
+    unset info
+
+    # examine lsusb to detect device segun vid
+    local dev_usb="$(lsusb | grep "${vid}" | awk '{ print $2"/"substr($4,0,3)}')"
+    # obtain all informations about device by lsusb -D
+    $(lsusb -D /dev/bus/usb/${dev_usb} > "${file}")
+    unset dev_usb
 
     if [[ -f "${file}" ]]; then
-        ANDROID_MANUFACTURER="$(awk '/Manufacturer:/ { print $5 }' ${file})"
-        ANDROID_PRODUCT="$(awk '/Product:/ { print $5,$6,$7 }' ${file})"
-        ANDROID_SERIAL="$(awk '/SerialNumber:/ { print $5 }' ${file})"
-        pid="$(awk '/idVendor/ { print substr($9, length("idProduct= "), 4) }' ${file})"
-        vid="$(awk '/idVendor/ { print substr($8, length("idVendor= "), 4) }' ${file})"
+        ANDROID_MANUFACTURER="$(awk '/iManufacturer/ { print $3 }' ${file})"
+        ANDROID_PRODUCT="$(awk '/iProduct/ { print $3,$4,$5 }' ${file})"
+        ANDROID_SERIAL="$(awk '/iSerial/ { print $3 }' ${file})"
 
         write_file "log" "$FUNCNAME: ANDROID_MANUFACTURER=${ANDROID_MANUFACTURER} ; ANDROID_PRODUCT=${ANDROID_PRODUCT} ; ANDROID_SERIAL=${ANDROID_SERIAL}"
     fi
+    rm "${file}"
     unset file
 
     # if not auto-detect, config vid and pid by config file
