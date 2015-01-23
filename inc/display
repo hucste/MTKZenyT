@@ -120,16 +120,16 @@ function display_menu() {
 
     local info_device="" info_mode=""
 
-    if [[ "${ANDROID_MANUFACTURER}" != "" ]]; then
-        info_device="${text_ANDROID_MANUFACTURER} ${ANDROID_MANUFACTURER}\n${text_ANDROID_PRODUCT} ${ANDROID_PRODUCT}\n${text_ANDROID_SERIAL} ${ANDROID_SERIAL}"
-    else
-        info_device="${text_ANDROID_DEVICE} ${ANDROID_DEVICE}\n${text_ANDROID_PRODUCT} ${ANDROID_PRODUCT}\n${text_ANDROID_SERIAL} ${ANDROID_SERIAL}"
-    fi
-
     case "${MODE}" in
         "${MENU_REBOOT[0]}") info_mode="${text_menu_reboot_RECOVERY}" ;;
         "${MENU_REBOOT[1]}") info_mode="${text_menu_reboot_SYSTEM}" ;;
     esac
+
+    if [[ "${ANDROID_MANUFACTURER}" != "" ]]; then
+        info_device="${text_ANDROID_MANUFACTURER} ${ANDROID_MANUFACTURER}\n${text_ANDROID_PRODUCT} ${ANDROID_PRODUCT}\n${text_ANDROID_SERIAL} ${ANDROID_SERIAL}\n${text_device_mode} ${info_mode}"
+    else
+        info_device="${text_ANDROID_DEVICE} ${ANDROID_DEVICE}\n${text_ANDROID_PRODUCT} ${ANDROID_PRODUCT}\n${text_ANDROID_SERIAL} ${ANDROID_SERIAL}\n${text_device_mode} ${info_mode}"
+    fi
 
     while true; do
         choice=""

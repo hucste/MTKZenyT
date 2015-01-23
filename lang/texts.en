@@ -41,7 +41,7 @@ text_dev_not_recovery="Your device isn't into needed recovery mode!"
 text_dev_unrecognized="It seems your device isn't recognized by your OS! Please, search reason..."
 
 text_device="Device: %s"
-text_device_mode="Into mode: %s"
+text_device_mode="Into mode: "
 
 text_dir_ok="This folder has been maked: %s"
 text_dir_ssu_upd="It seems that the archive has been unpacked. \nThe relative folder exists!\n Do you want to keep (YES) or delete (NO)?"

@@ -10,5 +10,6 @@ declare -a PART_NAME=("android" "usrdata")
 declare -a PART_TEXT=("system" "data")
 # files to saved by default
 declare -a PART_CHOOSED
+declare -a PART_BLOCK=('android' 'cache' 'ebr1' 'fat' 'protect_f' 'protect_s' 'sec_ro' 'usrdata')
 declare -a PART_DEFAULT=('uboot' 'bootimg' 'recovery' 'logo' 'android' 'usrdata')
 declare -a PART_NOBCKP=('pmt' 'pro_info' 'protect_f' 'protect_s' 'seccfg' 'misc' 'expdb' 'bmtpool')

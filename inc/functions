@@ -61,7 +61,8 @@ function BACKUP() {
 
     sleep 1
 
-    if [[ "$(adb_whoami)" == "0" ]]; then
+    #whoami="$(adb_whoami)"; echo "whoami: ${whoami}"; EXIT
+    if [[ "$(adb_whoami)" == "uid=0" ]]; then
 
         # obtain dir to save
         if [[ -z "${DIR_SVG}" ]]; then
@@ -515,7 +516,7 @@ function detect_device() {
             MODE="${MENU_REBOOT[1]}"
         fi
 
-        local mssg="Mode: ${MODE}"
+        local mssg="${text_device_mode}${MODE}"
         display_detected "${mssg}"
 
         write_file "log" "${NOW} ### $FUNCNAME: VID:${vid} ; PID:${pid} ; MODE:${MODE}"
@@ -559,9 +560,11 @@ function detect_usb_connection() {
         for (( x=0; x < $(count "${VID[@]}") ; x++ )); do
             vid="${VID[$x]}"
             lsusb=$(lsusb | egrep "${vid}")
+
+            if [[ -n "${lsusb}" ]]; then break; fi
         done
 
-        if [[ "${lsusb}" ]]; then
+        if [[ -n "${lsusb}" ]]; then
             pid=$(awk '/'"${vid}"'/ { print substr($6, length("'"${vid}"': ")) } ' <<< "${lsusb}")
         fi
         unset lsusb
@@ -775,6 +778,10 @@ function file_to_array_mtd() {
     MTD_ADDR_BLOCK=("${MTD_ADDR_BLOCK[@]}")
 
     write_file "log" "${NOW} ### $FUNCNAME: Create mtd array: MTD_NAME[ ${MTD_NAME[*]} ]"
+    write_file "log" "${NOW} ### $FUNCNAME: Create mtd array: MTD_SIZE[ ${MTD_SIZE[*]} ]"
+    write_file "log" "${NOW} ### $FUNCNAME: Create mtd array: MTD_ADDR[ ${MTD_ADDR[*]} ]"
+    write_file "log" "${NOW} ### $FUNCNAME: Create mtd array: MTD_TYPE[ ${MTD_TYPE[*]} ]"
+    write_file "log" "${NOW} ### $FUNCNAME: Create mtd array: MTD_MAP[ ${MTD_MAP[*]} ]"
 
 }
 
@@ -825,7 +832,7 @@ function make_dir_dated() {
 
     if [[ -d "${DIR_SVG}" ]]; then
 
-        DIR_SVG_DATED="${DIR_SVG}/${vid}:${pid}_${NOW}"
+        DIR_SVG_DATED="${DIR_SVG}${vid}:${pid}_${NOW}"
 
         if [[ ! -d "${DIR_SVG_DATED}" ]]; then
             mkdir "${DIR_SVG_DATED}" && display_detected "${text_dir_ok}" "${DIR_SVG_DATED}"
@@ -1088,8 +1095,8 @@ function steps_to_recovery() {
 
     adb_reboot_recovery
 
-    display_mssg "n" "${press_any_key_after_reboot}"
-    press_any_key
+    #display_mssg "n" "${press_any_key_after_reboot}"
+    press_any_key "reboot"
 
     detect_device
 
@@ -1163,7 +1170,7 @@ function unroot_to_system() {
     ##id=$(${adb} shell su -c busybox id -un | sed 's/\r$//'); display_detected "${id}"
     #whoami="$(adb_whoami)"; display_detected "id: ${whoami}"
 
-    if [[ "$(adb_whoami)" == "0" ]]; then
+    if [[ "$(adb_whoami)" == "uid=0" ]]; then
 
         adb_mount_partition "w"
 
@@ -1200,38 +1207,42 @@ function verify_ssu_exists() {
 
         mssg=$(printf "\n${text_app_inexistant}\n" "${SSU_APK}")
         mssg="${mssg}"$(printf "${text_app_dl}\n" "${SSU_APK}" "${SSU_URL}")
-        mssg="${mssg}"$(printf "\n${text_ask_dl} ${text_yes_no}")
+        display_error "${mssg}"
 
-        display_mssg "q" "${mssg}" ""
+        dl_yourself "${SSU_APK}"
 
-        if [[ "${ZENITY}" -ne 0 ]]; then
+        #mssg="${mssg}"$(printf "\n${text_ask_dl} ${text_yes_no}")
 
-            REPLY=$?
+        #display_mssg "q" "${mssg}" ""
 
-        elif [[ "${DIALOG}" -ne 0 ]]; then
+        #if [[ "${ZENITY}" -ne 0 ]]; then
 
-            REPLY="${read}"
+            #REPLY=$?
 
-        fi
+        #elif [[ "${DIALOG}" -ne 0 ]]; then
 
-        while true; do
-            case $REPLY in
-                y|Y|o|O|0)
-                    dl_file "${SSU_DL}" "${SSU_FILE_ZIP}"
-                    break
-                ;;
-                n|N|1)
-                    dl_yourself "${SSU_APK}"
-                ;;
-                *)
-                    display_error "${text_choice_invalid}"
-                    verify_ssu_exists
-                ;;
-            esac
-        done
+            #REPLY="${read}"
+
+        #fi
+
+        #while true; do
+            #case $REPLY in
+                #y|Y|o|O|0)
+                    #dl_file "${SSU_DL}" "${SSU_FILE_ZIP}"
+                    #break
+                #;;
+                #n|N|1)
+                    #dl_yourself "${SSU_APK}"
+                #;;
+                #*)
+                    #display_error "${text_choice_invalid}"
+                    #verify_ssu_exists
+                #;;
+            #esac
+        #done
 
 
-        verify_archive
+        #verify_archive
 
     else
 

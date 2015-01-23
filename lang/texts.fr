@@ -40,7 +40,7 @@ text_dev_not_recovery="Votre appareil n'est pas dans le mode recovery nécessair
 text_dev_unrecognized="Il semble que votre appareil ne soit pas reconnu par votre système d'exploitation !\nCherchez la raison ..."
 
 text_device="Périphérique : %s"
-text_device_mode="Dans le mode : %s"
+text_device_mode="Dans le mode : "
 
 text_dir_ok="Ce répertoire a bien été créé : %s"
 text_dir_ssu_upd="Il semble que l'archive a déjà été décompressée. \nLe répertoire relatif existe !\n Voulez-vous le garder (OUI) ou le supprimer (NON) ?"

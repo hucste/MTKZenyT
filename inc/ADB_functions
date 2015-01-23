@@ -300,7 +300,11 @@ function adb_reboot_system() {
 function adb_restart_server() {
 
     adb kill-server
+    write_file "log" "$FUNCNAME: adb kill server!"
+    sleep 1
     adb start-server
+    write_file "log" "$FUNCNAME: adb start server!"
+    sleep 1
 
 }
 
@@ -448,14 +452,20 @@ function adb_save_partitions() {
         for (( x=0 ; x < $(count "${PART_CHOOSED[@]}"); x++ )); do
 
             if [[ "${DIALOG}" -ne 0 ]]; then
-                local key="${PART_CHOOSED[$x]}"; display_detected "key: ${key}"
+                local key="$(bc <<< "${PART_CHOOSED[$x]} - 1")"; display_detected "key: ${key}"
             else
                 local key=$(bc <<< "$(array_search "${PART_CHOOSED[$x]}" "${MTD_NAME[@]}")"); display_detected "key: ${key}"
             fi
 
             local ddname="${MTD_NAME[${key}]}"; display_detected "dd_name: ${ddname}"
-            local ddof="${BCKP_PHONE}${MTD_NAME[${key}]}.img"; display_detected "dd_of: ${ddof}"
-            local ddif="/dev/${ddname}"; display_detected "dd_if: ${ddif}"
+            local ddof="${BCKP_PHONE}${ddname}.img"; display_detected "dd_of: ${ddof}"
+
+            if [[ -z "$(array_search "${ddname}" "${PART_BLOCK[@]}")" ]]; then
+                local ddif="/dev/${ddname}"; display_detected "dd_if: ${ddif}"
+            else
+                local ddif="${MTD_MAP[${key}]}"; display_detected "dd_if: ${ddif}"
+            fi
+
             local ddbs="${MTD_SIZE_DEC[${key}]}"; display_detected "dd_bs: ${ddbs}"
 
             mssg="$(printf "${text_progress_adb_dd}" "${ddif}")"
@@ -629,7 +639,7 @@ function adb_whoami() {
 
     adb_su
 
-    adb shell "${adb_su}"id | awk '{ print substr($1,5,1) }'
-    #display_detected "${id}"
+    #adb shell "${adb_su}"id | awk '{ print substr($1,5,1) }'
+    adb shell "${adb_su}id | busybox head -c5"
 
 }
