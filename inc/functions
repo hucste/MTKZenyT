@@ -92,8 +92,8 @@ function BACKUP() {
                         display_files
 
                         #convert_str_to_array
-                        if [[ "${files}" ]]; then
-                            PART_CHOOSED=($(explode " " "${files}"))
+                        if [[ "${FILES}" ]]; then
+                            PART_CHOOSED=($(explode " " "${FILES}"))
                         fi
 
                     fi
@@ -203,7 +203,7 @@ function FLASH() {
 
             display_files
 
-            if [[ "${files}" ]]; then files=($(explode " " "${files}")); fi
+            if [[ "${FILES}" ]]; then files=($(explode " " "${FILES}")); fi
 
             if [[ -n "${files[@]}" ]]; then
 
@@ -569,7 +569,7 @@ function detect_usb_connection() {
         fi
         unset lsusb
     fi
-    write_file "log" "$FUNCNAME: VID=${vid} ; PID=${pid}"
+    write_file "log" "${NOW} ### $FUNCNAME: VID=${vid} ; PID=${pid}"
 
     ###
     # Using lsusb to obtain good informations about device
@@ -586,7 +586,7 @@ function detect_usb_connection() {
         ANDROID_PRODUCT="$(awk '/iProduct/ { print $3,$4,$5 }' ${file})"
         ANDROID_SERIAL="$(awk '/iSerial/ { print $3 }' ${file})"
 
-        write_file "log" "$FUNCNAME: ANDROID_MANUFACTURER=${ANDROID_MANUFACTURER} ; ANDROID_PRODUCT=${ANDROID_PRODUCT} ; ANDROID_SERIAL=${ANDROID_SERIAL}"
+        write_file "log" "${NOW} ### $FUNCNAME: ANDROID_MANUFACTURER=${ANDROID_MANUFACTURER} ; ANDROID_PRODUCT=${ANDROID_PRODUCT} ; ANDROID_SERIAL=${ANDROID_SERIAL}"
     fi
     rm "${file}"
     unset file
@@ -1203,80 +1203,81 @@ function unroot_to_system() {
 
 function verify_ssu_exists() {
 
-    if [[ ! -f "${SSU_FILE_ZIP}" ]]; then
+    x=0
+    for file in $(find "${DIR_TOOLS}" -type f -iname "*supersu*"); do
+        SSU_FILES[$x]="${file}"
+        SSU_VERSIONS[$x]="$(awk -F "UPDATE-SuperSU-v" '{ print $2 }' <<< "${file}" | sed 's/.zip//g')"
+        ((x++))
+    done
+    unset file x
 
+    write_file "log" "${NOW} ### $FUNCNAME: SSU_FILES:'${SSU_FILES[@]}'"
+
+    if [[ -z "${SSU_FILES}" ]]; then
         mssg=$(printf "\n${text_app_inexistant}\n" "${SSU_APK}")
         mssg="${mssg}"$(printf "${text_app_dl}\n" "${SSU_APK}" "${SSU_URL}")
         display_error "${mssg}"
 
         dl_yourself "${SSU_APK}"
-
-        #mssg="${mssg}"$(printf "\n${text_ask_dl} ${text_yes_no}")
-
-        #display_mssg "q" "${mssg}" ""
-
-        #if [[ "${ZENITY}" -ne 0 ]]; then
-
-            #REPLY=$?
-
-        #elif [[ "${DIALOG}" -ne 0 ]]; then
-
-            #REPLY="${read}"
-
-        #fi
-
-        #while true; do
-            #case $REPLY in
-                #y|Y|o|O|0)
-                    #dl_file "${SSU_DL}" "${SSU_FILE_ZIP}"
-                    #break
-                #;;
-                #n|N|1)
-                    #dl_yourself "${SSU_APK}"
-                #;;
-                #*)
-                    #display_error "${text_choice_invalid}"
-                    #verify_ssu_exists
-                #;;
-            #esac
-        #done
-
-
-        #verify_archive
-
     else
 
-        display_mssg "n" "\n${text_ssu_exists}"
+        if [[ $(count "${SSU_VERSIONS[@]}") -gt 1 ]]; then
+            display_files
 
-        verify_archive
-
-    fi
-
-}
-
-function verify_archive() {
-
-    if [[ -f "${SSU_FILE_ZIP}" ]]; then
-
-        local key="$(array_search "${SSU_VERSION}" "${SSU_STATS_VERSION[@]}")"
-        local stat="$(stat -c "%s" "${SSU_FILE_ZIP}")"
-
-        if [[ "${stat}" -ne "${SSU_STATS_SIZE[${key}]}" ]]; then
-
-            mssg="$(printf "${text_error_zip_ssu}" "${stat}" "${SSU_STATS_SIZE[${key}]}")"
-            display_error "${mssg}"
-
-            dl_yourself
+            local -i index=$(bc <<< "${FILES} - 1")
+            SSU_FILE_ZIP="${SSU_FILES[${index}]}"
+            SSU_VERSION="${SSU_VERSIONS[${index}]}"
+            unset index
 
         else
 
-            extract_archive_zip
+            SSU_FILE_ZIP="${SSU_FILES[0]}"
+            SSU_VERSION="${SSU_VERSIONS[0]}"
 
         fi
+        display_detected "SSU_FILE_ZIP: ${SSU_FILE_ZIP}"
+        display_detected "SSU_VERSION: ${SSU_VERSION}"
+
+        SSU_DIR_UNZIP="$(dirname ${SSU_FILE_ZIP})"; display_detected "SSU_DIR_UNZIP: ${SSU_DIR_UNZIP}"
+        SSU_DIR="${SSU_DIR_UNZIP}/"; display_detected "SSU_DIR: ${SSU_DIR}"
+
+        SSU_DIR_CMN="${SSU_DIR}common/"; display_detected "SSU_DIR_CMN: ${SSU_DIR_CMN}"
+        SSU_DIR_APK="${SSU_DIR_CMN}${SSU_APK}"; display_detected "SSU_DIR_APK: ${SSU_DIR_APK}"
+        SSU_DIR_SSUD="${SSU_DIR_CMN}${SSU_SSUD}"; display_detected "SSU_DIR_SSUD: ${SSU_DIR_SSUD}"
+
+        adb_detect_abi
+        SSU_DIR_ARCH="${SSU_DIR}${ARCH}/"; display_detected "SSU_DIR_ARCH: ${SSU_DIR_ARCH}"
+        SSU_DIR_SU="${SSU_DIR_ARCH}${SSU_SU}"; display_detected "SSU_DIR_SU: ${SSU_DIR_SU}"
+
+        if [[ -f "${SSU_FILE_ZIP}" ]]; then extract_archive_zip; fi
 
     fi
 
 }
+
+#function verify_archive() {
+
+    #if [[ -f "${SSU_FILE_ZIP}" ]]; then
+
+        #local key="$(array_search "${SSU_VERSION}" "${SSU_STATS_VERSION[@]}")"
+        #local stat="$(stat -c "%s" "${SSU_FILE_ZIP}")"
+
+        #if [[ "${stat}" -ne "${SSU_STATS_SIZE[${key}]}" ]]; then
+
+            #mssg="$(printf "${text_error_zip_ssu}" "${stat}" "${SSU_STATS_SIZE[${key}]}")"
+            #display_error "${mssg}"
+
+            #dl_yourself
+
+        #else
+
+            #extract_archive_zip
+
+        #fi
+
+    #fi
+
+#}
 
 function verify_installed() {
 

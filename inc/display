@@ -80,11 +80,18 @@ function display_files() {
 
     write_file "log" "${NOW} ### $FUNCNAME: attempt to display files for choosing..."
 
-    files=""
+    case "${choice}" in
+        "BACKUP"|"FLASH")
+            type="check"
+        ;;
+        "ROOT")
+            type="radio"
+        ;;
+    esac
 
     if [[ "${ZENITY}" -eq 1 ]]; then
 
-        files=$( echos_files | zenity_list_files "${text_menu_files}" "${title_menu_files}" "${#MTD_NAME[@]}")
+        FILES=$( echos_files | zenity_list_files "${type}" "${text_menu_files}" "${title_menu_files}") # "${#MTD_NAME[@]}"
 
     fi
 
@@ -92,12 +99,12 @@ function display_files() {
 
         echos_files
 
-        files=$(<${SCRIPT_TMP_DIR}checklist_reply.tmp)
-        display_detected "files: $files"
+        FILES=$(<${SCRIPT_TMP_DIR}checklist_reply.tmp)
+        display_detected "files: ${FILES}"
 
     fi
 
-    if [[ -z "${files}" ]]; then
+    if [[ -z "${FILES}" ]]; then
         display_error "${text_error_not_files}";
         display_files
     else
@@ -176,7 +183,7 @@ function display_menu() {
 
         fi
 
-        write_file "log" "$FUNCNAME: choice=${choice}"
+        write_file "log" "${NOW} ### $FUNCNAME: choice=${choice}"
         unset info_product info_text
 
         # if choice exists, then run-it!
@@ -254,42 +261,64 @@ function echos_files() {
     write_file "log" "${NOW} ### $FUNCNAME: Attempt ones echos to choose files..."
 
     local -i i=0 j=1
+    local -a names
+
+    case "${choice}" in
+        "BACKUP"|"FLASH")
+            names=("${MTD_NAME[@]}")
+        ;;
+        "ROOT")
+            names=("${SSU_VERSIONS[@]}")
+        ;;
+    esac
+
+    write_file "log" "${NOW} ### $FUNCNAME: values array names: ${names[@]}"
 
     if [[ "${DIALOG}" -eq 1 ]]; then
 
         local items=""
-        for name in "${MTD_NAME[@]}"; do
+        for name in "${names[@]}"; do
 
-            key=$(array_search "${name}" "${PART_DEFAULT[@]}");
-            if [[ -n "$key" ]] ; then key="on"; else key="off"; fi
+            if [[ "${choice}" == "BACKUP" || "${choice}" == "FLASH" ]]; then
+                key=$(array_search "${name}" "${PART_DEFAULT[@]}");
+                if [[ -n "$key" ]] ; then key="on"; else key="off"; fi
 
-            items="${items} $j ${name} ${key}"
+                items="${items} $j ${name} ${key}"
+            else
+                items="${items} $j ${name} off"
+            fi
 
             let "i = $i + 1"; let "j = $i + 1"
             unset key
 
         done
+        items="$(tr -s ' ' <<< "${items}")"
 
         display_detected "items: ${items}"
 
-        dialog_list_files "${text_menu_files}" "${title_menu_files}" "${items}" "$(count ${MTD_NAME[@]})"
+        dialog_list_files "${type}" "${text_menu_files}" "${title_menu_files}" "${items}" "$(count ${names[@]})"
 
-        unset items
+        unset items type names
 
     fi
 
     if [[ "${ZENITY}" -eq 1 ]]; then
 
-        for name in "${MTD_NAME[@]}"; do
+        for name in "${names[@]}"; do
 
-            key=$(array_search "${name}" "${PART_DEFAULT[@]}");
-            if [[ -n "${key}" ]]; then echo TRUE; else echo FALSE; fi
-            unset key
+            if [[ "${choice}" == "BACKUP" || "${choice}" == "FLASH" ]]; then
+                key=$(array_search "${name}" "${PART_DEFAULT[@]}");
+                if [[ -n "${key}" ]]; then echo TRUE; else echo FALSE; fi
+                unset key
 
-            echo "${name}"
-            echo "${MTD_SIZE[$i]}"
-            echo "${MTD_ADDR[$i]}"
-            echo "${MTD_MAP[$i]}"
+                echo "${name}"
+                echo "${MTD_SIZE[$i]}"
+                echo "${MTD_ADDR[$i]}"
+                echo "${MTD_MAP[$i]}"
+            else
+                echo FALSE
+                echo "${name}"
+            fi
 
             let "i = $i + 1";
 
@@ -297,7 +326,7 @@ function echos_files() {
 
     fi
 
-    unset array i j
+    unset i j names
 
 }
 

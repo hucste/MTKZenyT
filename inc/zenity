@@ -52,16 +52,27 @@ function zenity_list() {
 
 function zenity_list_files() {
 
-    local text="$1" title="$2" size="$3"
+    local type="$1" text="$2" title="$3" #size="$3"
     #height=$(bc <<< "$3 * 40 + 5")
     local height=300
 
-    ${zenity} --checklist \
-        --column="###" \
-        --column="${text_column_name}" --column="${text_column_size}" \
-        --column="${text_column_addr}" --column="${text_column_map}" \
-        --list --height=${height} --width=620 --separator=' '\
-        --text "${text}" --title "${title}"
+    case "${type}" in
+        "check")
+            ${zenity} --checklist \
+            --column="###" \
+            --column="${text_column_name}" --column="${text_column_size}" \
+            --column="${text_column_addr}" --column="${text_column_map}" \
+            --list --height=${height} --width=620 --separator=' '\
+            --text "${text}" --title "${title}"
+        ;;
+        "radio")
+            ${zenity} --radiolist \
+            --column="###" \
+            --column="${text_column_name}" \
+            --list --height=${height} --width=620 --separator=' '\
+            --text "${text}" --title "${title}"
+        ;;
+    esac
 
     case $? in
         1|255)

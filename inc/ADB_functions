@@ -62,6 +62,18 @@ function adb_delete_supersu() {
 
 }
 
+function adb_detect_abi() {
+
+    display_detected "### Detect Tablet Architecture:"
+    ABI=$(adb shell cat /system/build.prop /default.prop | grep -m 1 "ro.product.cpu.abi=" | dd bs=1 skip=19 count=3)
+    #ABI=$(adb shell uname -m)
+    sleep 1
+    ARCH="${ARCH_FOLDERS[${ABI}]}"
+
+    write_file "log" "${NOW} ### $FUNCNAME: ABI=${ABI} ; ARCH=${ARCH}"
+
+}
+
 function adb_detect_device() {
 
     local search="$(adb devices -l | awk '/usb:/ { print }')"
@@ -115,9 +127,23 @@ function adb_detect_device() {
 
 }
 
+function adb_detect_sdk() {
+
+    display_detected "### Detect SDK Version:"
+    SDK=$(adb shell cat /system/build.prop | grep "ro.build.version.sdk=" | dd bs=1 skip=21 count=2)
+    sleep 1
+
+    if [[ ${SDK} -gt 17 ]]; then
+        CHMOD="0755"
+    fi
+
+    write_file "log" "${NOW} ### $FUNCNAME: CHMOD=${CHMOD} ; SDK=${SDK}"
+
+}
+
 function adb_flash_partitions() {
 
-    write_file "log" "*** $FUNCNAME: Call ADB to flash partitions "
+    write_file "log" "${NOW} *** $FUNCNAME: Call ADB to flash partitions "
 
     path=($(explode "/" "${BCKP_PHONE}")); display_detected "path: ${path[@]}"
     # verify if partition backup exists if not, then mount...
@@ -300,10 +326,10 @@ function adb_reboot_system() {
 function adb_restart_server() {
 
     adb kill-server
-    write_file "log" "$FUNCNAME: adb kill server!"
+    write_file "log" "${NOW} ### $FUNCNAME: adb kill server!"
     sleep 1
     adb start-server
-    write_file "log" "$FUNCNAME: adb start server!"
+    write_file "log" "${NOW} ### $FUNCNAME: adb start server!"
     sleep 1
 
 }
@@ -351,12 +377,9 @@ function adb_root_system() {
 
             display_mssg "n" "chmod and chown ${SYS_BIN}${SSU_SU}"
 
-            local SDK=$(adb shell egrep ro.build.version.sdk /system/build.prop | dd bs=1 skip=21 count=2)
-            #SDK="$(adb shell grep ro.build.version.sdk /system/build.prop)"
-            #echo "SDK: $SDK"
-            #SDK="${SDK##*=}"
-            echo "SDK: ${SDK}"
-            if [[ "${SDK}" -gt 17 ]]; then
+            adb_detect_sdk
+
+            if [[ ${SDK} -gt 17 ]]; then
                 display_detected "SDK: ${SDK} > 17"
                 adb shell 'if [[ -f "${SYS_BIN}${SSU_SU}" ]]; then chmod 0755 "${SYS_BIN}${SSU_SU}"; fi'
                 #adb shell chmod 0755 "/system/bin/.ext/.${SSU_SU}"
@@ -439,7 +462,7 @@ function adb_root_system() {
 
 function adb_save_partitions() {
 
-    write_file "log" "*** $FUNCNAME: Call ADB to save partitions "
+    write_file "log" "${NOW} *** $FUNCNAME: Call ADB to save partitions "
 
     path=($(explode "/" "${BCKP_PHONE}")); display_detected "path: ${path[@]}"
     # verify if partition backup exists if not, then mount...
@@ -548,7 +571,7 @@ function adb_write_img() {
     if [[ $? -eq 0 ]]; then
 
         display_mssg "n" "dd if=${ddif} of=${ddof} bs=${ddbs} count=1"
-        write_file "log" "### $FUNCNAME: dd ${ddif} into ${ddof}"
+        write_file "log" "${NOW} ### $FUNCNAME: dd ${ddif} into ${ddof}"
 
     else
 
@@ -575,7 +598,7 @@ function adb_write_img() {
         if [[ $? -eq 0 ]]; then
 
             display_mssg "n" "dd if=${ddif} of=${ddof} bs=4096 count=${ddbs} skip=${ddskip}"
-            write_file "log" "### $FUNCNAME: dd ${ddif} into ${ddof} [bs: 4096 | count: ${ddbs} | skip: ${ddskip}]"
+            write_file "log" "${NOW} ### $FUNCNAME: dd ${ddif} into ${ddof} [bs: 4096 | count: ${ddbs} | skip: ${ddskip}]"
 
         else
 

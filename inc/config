@@ -20,12 +20,23 @@ source "${DIR_CFG}/cfg_time"
 # Arrays
 ###
 
+declare -A ARCH_FOLDERS
+ARCH_FOLDERS["arm"]="arm";
+ARCH_FOLDERS["armeabi-v7a"]="armv7";
+ARCH_FOLDERS["arm64-v8a"]="arm64";
+ARCH_FOLDERS["mip"]="mips";
+ARCH_FOLDERS["mips"]="mips";
+ARCH_FOLDERS["mips64"]="mips64";
+ARCH_FOLDERS["x86"]="x86";
+ARCH_FOLDERS["x86_64"]="x64";
+
 # arrays to build informations colored
 declare -a COLORS_NAME=('black' 'red' 'green' 'yellow' 'blue' 'magenta' 'cyan' 'white')
 declare -a COLORS_VALUE=('0' '1' '2' '3' '4' '5' '6' '7')
 
 #declare -a CFG
 
+declare -a FILES
 declare -A FILES_CHOOSED
 
 declare -a GUIS=( 'd' 'dialog' 'z' 'zenity')
@@ -56,11 +67,13 @@ source "${DIR_CFG}/cfg_vid_pid"
 ###
 # Int variables
 ###
+declare -i ABI=0
 declare -i CHOICE=0
 declare -i CFG=0
 declare -i DIALOG=0
 declare -i INODE=4096
 declare -i LOG=0
+declare -i SDK=0
 declare -i ZENITY=0
 
 ###
@@ -74,17 +87,26 @@ ANDROID_MODEL=""
 ANDROID_PRODUCT=""
 ANDROID_SERIAL=""
 
+ARCH="arm"  # architecture by default
+
 BCKP_PHONE="/sdcard/BACKUP/" # dir to backup into phone
+
+CHMOD="06775"
+
 DIR_CHOOSED=""
 DIR_TMP="/tmp/"
 DIR_SVG=""
 DIR_SVG_DATED=""
+
 FILE_CHOOSED=""
 FILE_DUMCHAR="dumchar.info"
 FILE_PARAM="${DIR_TOOLS}${FILE_DUMCHAR}"
+FILES=""
+
 GUI=""
 HOME="/home/$USER"  #HOME=~
 MODE=""
+
 #PART_BCKP=""
 SCRIPT_NAME=$0
 SCRIPT_TMP_DIR="${DIR_TMP}${SCRIPT_NAME:2}/"
