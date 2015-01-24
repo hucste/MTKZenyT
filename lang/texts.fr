@@ -50,7 +50,7 @@ text_dl_yourself="Téléchargez vous-même l'application %s !"
 
 text_error_bckp="!!! Erreur : Il semble que la sauvegarde n'a pas eu lieu : %s n'existe pas !!!"
 text_error_device_offline="!!! Erreur : Votre appareil est en mode 'offline' ! \n Veuillez désactiver l'option 'Deboguage USB' dans votre appareil ; déconnectez le câble USB, attendre trois secondes et reconnectez l'appareil à votre ordinateur ; puis réactivez l'option 'Deboguage USB' ..."
-text_error_device_no_perm="!!! Erreur : Votre appareil n'est pas reconnu, parce que la commande 'adb devices' n'a pas les permissions nécessaires. \n Le script va s'arrêter ... Ensuite, veuillez relancer la commande 'adb devices' avec des droits administrateurs, selon votre distribution ... \n Une fois fait, vérifiez le support correct de votre appareil, puis si c'est bon, relancez le programme !"
+text_error_device_no_perm="!!! Erreur : Votre appareil n'est pas reconnu, parce que la commande 'adb devices' n'a pas les permissions nécessaires. \n Le script va s'arrêter ... Ensuite, veuillez relancer le serveur adb par les commandes suivantes 'adb kill-server', puis 'adb start-server' avec des droits administrateurs, selon votre distribution ... \n Une fois fait, vérifiez le support correct de votre appareil, puis si c'est bon, relancez le programme !"
 text_error_dl="!!! Erreur pendant le téléchargement %s !!!"
 text_error_file="!!! Erreur avec le fichier %s! Vérifiez sa présence et ses droits en lecture ..."
 text_error_not_adb="ADB n'est pas installé. Il est pleinement nécessaire !"

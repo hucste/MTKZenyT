@@ -51,7 +51,7 @@ text_dl_yourself="Download yourself the app %s!"
 
 text_error_bckp="!!! ERROR: It seems Backup failed: %s not exists !!!"
 text_error_device_offline="!!! ERROR: Your device is into 'offline' mode! \n Please disable option 'USB Debug' into your Android system; unplug USB cable, wait few secondes and plug again your device to your computer; after enable option 'USB Debug'..."
-text_error_device_no_perm="!!! ERROR: Your device is not recognized, because 'adb devices' has not permissions needed. \n The script will stop... After, launch 'adb devices' with rights administrator, segun your distribution... \n Verify if your device is correctly recognized, if yes, relaunch this script!"
+text_error_device_no_perm="!!! ERROR: Your device is not recognized, because 'adb devices' has not permissions needed. \n The script will stop... After, launch adb server by 'adb kill-server', and 'adb start-server' with rights administrator, segun your distribution... \n Verify if your device is correctly recognized, if yes, relaunch this script!"
 text_error_dl="!!! Error during download %s !!!"
 text_error_file="!!! ERROR with file %s! Checks its presence and its readable..."
 text_error_not_adb="ADB isn't install. Do the needful!"
