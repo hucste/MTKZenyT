@@ -431,6 +431,10 @@ function control_system() {
     verify_installed
     detect_device
 
+    adb_detect_abi
+    adb_detect_sdk
+    adb_su
+
 }
 
 function delete_dir() {
@@ -510,16 +514,7 @@ function detect_device() {
         display_detected "${text_VendorID}" "${vid}"
         display_detected "${text_ProductID}" "${pid}"
 
-        if [[ "${vid}" == "${VID[0]}" ]]; then
-            MODE="${MENU_REBOOT[0]}"
-        else
-            MODE="${MENU_REBOOT[1]}"
-        fi
-
-        local mssg="${text_device_mode}${MODE}"
-        display_detected "${mssg}"
-
-        write_file "log" "${NOW} ### $FUNCNAME: VID:${vid} ; PID:${pid} ; MODE:${MODE}"
+        detect_mode
 
         adb_detect_device
 
@@ -540,6 +535,27 @@ function detect_device() {
         if [[ "${mssg}" ]]; then unset mssg; fi
 
     fi
+
+}
+
+function detect_mode() {
+
+    if [[ "${vid}" == "${VID[0]}" ]]; then
+
+        if [[ "${pid}" == "0c02" ]]; then
+            MODE="${MENU_REBOOT[1]}"
+        else
+            MODE="${MENU_REBOOT[0]}"
+        fi
+
+    else
+        MODE="${MENU_REBOOT[1]}"
+    fi
+
+    local mssg="${text_device_mode}${MODE}"
+    display_detected "${mssg}"
+
+    write_file "log" "${NOW} ### $FUNCNAME: VID:${vid} ; PID:${pid} ; MODE:${MODE}"
 
 }
 
@@ -587,8 +603,8 @@ function detect_usb_connection() {
         ANDROID_SERIAL="$(awk '/iSerial/ { print $3 }' ${file})"
 
         write_file "log" "${NOW} ### $FUNCNAME: ANDROID_MANUFACTURER=${ANDROID_MANUFACTURER} ; ANDROID_PRODUCT=${ANDROID_PRODUCT} ; ANDROID_SERIAL=${ANDROID_SERIAL}"
+        rm "${file}"
     fi
-    rm "${file}"
     unset file
 
 }
@@ -753,8 +769,8 @@ function file_to_array_mtd() {
                 MTD_MAP[$x]="${mtd[4]}"
                 MTD_SIZE_DEC[$x]=$(hexdec "${MTD_SIZE[$x]}")
                 MTD_ADDR_DEC[$x]=$(hexdec "${MTD_ADDR[$x]}")
-                MTD_SIZE_BLOCK[$x]=$(bc <<< "${MTD_SIZE_DEC[$key]} / ${INODE}")
-                MTD_ADDR_BLOCK[$x]=$(bc <<< "${MTD_ADDR_DEC[$key]} / ${INODE}")
+                MTD_SIZE_BLOCK[$x]=$(bc <<< "${MTD_SIZE_DEC[$x]} / ${INODE}")
+                MTD_ADDR_BLOCK[$x]=$(bc <<< "${MTD_ADDR_DEC[$x]} / ${INODE}")
 
             fi
             unset mtd
@@ -782,6 +798,10 @@ function file_to_array_mtd() {
     write_file "log" "${NOW} ### $FUNCNAME: Create mtd array: MTD_ADDR[ ${MTD_ADDR[*]} ]"
     write_file "log" "${NOW} ### $FUNCNAME: Create mtd array: MTD_TYPE[ ${MTD_TYPE[*]} ]"
     write_file "log" "${NOW} ### $FUNCNAME: Create mtd array: MTD_MAP[ ${MTD_MAP[*]} ]"
+    write_file "log" "${NOW} ### $FUNCNAME: Create mtd array: MTD_ADDR_DEC[ ${MTD_ADDR_DEC[*]} ]"
+    write_file "log" "${NOW} ### $FUNCNAME: Create mtd array: MTD_ADDR_BLOCK[ ${MTD_ADDR_BLOCK[*]} ]"
+    write_file "log" "${NOW} ### $FUNCNAME: Create mtd array: MTD_SIZE_DEC[ ${MTD_SIZE_DEC[*]} ]"
+    write_file "log" "${NOW} ### $FUNCNAME: Create mtd array: MTD_SIZE_BLOCK[ ${MTD_SIZE_BLOCK[*]} ]"
 
 }
 
@@ -793,6 +813,7 @@ function file_stat() {
     if [[ -f "${file}" ]]; then int=$(stat -c "%s" ${file} | sed 's/\r$//'); fi
 
     echo ${int}
+    unset int file
 
 }
 
@@ -1245,7 +1266,7 @@ function verify_ssu_exists() {
         SSU_DIR_APK="${SSU_DIR_CMN}${SSU_APK}"; display_detected "SSU_DIR_APK: ${SSU_DIR_APK}"
         SSU_DIR_SSUD="${SSU_DIR_CMN}${SSU_SSUD}"; display_detected "SSU_DIR_SSUD: ${SSU_DIR_SSUD}"
 
-        adb_detect_abi
+        #adb_detect_abi
         SSU_DIR_ARCH="${SSU_DIR}${ARCH}/"; display_detected "SSU_DIR_ARCH: ${SSU_DIR_ARCH}"
         SSU_DIR_SU="${SSU_DIR_ARCH}${SSU_SU}"; display_detected "SSU_DIR_SU: ${SSU_DIR_SU}"
 
@@ -1351,7 +1372,7 @@ function write_file() {
 
     case $1 in
         "cfg") sed -i -e "s#$2=.*#$2=$3#g" "${CONFIG}" ;;
-        "log") [[ "${LOG}" -eq 1 ]] && echo "$2" >> "${PWD}/logs/${DAY}.log" ;;
+        "log") [[ "${LOG}" -eq 1 ]] && echo "$2" >> "${PWD}/logs/${DAY_LOG}.log" ;;
     esac
 
 }

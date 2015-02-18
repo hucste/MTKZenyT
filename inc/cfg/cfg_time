@@ -7,4 +7,5 @@ if ! ${EXEC}; then exit; fi
 ###
 
 DAY=$(date +"%d-%m-%Y")
+DAY_LOG=$(date +"%Y-%m-%d")
 NOW=$(date +"%d-%m-%Y_%H-%M-%S")

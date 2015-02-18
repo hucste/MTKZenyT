@@ -32,8 +32,10 @@ text_column_size="Taille"
 text_datas_remove="Toutes les données relatives au root dans /%s vont être supprimées"
 text_datas_removed="*** Toutes les données dans /%s devraient être supprimées ! Veuillez vérifier ..."
 
+text_detect_abi="### Détection de l'architecture de votre tablette : "
 text_detect_cfg="*** Détection des valeurs de config : "
 text_detect_dev="*** Détection de votre appareil : "
+text_detect_sdk="### Détection de la version du SDK : "
 
 text_dev_mode="Votre montage est en mode %s ..."
 text_dev_not_recovery="Votre appareil n'est pas dans le mode recovery nécessaire !"

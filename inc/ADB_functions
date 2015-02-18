@@ -4,26 +4,26 @@ if ! ${EXEC}; then exit; fi
 
 function adb_delete_su_datas() {
 
-    adb_su
+    #adb_su
 
     mssg=$(printf "${text_datas_remove}\n" "data")
     display_mssg "n" "${mssg}" "" "2"
 
-    adb shell "${adb_su}find /data/app/ -type f -name 'com.koushikdutta.superuser-*' -delete"
-    adb shell "${adb_su}find /data/app/ -type f -name 'com.mgyun.shua.su-*' -delete"
-    adb shell "${adb_su}find /data/app/ -type f -name 'com.noshufou.android.su-*' -delete"
-    adb shell "${adb_su}find /data/app/ -type f -name '*eu.chainfire.supersu*' -delete"
+    adb shell "${ADB_SU}find /data/app/ -type f -name 'com.koushikdutta.superuser-*' -delete"
+    adb shell "${ADB_SU}find /data/app/ -type f -name 'com.mgyun.shua.su-*' -delete"
+    adb shell "${ADB_SU}find /data/app/ -type f -name 'com.noshufou.android.su-*' -delete"
+    adb shell "${ADB_SU}find /data/app/ -type f -name '*eu.chainfire.supersu*' -delete"
 
-    adb shell "${adb_su}find /data/app-lib/ -type d -name '*eu.chainfire.supersu*' -depth | xargs -0 rm -rf {}" #-exec rm -rf \"{}\" \;"
+    adb shell "${ADB_SU}find /data/app-lib/ -type d -name '*eu.chainfire.supersu*' -depth | xargs -0 rm -rf {}" #-exec rm -rf \"{}\" \;"
 
-    adb shell "${adb_su}find /data/data/ -type d -name '*eu.chainfire.supersu*' -depth | xargs -0 rm -rf {}" #-exec rm -rf \"{}\" \;"
+    adb shell "${ADB_SU}find /data/data/ -type d -name '*eu.chainfire.supersu*' -depth | xargs -0 rm -rf {}" #-exec rm -rf \"{}\" \;"
 
-    adb shell "${adb_su}find /data/dalvik-cache/ -type f -name '*com.noshufou.android.su*' -delete"
-    adb shell "${adb_su}find /data/dalvik-cache/ -type f -name '*com.koushikdutta.superuser*' -delete"
-    adb shell "${adb_su}find /data/dalvik-cache/ -type f -name '*com.mgyun.shua.su*' -delete"
-    adb shell "${adb_su}find /data/dalvik-cache/ -type f -name '*eu.chainfire.supersu*' -delete"
-    adb shell "${adb_su}find /data/dalvik-cache/ -type f -iname '*superuser.apk*' -delete"
-    adb shell "${adb_su}find /data/dalvik-cache/ -type f -name '*.oat' -delete"
+    adb shell "${ADB_SU}find /data/dalvik-cache/ -type f -name '*com.noshufou.android.su*' -delete"
+    adb shell "${ADB_SU}find /data/dalvik-cache/ -type f -name '*com.koushikdutta.superuser*' -delete"
+    adb shell "${ADB_SU}find /data/dalvik-cache/ -type f -name '*com.mgyun.shua.su*' -delete"
+    adb shell "${ADB_SU}find /data/dalvik-cache/ -type f -name '*eu.chainfire.supersu*' -delete"
+    adb shell "${ADB_SU}find /data/dalvik-cache/ -type f -iname '*superuser.apk*' -delete"
+    adb shell "${ADB_SU}find /data/dalvik-cache/ -type f -name '*.oat' -delete"
 
     mssg=$(printf "${text_datas_removed}\n" "data")
     display_mssg "n" "${mssg}"
@@ -32,18 +32,18 @@ function adb_delete_su_datas() {
 
 function adb_delete_su_system() {
 
-    adb_su
+    #adb_su
 
     mssg=$(printf "${text_remove}\n" "${SSU_SU}")
     display_mssg "n" "${mssg}" "" "2"
 
-    adb shell "${adb_su}find /system/bin/.ext/ -type f -name '*su' -delete"
-    adb shell "${adb_su}find '${SYS_BIN}' -type f -name 'sugote*' -delete"
-    adb shell "${adb_su}find '${SYS_BIN}' -type f -name '${SSU_SSUD}' -delete"
-    adb shell "${adb_su}find '${SYS_ETC}init.d' -type f -name 'daemonsu' -delete"
-    adb shell "${adb_su}find '${SYS_ETC}' -type f -name '*installed_su_daemon' -delete"
-    adb shell "${adb_su}find /system/bin/ -name 'su' -delete"
-    adb shell "${adb_su}find '${SYS_BIN}' -type f -name '${SSU_SU}' -delete"
+    adb shell "${ADB_SU}find /system/bin/.ext/ -type f -name '*su' -delete"
+    adb shell "${ADB_SU}find '${SYS_BIN}' -type f -name 'sugote*' -delete"
+    adb shell "${ADB_SU}find '${SYS_BIN}' -type f -name '${SSU_SSUD}' -delete"
+    adb shell "${ADB_SU}find '${SYS_ETC}init.d' -type f -name 'daemonsu' -delete"
+    adb shell "${ADB_SU}find '${SYS_ETC}' -type f -name '*installed_su_daemon' -delete"
+    adb shell "${ADB_SU}find /system/bin/ -name 'su' -delete"
+    adb shell "${ADB_SU}find '${SYS_BIN}' -type f -name '${SSU_SU}' -delete"
 
     mssg=$(printf "${text_datas_removed}\n" "system")
     display_mssg "n" "${mssg}"
@@ -52,21 +52,23 @@ function adb_delete_su_system() {
 
 function adb_delete_supersu() {
 
-    adb_su
+    #adb_su
 
     mssg=$(printf "${text_remove}\n" "${SSU_APK}")
     display_mssg "n" "${mssg}"
 
-    adb shell "${adb_su}find '${SYS_APP}' -iname 'superuser*' -delete"
-    adb shell "${adb_su}find '${SYS_APP}' -iname 'supersu*' -delete"
+    adb shell "${ADB_SU}find '${SYS_APP}' -iname 'superuser*' -delete"
+    adb shell "${ADB_SU}find '${SYS_APP}' -iname 'supersu*' -delete"
 
 }
 
 function adb_detect_abi() {
 
-    display_detected "### Detect Tablet Architecture:"
-    ABI=$(adb shell cat /system/build.prop /default.prop | grep -m 1 "ro.product.cpu.abi=" | dd bs=1 skip=19 count=3)
+    display_detected "${text_detect_abi}"
+    #ABI=$(adb shell cat /system/build.prop /default.prop | grep -m 1 "ro.product.cpu.abi=" | dd bs=1 skip=19 count=3)
     #ABI=$(adb shell uname -m)
+
+    ABI="$(adb shell getprop ro.product.cpu.abi | sed 's/\r$//' )"
     sleep 1
     ARCH="${ARCH_FOLDERS[${ABI}]}"
 
@@ -101,7 +103,7 @@ function adb_detect_device() {
         else
 
             if [[ "${MODE}" == "${MENU_REBOOT[1]}" ]]; then
-                # thoses informtions exists only into mode system, not recovery!
+                # thoses informations exists only into mode system, not recovery!
                 ANDROID_DEVICE="$(awk '/device/ { print substr($6, length("device: ")) }' <<< "$search")"; display_detected "${text_ANDROID_DEVICE}${ANDROID_DEVICE}"
                 ANDROID_MODEL="$(awk '/model/ { print substr($5, length("model: ")) }' <<< "$search")"; display_detected "${text_ANDROID_MODEL}${ANDROID_MODEL}"
 
@@ -129,15 +131,16 @@ function adb_detect_device() {
 
 function adb_detect_sdk() {
 
-    display_detected "### Detect SDK Version:"
-    SDK=$(adb shell cat /system/build.prop | grep "ro.build.version.sdk=" | dd bs=1 skip=21 count=2)
+    display_detected "${text_detect_sdk}"
+    #SDK=$(adb shell cat /system/build.prop | grep "ro.build.version.sdk=" | dd bs=1 skip=21 count=2)
+    SDK=$(adb shell getprop ro.build.version.sdk | sed 's/\r$//' )
     sleep 1
 
     if [[ ${SDK} -gt 17 ]]; then
         CHMOD="0755"
     fi
 
-    write_file "log" "${NOW} ### $FUNCNAME: CHMOD=${CHMOD} ; SDK=${SDK}"
+    write_file "log" "${NOW} ### $FUNCNAME: SDK=${SDK} ; CHMOD=${CHMOD}"
 
 }
 
@@ -226,9 +229,9 @@ function adb_mkdir() {
 
     local folder="$1"
 
-    adb_su
+    #adb_su
 
-    adb shell 'if [[ ! -d "${folder}" ]]; then ${adb_su}mkdir "${folder}"; fi'
+    adb shell 'if [[ ! -d "${folder}" ]]; then ${ADB_SU}mkdir "${folder}"; fi'
 
     unset folder
 
@@ -377,7 +380,7 @@ function adb_root_system() {
 
             display_mssg "n" "chmod and chown ${SYS_BIN}${SSU_SU}"
 
-            adb_detect_sdk
+            #adb_detect_sdk
 
             if [[ ${SDK} -gt 17 ]]; then
                 display_detected "SDK: ${SDK} > 17"
@@ -389,7 +392,6 @@ function adb_root_system() {
                 adb shell 'if [[ -f /system/xbin/su ]]; then chmod 06755 /system/xbin/su; fi'
                 #adb shell chmod 06755 "/system/bin/.ext/.${SSU_SU}"
             fi
-            unset SDK
 
             adb shell 'if [[ -f "${SYS_BIN}${SSU_SU}" ]]; then chown 0:0 "${SYS_BIN}${SSU_SU}"; fi'
             adb shell "if [[ ! -h '/system/bin/${SSU_SU}' ]]; then ln -s ${SYS_BIN}${SSU_SU} /system/bin/${SSU_SU}; fi"
@@ -483,17 +485,19 @@ function adb_save_partitions() {
             local ddname="${MTD_NAME[${key}]}"; display_detected "dd_name: ${ddname}"
             local ddof="${BCKP_PHONE}${ddname}.img"; display_detected "dd_of: ${ddof}"
 
-            if [[ -z "$(array_search "${ddname}" "${PART_BLOCK[@]}")" ]]; then
-                local ddif="/dev/${ddname}"; display_detected "dd_if: ${ddif}"
-            else
-                local ddif="${MTD_MAP[${key}]}"; display_detected "dd_if: ${ddif}"
-            fi
+            #if [[ -z "$(array_search "${ddname}" "${PART_BLOCK[@]}")" ]]; then
+                #local ddif="/dev/${ddname}"; display_detected "dd_if: ${ddif}"
+            #else
+                #local ddif="${MTD_MAP[${key}]}"; display_detected "dd_if: ${ddif}"
+            #fi
+
+            local ddif="${MTD_MAP[${key}]}"; display_detected "dd_if: ${ddif}"
 
             local ddbs="${MTD_SIZE_DEC[${key}]}"; display_detected "dd_bs: ${ddbs}"
 
             mssg="$(printf "${text_progress_adb_dd}" "${ddif}")"
             (
-            adb_write_img "${ddname}" "${ddif}" "${ddof}" "${ddbs}" "${ddskip}"
+            adb_write_img2 "${ddname}" "${ddif}" "${ddof}" "${ddbs}" "${ddskip}"
             ) | display_mssg "p" "${mssg}" "${title_adb_progress}"
 
             if [[ -z "$(adb_test "-f ${ddof}")" ]]; then
@@ -560,60 +564,6 @@ function adb_save_partitions() {
 
 }
 
-function adb_write_img() {
-
-    adb_su
-
-    local ddname="$1" ddif="$2" ddof="$3" ddbs="$4" ddskip="$5"
-
-    adb shell "${adb_su}dd if=${ddif} of=${ddof} bs=${ddbs} count=1"
-
-    if [[ $? -eq 0 ]]; then
-
-        display_mssg "n" "dd if=${ddif} of=${ddof} bs=${ddbs} count=1"
-        write_file "log" "${NOW} ### $FUNCNAME: dd ${ddif} into ${ddof}"
-
-    else
-
-        mssg="$(printf "${text_error_write_img}" "${ddif}")"
-        display_error "${mssg}"
-        display_mssg "n" "${text_bckp_method2}${ddif}"
-
-        case "${choice}" in
-
-            "BACKUP")
-                ddif="${MTD_MAP[${key}]}"; display_detected "${ddname}: new dd_if: ${ddif}"
-            ;;
-            "FLASH")
-                ddof="${MTD_MAP[${key}]}"; display_detected "${ddname}: new dd_of: ${ddof}"
-            ;;
-
-        esac
-
-        ddbs="${MTD_SIZE_BLOCK[${key}]}"; display_detected "${ddname}: new dd_bs: ${ddbs}"
-        ddskip="${MTD_ADDR_BLOCK[${key}]}"; display_detected "${ddname}: new dd_skip: ${ddskip}"
-
-        adb shell "${adb_su}dd if=${ddif} of=${ddof} bs=4096 count=${ddbs} skip=${ddskip}"
-
-        if [[ $? -eq 0 ]]; then
-
-            display_mssg "n" "dd if=${ddif} of=${ddof} bs=4096 count=${ddbs} skip=${ddskip}"
-            write_file "log" "${NOW} ### $FUNCNAME: dd ${ddif} into ${ddof} [bs: 4096 | count: ${ddbs} | skip: ${ddskip}]"
-
-        else
-
-            mssg="$(printf "" "${ddif}")"
-            display_error "${mssg}"
-            display_mssg "n" "${text_sorry}"
-
-        fi
-
-    fi
-
-    unset ddname ddif ddof ddbs ddskip
-
-}
-
 function adb_stat_file() {
 
     local file="$1"
@@ -634,9 +584,12 @@ function adb_stat_file() {
 
 function adb_su() {
 
-    adb_su=""
+    #adb_su=""
+    #if [[ "${vid}" != "${VID[0]}" ]]; then adb_su="su -c "; fi
 
-    if [[ "${vid}" != "${VID[0]}" ]]; then adb_su="su -c "; fi
+    local which=$(adb shell busybox which su)
+    if [[ "${which}" != "" ]]; then ADB_SU="su -c "; fi
+    unset which
 
 }
 
@@ -660,9 +613,71 @@ function adb_verify_mount() {
 
 function adb_whoami() {
 
-    adb_su
+    #adb_su
+    #adb shell "${ADB_SU}"id | awk '{ print substr($1,5,1) }'
 
-    #adb shell "${adb_su}"id | awk '{ print substr($1,5,1) }'
-    adb shell "${adb_su}id | busybox head -c5"
+    adb shell "${ADB_SU}id | busybox head -c5"
+
+}
+
+
+function adb_write_img() {
+
+    #adb_su
+
+    local ddname="$1" ddif="$2" ddof="$3" ddbs="$4" ddskip="$5"
+
+    adb shell "${ADB_SU}dd if=${ddif} of=${ddof} bs=${ddbs} count=1"
+
+    if [[ $? -eq 0 ]]; then
+
+        display_mssg "n" "dd if=${ddif} of=${ddof} bs=${ddbs} count=1"
+        write_file "log" "${NOW} ### $FUNCNAME: dd ${ddif} into ${ddof}"
+
+    else
+
+        mssg="$(printf "${text_error_write_img}" "${ddif}")"
+        display_error "${mssg}"
+        display_mssg "n" "${text_bckp_method2}${ddif}"
+
+        adb_write_img2
+
+    fi
+
+    unset ddname ddif ddof ddbs ddskip
+
+}
+
+
+function adb_write_img2() {
+
+    case "${choice}" in
+
+        "BACKUP")
+            ddif="${MTD_MAP[${key}]}"; display_detected "${ddname}: new dd_if: ${ddif}"
+        ;;
+        "FLASH")
+            ddof="${MTD_MAP[${key}]}"; display_detected "${ddname}: new dd_of: ${ddof}"
+        ;;
+
+    esac
+
+    ddbs="${MTD_SIZE_BLOCK[${key}]}"; display_detected "${ddname}: new dd_bs: ${ddbs}"
+    ddskip="${MTD_ADDR_BLOCK[${key}]}"; display_detected "${ddname}: new dd_skip: ${ddskip}"
+
+    adb shell "${ADB_SU}dd if=${ddif} of=${ddof} bs=4096 count=${ddbs} skip=${ddskip}"
+
+    if [[ $? -eq 0 ]]; then
+
+        display_mssg "n" "dd if=${ddif} of=${ddof} bs=4096 count=${ddbs} skip=${ddskip}"
+        write_file "log" "${NOW} ### $FUNCNAME: dd ${ddif} into ${ddof} [bs: 4096 | count: ${ddbs} | skip: ${ddskip}]"
+
+    else
+
+        mssg="$(printf "" "${ddif}")"
+        display_error "${mssg}"
+        display_mssg "n" "${text_sorry}"
+
+    fi
 
 }

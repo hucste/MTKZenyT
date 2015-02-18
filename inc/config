@@ -67,7 +67,7 @@ source "${DIR_CFG}/cfg_vid_pid"
 ###
 # Int variables
 ###
-declare -i ABI=0
+#declare -i ABI=0
 declare -i CHOICE=0
 declare -i CFG=0
 declare -i DIALOG=0
@@ -79,7 +79,8 @@ declare -i ZENITY=0
 ###
 # String variables
 ###
-adb_su=""
+ABI="arm"
+ADB_SU=""
 
 ANDROID_DEVICE=""
 ANDROID_MANUFACTURER=""

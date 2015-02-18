@@ -33,8 +33,10 @@ text_column_Size="Size"
 text_datas_remove="All datas relatived at root into /%s will be deleted"
 text_datas_removed="*** all datas into /%s should be deleted! Verify..."
 
-text_detect_cfg="*** Detection of values config:"
+text_detect_abi="### Detect Tablet Architecture: "
+text_detect_cfg="*** Detection of values config: "
 text_detect_dev="*** Detect your device: "
+text_detect_sdk="### Detect SDK Version: "
 
 text_dev_mode="Your mount is into %s mode..."
 text_dev_not_recovery="Your device isn't into needed recovery mode!"
