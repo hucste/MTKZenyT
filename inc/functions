@@ -332,6 +332,7 @@ function build_vars() {
 
     if [[ -n "${MENU_NAME[@]}" ]]; then
 
+        # build array MENU_TEXT segun MENU_NAME
         for name in "${MENU_NAME[@]}"; do
             # fill array MENU_TEXT...
             var="text_menu_$name"
@@ -853,7 +854,7 @@ function make_dir_dated() {
 
     if [[ -d "${DIR_SVG}" ]]; then
 
-        DIR_SVG_DATED="${DIR_SVG}${vid}:${pid}_${NOW}"
+        DIR_SVG_DATED="${DIR_SVG}${vid}:${pid}_${NOW_DIR}"
 
         if [[ ! -d "${DIR_SVG_DATED}" ]]; then
             mkdir "${DIR_SVG_DATED}" && display_detected "${text_dir_ok}" "${DIR_SVG_DATED}"
@@ -971,15 +972,17 @@ function press_any_key() {
 
 function read_config() {
 
-    search=$(grep "$1" "${PWD}/${CONFIG}")
+    search=$(grep "$1" "${PWD}/${CONFIG}")  # search0
     if [[ -n "${search}" ]]; then
 
-        #if [[ "$(grep "^DIR" <<< "${search}")" || "$(grep "^BCKP" <<< "${search}")" ]]; then
-        s1=$(grep "^DIR" <<< "${search}"); s2=$(grep "^BCKP" <<< "${search}")
+        # if search begin with...
+        s1=$(grep "^DIR" <<< "${search}")   # search1
+        s2=$(grep "^BCKP" <<< "${search}")  # search2
         if [[ "$s1" || "$s2" ]]; then
 
             # if ultimate character of search isn't '/' and not '=', add-it '/'
-            s3=$(grep "./$" <<< "${search}"); s4=$(grep ".=$" <<< "${search}")
+            s3=$(grep "./$" <<< "${search}")    # search3
+            s4=$(grep ".=$" <<< "${search}")    # search4
             if [[ ! "$s3" && ! "$s4" ]]; then
                 search="${search}/";
             fi
@@ -988,6 +991,7 @@ function read_config() {
         fi
         unset s1 s2
 
+        # echo all characters after symbol '='
         echo "${search#*=}"
 
     fi
@@ -1133,9 +1137,15 @@ function test_config_file() {
     if [[ -f "${CONFIG}" && -r "${CONFIG}" ]]; then
 
         LOG=$(read_config "LOG") && display_detected "LOG=${LOG}"
-        BCKP_PHONE=$(read_config "BCKP_PHONE") && display_detected "BCKP_PHONE=${BCKP_PHONE}"
+
+        BCKP_PHONE=$(read_config "BCKP_PHONE");
+        if [[ -z "${BCKP_PHONE}" ]]; then BCKP_PHONE="${CFG_BCKP_PHONE}"; fi
+        display_detected "BCKP_PHONE=${BCKP_PHONE}"
+
         CFG=1 && display_detected "CFG=1"
+
         DIR_SVG=$(read_config "DIR_SVG") && display_detected "DIR_SVG=${DIR_SVG}"
+
         if [[ "$1" == "MTKZenyTux" ]]; then
             GUI=$(read_config "GUI") && display_detected "GUI=${GUI}"
         else

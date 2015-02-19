@@ -46,6 +46,7 @@ declare -a INFO_MAP
 declare -a INFO_NAME=('name' 'size' 'addr' 'type' 'map')
 
 # arrays to build menu
+declare -a MENU_BACKUP=("ADB" "PARTITIONS")
 declare -a MENU_NAME=("BACKUP" "FLASH" "ROOT" "UNROOT" "REBOOT" "EXIT")
 declare -a MENU_REBOOT=("RECOVERY" "SYSTEM")
 declare -A MENU_TEXT
@@ -90,7 +91,7 @@ ANDROID_SERIAL=""
 
 ARCH="arm"  # architecture by default
 
-BCKP_PHONE="/sdcard/BACKUP/" # dir to backup into phone
+CFG_BCKP_PHONE="/sdcard/BACKUP/" # dir to backup into phone
 
 CHMOD="06775"
 

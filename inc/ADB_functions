@@ -231,7 +231,7 @@ function adb_mkdir() {
 
     #adb_su
 
-    adb shell 'if [[ ! -d "${folder}" ]]; then ${ADB_SU}mkdir "${folder}"; fi'
+    adb shell "if [[ ! -d "${folder}" ]]; then ${ADB_SU}'mkdir "${folder}"'; fi"
 
     unset folder
 
@@ -567,18 +567,21 @@ function adb_save_partitions() {
 function adb_stat_file() {
 
     local file="$1"
+    local -i stat=0
 
     if [[ "${vid}" != "${VID[0]}" ]]; then
 
-        echo $( sed 's/\r$//' <<< $(adb shell stat -c "%s" "${file}") )
+        stat=$( sed 's/\r$//' <<< $(adb shell stat -c "%s" "${file}") )
 
     else
 
-        echo $( sed 's/\r$//' <<< $(adb shell ls -l "${file}" | awk '{print $5}') )
+        stat=$( sed 's/\r$//' <<< $(adb shell ls -l "${file}") | awk '{ print $4 }' )
 
     fi
 
-    unset file
+    if [[ ${stat} ]]; then echo ${stat}; fi
+
+    unset file stat
 
 }
 
@@ -662,22 +665,29 @@ function adb_write_img2() {
 
     esac
 
-    ddbs="${MTD_SIZE_BLOCK[${key}]}"; display_detected "${ddname}: new dd_bs: ${ddbs}"
-    ddskip="${MTD_ADDR_BLOCK[${key}]}"; display_detected "${ddname}: new dd_skip: ${ddskip}"
+    local ddbs="${MTD_SIZE_BLOCK[${key}]}"; display_detected "${ddname}: new dd_bs: ${ddbs}"
+    local ddskip="${MTD_ADDR_BLOCK[${key}]}"; display_detected "${ddname}: new dd_skip: ${ddskip}"
+    local ddlog="${BCKP_PHONE}dd_${ddname}.log"
 
-    adb shell "${ADB_SU}dd if=${ddif} of=${ddof} bs=4096 count=${ddbs} skip=${ddskip}"
+    adb shell "${ADB_SU}'dd if=${ddif} of=${ddof} bs=4096 count=${ddbs} skip=${ddskip} > ${ddlog}'"
 
-    if [[ $? -eq 0 ]]; then
+    local log="$(adb shell cat ${ddlog})"
+
+    #if [[ $? -eq 0 ]]; then
+    if [[ -z "${log}" ]]; then
 
         display_mssg "n" "dd if=${ddif} of=${ddof} bs=4096 count=${ddbs} skip=${ddskip}"
         write_file "log" "${NOW} ### $FUNCNAME: dd ${ddif} into ${ddof} [bs: 4096 | count: ${ddbs} | skip: ${ddskip}]"
 
     else
 
-        mssg="$(printf "" "${ddif}")"
+        mssg="$(printf "${text_error_write_img}" "${ddif}")"
         display_error "${mssg}"
         display_mssg "n" "${text_sorry}"
 
     fi
+
+    adb shell "if [[ -f "${ddlog}" ]]; then rm "${ddlog}"; fi"
+    unset log
 
 }

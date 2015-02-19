@@ -96,6 +96,9 @@ text_menu_REBOOT="Reboot your device"
 text_menu_ROOT="To root your device"
 text_menu_UNROOT="To unroot your device"
 
+text_menu_backup_ADB="adb backup"
+text_menu_backup_PARTITIONS="partitions backup"
+
 text_menu_reboot_RECOVERY="Recovery"
 text_menu_reboot_SYSTEM="System"
 
