@@ -1,5 +1,6 @@
 #!/bin/bash
 
+title_adb_backup_options="Menu ADB :: Backup options"
 title_adb_progress="Step ADB ... Processing"
 
 title_detect_dev="*** Detection Device ***"

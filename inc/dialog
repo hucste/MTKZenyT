@@ -64,10 +64,19 @@ function dialog_list_files() {
 function dialog_menu() {
 
     # call: dialog menu text title
-    local text="$1" title="$2" height=$(bc <<< "$3 * 10 + 5")
+    local text="$1" title="$2" height=$(bc <<< "$3 * 10 + 5") info="$4"
+    local filename=""
+
+    case "${info}" in
+        "choice") filename="${SCRIPT_TMP_DIR}menu.tmp"
+        ;;
+        "reboot") filename="${SCRIPT_TMP_DIR}menu_reboot.tmp"
+        ;;
+    esac
+    unset info
 
     dialog --backtitle "${title}" --title "${title}" \
-        --menu "${text}" 0 0 ${height} "${menu[@]}" 2> "${SCRIPT_TMP_DIR}menu.tmp"
+        --menu "${text}" 0 0 ${height} "${menu[@]}" 2> "${filename}"
         #--menu "${text}" 0 0 ${height} "${menu[@]}" 2>&1 1>&3
 
     case $? in
@@ -78,7 +87,7 @@ function dialog_menu() {
         #;;
     esac
 
-    unset text title height
+    unset text title height filename
 
 }
 

@@ -1,5 +1,6 @@
 #!/bin/bash
 
+title_adb_backup_options="Menu ADB :: Options de sauvegarde"
 title_adb_progress="Étape ADB :: En cours ..."
 
 title_detect_dev="*** Détection de l'appareil ***"

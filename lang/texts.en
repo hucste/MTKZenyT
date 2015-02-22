@@ -2,6 +2,11 @@
 
 if ! ${EXEC}; then exit; fi
 
+text_adb_backup_apk="Backup of the .apks themselves in the archive"
+text_adb_backup_options="Which options do you want enable?"
+text_adb_backup_shared="Backup of the device's shared storage / SD card contents"
+text_adb_backup_system="Backup all system apps"
+
 text_ANDROID_DEVICE="Device: "
 text_ANDROID_MANUFACTURER="Manufacturer: "
 text_ANDROID_MODEL="Model: "
@@ -88,7 +93,9 @@ text_menu_action="What action, do you want: "
 text_menu_cancel="Are you sure than cancel-it?"
 text_menu_files="Which files do you want to flash?"
 
-text_menu_BACKUP="Backup your device"
+text_menu_ADB_BACKUP="Backup with adb command your datas"
+text_menu_ADB_RESTORE="Restore your backuped datas with adb command"
+text_menu_BACKUP="Backup your partition device"
 #text_menu_CUSTOM="To flash custom ROM..."
 text_menu_EXIT="Exit the program!"
 text_menu_FLASH="To flash original ROM..."
@@ -114,8 +121,9 @@ text_press_key="Press any key..."
 text_press_key_after_reboot="Press any key when your device has rebooted..."
 text_press_key_when_ready="Press any key, when your device is ready..."
 text_ProductID="ProductID: %s"
-text_progress_adb_pull="Wait during ADB copy file %s into your device..."
+text_progress_adb_backup="Wait during ADB backup file %s into your computer..."
 text_progress_adb_dd="Wait during ADB write file %s into your device..."
+text_progress_adb_pull="Wait during ADB copy file %s into your device..."
 
 text_reboot="What reboot do you want?"
 text_reboot_now="Your device reboot... now!"

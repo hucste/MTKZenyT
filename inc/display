@@ -80,7 +80,14 @@ function display_files() {
 
     write_file "log" "${NOW} ### $FUNCNAME: attempt to display files for choosing..."
 
+    local text="${text_menu_files}" title="${title_menu_files}"
+
     case "${choice}" in
+        "ADB_BACKUP")
+            type="check"
+            text="${text_adb_backup_options}"
+            title="${title_adb_backup_options}"
+        ;;
         "BACKUP"|"FLASH")
             type="check"
         ;;
@@ -91,7 +98,7 @@ function display_files() {
 
     if [[ "${ZENITY}" -eq 1 ]]; then
 
-        FILES=$( echos_files | zenity_list_files "${type}" "${text_menu_files}" "${title_menu_files}") # "${#MTD_NAME[@]}"
+        FILES=$( echos_files | zenity_list_files "${type}" "${text}" "${title}") # "${#MTD_NAME[@]}"
 
     fi
 
@@ -104,7 +111,7 @@ function display_files() {
 
     fi
 
-    if [[ -z "${FILES}" ]]; then
+    if [[ -z "${FILES}" && "${choice}" != "ADB_BACKUP" ]]; then
         display_error "${text_error_not_files}";
         display_files
     else
@@ -147,11 +154,11 @@ function display_menu() {
             #info_product="$(printf "<span color=\"${green}\"><b>${text_device} - ${info_mode}</b></span>" "${info_device}" "${MODE}")"
             info_text="$(printf "%s" "${info_device}\n${text_menu_action}")"
 
-            choice=$( echos_menu | zenity_list "${info_text}" "${title_welcome}" "$(count ${MENU_NAME[@]})")
+            choice=$( echos_menu2 | zenity_list "${info_text}" "${title_welcome}" "$(count ${MENU_NAME[@]})")
 
         elif  [[ "${DIALOG}" -ne 0 ]]; then
 
-            echos_menu
+            echos_menu2
 
             #info_product="$(printf "${text_device} - ${text_device_mode}" "${info_device}" "${info_mode}")"
             info_text="$(printf "%s" "${info_device}\n${text_menu_action}")"
@@ -160,7 +167,7 @@ function display_menu() {
             #choice=$(dialog_menu "${info_text}" "${title_welcome}" "$(count ${MENU_NAME[@]})")
             #exec 3>&-;
 
-            dialog_menu "${info_text}" "${title_welcome}" "$(count ${MENU_NAME[@]})"
+            dialog_menu "${info_text}" "${title_welcome}" "$(count ${MENU_NAME[@]})" "choice"
             choice=$(<${SCRIPT_TMP_DIR}menu.tmp)
 
             unset menu
@@ -264,6 +271,9 @@ function echos_files() {
     local -a names
 
     case "${choice}" in
+        "ADB_BACKUP")
+            names=("${ADB_BACKUP_OPTIONS[@]}")
+        ;;
         "BACKUP"|"FLASH")
             names=("${MTD_NAME[@]}")
         ;;
@@ -280,10 +290,18 @@ function echos_files() {
         for name in "${names[@]}"; do
 
             if [[ "${choice}" == "BACKUP" || "${choice}" == "FLASH" ]]; then
+
                 key=$(array_search "${name}" "${PART_DEFAULT[@]}");
                 if [[ -n "$key" ]] ; then key="on"; else key="off"; fi
 
                 items="${items} $j ${name} ${key}"
+
+            elif [[ "${choice}" == "ADB_BACKUP" ]]; then
+
+                key="off"
+                if [[ "${name}" == "system" ]]; then key="on"; fi
+                items="${items} $j ${name} ${key}"
+
             else
                 items="${items} $j ${name} off"
             fi
@@ -296,7 +314,7 @@ function echos_files() {
 
         display_detected "items: ${items}"
 
-        dialog_list_files "${type}" "${text_menu_files}" "${title_menu_files}" "${items}" "$(count ${names[@]})"
+        dialog_list_files "${type}" "${text}" "${title}" "${items}" "$(count ${names[@]})"
 
         unset items type names
 
@@ -307,6 +325,7 @@ function echos_files() {
         for name in "${names[@]}"; do
 
             if [[ "${choice}" == "BACKUP" || "${choice}" == "FLASH" ]]; then
+
                 key=$(array_search "${name}" "${PART_DEFAULT[@]}");
                 if [[ -n "${key}" ]]; then echo TRUE; else echo FALSE; fi
                 unset key
@@ -315,9 +334,17 @@ function echos_files() {
                 echo "${MTD_SIZE[$i]}"
                 echo "${MTD_ADDR[$i]}"
                 echo "${MTD_MAP[$i]}"
+
+            elif [[ "${choice}" == "ADB_BACKUP" ]]; then
+
+                if [[ "${name}" == "system" ]]; then echo TRUE; else echo FALSE; fi
+                echo "${name}"
+
             else
+
                 echo FALSE
                 echo "${name}"
+
             fi
 
             let "i = $i + 1";
@@ -354,6 +381,45 @@ function echos_menu() {
         done
 
     fi
+
+}
+
+function echos_menu2() {
+
+    write_file "log" "${NOW} ### $FUNCNAME: Attempt ones echos to choose menu..."
+
+    local -a NAMES
+    local -A TEXTS
+
+    if [[ -n "${choice}" && "${choice}" == "REBOOT" ]]; then
+        NAMES=("${MENU_REBOOT[@]}")
+        for key in "${!MENU_TEXT_REBOOT[@]}"; do TEXTS["${key}"]="${MENU_TEXT_REBOOT["${key}"]}"; done
+    else
+        NAMES=("${MENU_NAME[@]}")
+        for key in "${!MENU_TEXT[@]}"; do TEXTS["${key}"]="${MENU_TEXT["${key}"]}"; done
+    fi
+
+
+    if [[ "${DIALOG}" -eq 1 ]]; then
+
+        for name in "${NAMES[@]}"; do
+
+            menu+=("${name}" "${TEXTS[${name}]}")
+
+        done
+
+    else
+
+        for name in "${NAMES[@]}"; do
+
+            echo "${name}";
+            echo "${TEXTS[${name}]}";
+
+        done
+
+    fi
+
+    unset NAMES TEXTS
 
 }
 

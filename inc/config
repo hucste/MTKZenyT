@@ -19,6 +19,8 @@ source "${DIR_CFG}/cfg_time"
 ###
 # Arrays
 ###
+declare -a ADB_BACKUP_OPTIONS=('apk' 'shared' 'system' 'all')
+declare -a ADB_BACKUP_CHOOSED
 
 declare -A ARCH_FOLDERS
 ARCH_FOLDERS["arm"]="arm";
@@ -46,8 +48,7 @@ declare -a INFO_MAP
 declare -a INFO_NAME=('name' 'size' 'addr' 'type' 'map')
 
 # arrays to build menu
-declare -a MENU_BACKUP=("ADB" "PARTITIONS")
-declare -a MENU_NAME=("BACKUP" "FLASH" "ROOT" "UNROOT" "REBOOT" "EXIT")
+declare -a MENU_NAME=("ADB_BACKUP" "ADB_RESTORE" "BACKUP" "FLASH" "ROOT" "UNROOT" "REBOOT" "EXIT")
 declare -a MENU_REBOOT=("RECOVERY" "SYSTEM")
 declare -A MENU_TEXT
 declare -A MENU_TEXT_REBOOT

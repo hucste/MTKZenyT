@@ -2,6 +2,46 @@
 
 if ! ${EXEC}; then exit; fi
 
+function adb_backup() {
+
+    local file="backup_${vid}_${pid}" options=""
+
+    for option in "${ADB_BACKUP_OPTIONS[@]}"; do
+
+        if [[ -n "${ADB_BACKUP_CHOOSED[@]}" ]]; then
+            key=$(array_search "${option}" "${ADB_BACKUP_OPTIONS[@]}")
+            let search=key+1
+            key=$(array_search "${search}" "${ADB_BACKUP_CHOOSED[@]}")
+            unset search
+        fi
+
+        if [[ -n "${key}" ]]; then
+            file="${file}_${option}"
+            options="${options}-${option} "
+            unset key
+        else
+            if [[ "${option}" != "all" ]]; then
+                file="${file}_no${option}"
+                options="${options}-no${option} ";
+            fi
+        fi
+
+    done
+    unset option
+
+    file="${DIR_SVG_DATED}/${file}_${NOW_DIR}.ab"
+
+    write_file "log" "$FUNCNAME: filename: ${file} ; options: ${options}"
+
+    mssg="$(printf "${text_progress_adb_backup}" "${ddif}")"
+    (
+        adb backup -f "${file}" "${options}"
+    ) | display_mssg "p" "${mssg}" "${title_adb_progress}"
+
+    unset file options
+
+}
+
 function adb_delete_su_datas() {
 
     #adb_su
@@ -64,7 +104,6 @@ function adb_delete_supersu() {
 
 function adb_detect_abi() {
 
-    display_detected "${text_detect_abi}"
     #ABI=$(adb shell cat /system/build.prop /default.prop | grep -m 1 "ro.product.cpu.abi=" | dd bs=1 skip=19 count=3)
     #ABI=$(adb shell uname -m)
 
@@ -72,6 +111,7 @@ function adb_detect_abi() {
     sleep 1
     ARCH="${ARCH_FOLDERS[${ABI}]}"
 
+    display_detected "${text_detect_abi} ${ABI} ; ARCH: ${ARCH}"
     write_file "log" "${NOW} ### $FUNCNAME: ABI=${ABI} ; ARCH=${ARCH}"
 
 }
@@ -131,7 +171,6 @@ function adb_detect_device() {
 
 function adb_detect_sdk() {
 
-    display_detected "${text_detect_sdk}"
     #SDK=$(adb shell cat /system/build.prop | grep "ro.build.version.sdk=" | dd bs=1 skip=21 count=2)
     SDK=$(adb shell getprop ro.build.version.sdk | sed 's/\r$//' )
     sleep 1
@@ -140,6 +179,7 @@ function adb_detect_sdk() {
         CHMOD="0755"
     fi
 
+    display_detected "${text_detect_sdk} ${SDK}"
     write_file "log" "${NOW} ### $FUNCNAME: SDK=${SDK} ; CHMOD=${CHMOD}"
 
 }
@@ -337,6 +377,17 @@ function adb_restart_server() {
 
 }
 
+function adb_restore() {
+
+    # adb restore adb backup
+    local file="$1"
+
+    adb restore "${file}"
+
+    unset file
+
+}
+
 function adb_root_system() {
 
     mssg=$(printf "${text_mount_rw}" "system")
@@ -477,7 +528,7 @@ function adb_save_partitions() {
         for (( x=0 ; x < $(count "${PART_CHOOSED[@]}"); x++ )); do
 
             if [[ "${DIALOG}" -ne 0 ]]; then
-                local key="$(bc <<< "${PART_CHOOSED[$x]} - 1")"; display_detected "key: ${key}"
+                local key=$(bc <<< "${PART_CHOOSED[$x]} - 1"); display_detected "key: ${key}"
             else
                 local key=$(bc <<< "$(array_search "${PART_CHOOSED[$x]}" "${MTD_NAME[@]}")"); display_detected "key: ${key}"
             fi

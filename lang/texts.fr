@@ -2,6 +2,11 @@
 
 if ! ${EXEC}; then exit; fi
 
+text_adb_backup_apk="Sauvegarde les fichiers .apks dans l'archive"
+text_adb_backup_options="Quelle(s) option(s) désirez-vous activer ?"
+text_adb_backup_shared="Sauvegarde les contenus des repertoires partagés (tels que la SD carte)"
+text_adb_backup_system="Sauvegarde les applications système"
+
 text_ANDROID_DEVICE="Appareil : "
 text_ANDROID_MANUFACTURER="Fabriquant : "
 text_ANDROID_MODEL="Modèle du produit : "
@@ -88,7 +93,9 @@ text_menu_action="Que voulez-vous faire : "
 text_menu_cancel="Êtes-vous sûr de vouloir annuler ?"
 text_menu_files="Quel(s) fichier(s) désirez-vous flasher ?"
 
-text_menu_BACKUP="Sauvegarder votre appareil"
+text_menu_ADB_BACKUP="Sauvegarder vos données avec l'outil adb"
+text_menu_ADB_RESTORE="Restaurer vos données sauvegardées avec l'outil adb"
+text_menu_BACKUP="Sauvegarder les partitions de votre appareil"
 #text_menu_CUSTOM="Flasher une Custom ROM dans votre appareil"
 text_menu_EXIT="Quitter le programme !"
 text_menu_FLASH="Flasher une image officielle de votre appareil"
@@ -114,8 +121,9 @@ text_press_key="Appuyez sur n'importe quelle touche ..."
 text_press_key_after_reboot="Appuyez sur n'importe quelle touche, quand l'appareil a redemarré ..."
 text_press_key_when_ready="Appuyez sur n'importe quelle touche, quand l'appareil est prêt ..."
 text_ProductID="ProductID: %s"
-text_progress_adb_pull="Patientez pendant que l'outil ADB copie le fichier %s dans votre appareil ..."
+text_progress_adb_backup="Patientez pendant que l'outil ADB sauvegarde vos données, nommées '%s', dans votre ordinateur..."
 text_progress_adb_dd="Patientez pendant que l'outil ADB écrit le fichier %s dans votre appareil ..."
+text_progress_adb_pull="Patientez pendant que l'outil ADB copie le fichier %s dans votre appareil ..."
 
 text_reboot="Quel forme de redémarrage, voulez-vous faire ?"
 text_reboot_now="Votre appareil redémarre, maintenant !"

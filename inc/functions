@@ -14,6 +14,36 @@ function MTKZenyTux() {
 
 }
 
+function ADB_BACKUP() {
+
+    # obtain dir to save
+    get_dir_backup
+
+    # mkdir dated into DIR_SVG !
+    if [[ -d "${DIR_SVG}" ]]; then
+
+        make_dir_dated
+
+        if [[ -d "${DIR_SVG_DATED}" ]]; then
+            display_files
+
+            if [[ "${FILES}" ]]; then ADB_BACKUP_CHOOSED=($(explode " " "${FILES}")); fi
+
+            adb_backup
+        fi
+
+    fi
+
+}
+
+function ADB_RESTORE() {
+
+    display_feature_disable "${FUNCNAME}"
+
+    # need to chose an adb backup file and lauch adb_restore!
+
+}
+
 function BACKUP() {
 
     write_file "log" "${NOW} ### $FUNCNAME: Will try to backup your device!"
@@ -65,14 +95,7 @@ function BACKUP() {
     if [[ "$(adb_whoami)" == "uid=0" ]]; then
 
         # obtain dir to save
-        if [[ -z "${DIR_SVG}" ]]; then
-
-            choose_directory "d" "${title_dir_svg}" && DIR_SVG="${DIR_CHOOSED}"
-            write_file "cfg" "DIR_SVG" "${DIR_SVG}"
-
-        fi
-
-        write_file "log" "${NOW} *** $FUNCNAME: DIR_SVG=${DIR_SVG}"
+        get_dir_backup
 
         # mkdir dated into DIR_SVG !
         if [[ -d "${DIR_SVG}" ]]; then
@@ -245,14 +268,13 @@ function REBOOT() {
         done
 
         if [[ "${ZENITY}" -ne 0 ]]; then
-            reboot=$( echos_menu_reboot | zenity_list "${text_reboot}" "${title_reboot}" "$(count ${MENU_REBOOT[@]})")
+            reboot=$( echos_menu2 | zenity_list "${text_reboot}" "${title_reboot}" "$(count ${MENU_REBOOT[@]})")
 
         elif  [[ "${DIALOG}" -ne 0 ]]; then
-            echos_menu_reboot
+            echos_menu2
 
-            exec 3>&1;
-            reboot=$(dialog_menu "${text_reboot}" "${title_reboot}" "$(count ${MENU_REBOOT[@]})")
-            exec 3>&-;
+            dialog_menu "${text_reboot}" "${title_reboot}" "$(count ${MENU_REBOOT[@]})" "reboot"
+            reboot=$(<${SCRIPT_TMP_DIR}menu_reboot.tmp)
 
             unset menu
         else
@@ -815,6 +837,19 @@ function file_stat() {
 
     echo ${int}
     unset int file
+
+}
+
+function get_dir_backup() {
+
+    if [[ -z "${DIR_SVG}" ]]; then
+
+        choose_directory "d" "${title_dir_svg}" && DIR_SVG="${DIR_CHOOSED}"
+        write_file "cfg" "DIR_SVG" "${DIR_SVG}"
+
+    fi
+
+    write_file "log" "${NOW} *** $FUNCNAME: DIR_SVG=${DIR_SVG}"
 
 }
 

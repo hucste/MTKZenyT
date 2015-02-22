@@ -58,12 +58,22 @@ function zenity_list_files() {
 
     case "${type}" in
         "check")
-            ${zenity} --checklist \
-            --column="###" \
-            --column="${text_column_name}" --column="${text_column_size}" \
-            --column="${text_column_addr}" --column="${text_column_map}" \
-            --list --height=${height} --width=620 --separator=' '\
-            --text "${text}" --title "${title}"
+            case "${choice}" in
+                "ADB_BACKUP")
+                ${zenity} --checklist \
+                --column="###" --column="${text_column_name}" \
+                --list --height=${height} --width=620 --separator=' '\
+                --text "${text}" --title "${title}"
+                ;;
+                *)
+                ${zenity} --checklist \
+                --column="###" \
+                --column="${text_column_name}" --column="${text_column_size}" \
+                --column="${text_column_addr}" --column="${text_column_map}" \
+                --list --height=${height} --width=620 --separator=' '\
+                --text "${text}" --title "${title}"
+                ;;
+            esac;
         ;;
         "radio")
             ${zenity} --radiolist \
