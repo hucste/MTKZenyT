@@ -9,7 +9,7 @@ function dialog_info() {
 
     if [[ -z "${sec}" ]]; then sec=1; fi
 
-    dialog --colors --infobox "${text}" 0 0 ; sleep ${sec}
+    ${dialog} --colors --infobox "${text}" 0 0 ; sleep ${sec}
 
     unset text
 
@@ -20,7 +20,7 @@ function dialog_input() {
     # call: display_input text title
     local text="$1" title="$2"
 
-    dialog --stdout --title "${title}" --inputbox "${text}" 10 30 ; echo $? > "${SCRIPT_TMP_DIR}input.tmp"
+    ${dialog} --stdout --title "${title}" --inputbox "${text}" 10 30 ; echo $? > "${SCRIPT_TMP_DIR}input.tmp"
 
     unset text title
 
@@ -35,12 +35,12 @@ function dialog_list_files() {
 
     case "${type}" in
         "check")
-            dialog --backtitle "${title}" --title "${title}" \
+            ${dialog} --backtitle "${title}" --title "${title}" \
             --ok-label "${text_label_ok}" --cancel-label "${text_label_cancel}" \
             --checklist "${text}" 0 0 ${height} ${items} 2> "${SCRIPT_TMP_DIR}checklist_reply.tmp"
         ;;
         "radio")
-            dialog --backtitle "${title}" --title "${title}" \
+            ${dialog} --backtitle "${title}" --title "${title}" \
             --ok-label "${text_label_ok}" --cancel-label "${text_label_cancel}" \
             --radiolist "${text}" 0 0 ${height} ${items} 2> "${SCRIPT_TMP_DIR}checklist_reply.tmp"
         ;;
@@ -63,7 +63,7 @@ function dialog_list_files() {
 
 function dialog_menu() {
 
-    # call: dialog menu text title
+    # call: ${dialog} menu text title
     local text="$1" title="$2" height=$(bc <<< "$3 * 10 + 5") info="$4"
     local filename=""
 
@@ -75,11 +75,11 @@ function dialog_menu() {
     esac
     unset info
 
-    dialog --backtitle "${title}" --title "${title}" \
+    ${dialog} --backtitle "${title}" --title "${title}" \
         --menu "${text}" 0 0 ${height} "${menu[@]}" 2> "${filename}"
         #--menu "${text}" 0 0 ${height} "${menu[@]}" 2>&1 1>&3
 
-    case $? in
+    case "$?" in
         1|255)
             EXIT
         ;;
@@ -96,7 +96,7 @@ function dialog_mssg() {
     # call: dialog_mssg text title
     local text="$1" title="$2"
 
-    dialog --colors --title "${title}" --msgbox "${text}" 0 0
+    ${dialog} --colors --title "${title}" --msgbox "${text}" 0 0
 
     unset text title
 
@@ -106,7 +106,7 @@ function dialog_progress() {
 
     local text="$1" title="$2"
 
-    dialog --title "${title}" --gauge "${text}" 10 60 0
+    ${dialog} --title "${title}" --gauge "${text}" 10 60 0
 
     unset text title
 
@@ -117,7 +117,7 @@ function dialog_select_dir() {
     # call: dialog_select_dir title
     local title="$1"
 
-    dialog --stdout --title "${title}" --dselect "${HOME}" 0 0
+    ${dialog} --stdout --title "${title}" --dselect "${HOME}" 0 0
 
     unset title
 
@@ -128,7 +128,11 @@ function dialog_select_file() {
     # call: dialog_select_file title
     local title="$1"
 
-    dialog --stdout --title "${title}" --fselect "${HOME}" 0 50
+    ${dialog} --stdout --title "${title}" --fselect "${HOME}" 0 50
+
+    #case "$?" in
+        #1|255) display_menu ;;
+    #esac
 
     unset title
 
@@ -139,7 +143,7 @@ function dialog_yesno() {
     # call: dialog_yesno
     local text="$1" title="$2"
 
-    dialog --clear --title "${title}" --yesno "${text}" 10 30 ; echo $? > "${SCRIPT_TMP_DIR}yesno.tmp"
+    ${dialog} --clear --title "${title}" --yesno "${text}" 10 30 ; echo $? > "${SCRIPT_TMP_DIR}yesno.tmp"
 
     unset text title
 

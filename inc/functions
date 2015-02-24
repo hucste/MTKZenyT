@@ -38,9 +38,12 @@ function ADB_BACKUP() {
 
 function ADB_RESTORE() {
 
-    display_feature_disable "${FUNCNAME}"
+    #display_feature_disable "${FUNCNAME}"
 
     # need to chose an adb backup file and lauch adb_restore!
+    choose_directory "f" "${text_choose_adb_backup_file}"
+
+    if [[ -n "${FILE_CHOOSED}" ]]; then adb_restore "${FILE_CHOOSED}"; fi
 
 }
 

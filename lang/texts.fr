@@ -25,6 +25,7 @@ text_bckp_method2="Nous allons essayer une autre manière de sauvegarder votre p
 text_bckp_phone_inexists="%s semble ne pas être accessible.\n La sauvegarde ne peut être faite..."
 
 text_choice_invalid="Ce choix n'est pas valide. Par 'o' ou 'n'..."
+text_choose_adb_backup_file="SVP, veuillez choisir le fichier de sauvegarde fait par la commande 'adb backup' : "
 text_choose_gui="SVP, choisissez une interface graphique, telle que : dialog, ou zenity ...\n Configurez le fichier de config : "
 text_choose_file="SVP, veuillez choisir le fichier : "
 

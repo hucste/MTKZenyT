@@ -25,7 +25,7 @@ text_bckp_method2="We trying another method to backup your partition : "
 text_bckp_phone_inexists="%s seems not be accessible.\n The backup can't be create..."
 
 text_choice_invalid="This choice isn't valid. By 'y' or 'n'..."
-
+text_choose_adb_backup_file="Please, choose backup file maded with command 'adb backup': "
 text_choose_gui="Please, choose a GUI to use: dialog, or zenity...\n Configure file config: "
 text_choose_file="Please, choose the file : "
 
