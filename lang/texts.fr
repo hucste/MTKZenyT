@@ -2,10 +2,11 @@
 
 if ! ${EXEC}; then exit; fi
 
-text_adb_backup_apk="Sauvegarde les fichiers .apks dans l'archive"
+text_adb_backup_all="Sauvegarde toutes les applications installées - Défaut : désactivé"
+text_adb_backup_apk="Sauvegarde les fichiers .apks dans l'archive - Défaut : désactivé"
 text_adb_backup_options="Quelle(s) option(s) désirez-vous activer ?"
-text_adb_backup_shared="Sauvegarde les contenus des repertoires partagés (tels que la SD carte)"
-text_adb_backup_system="Sauvegarde les applications système"
+text_adb_backup_shared="Sauvegarde les contenus des repertoires partagés (tels que la SD carte) - Défaut : désactivé"
+text_adb_backup_system="Sauvegarde les applications système - Défaut : activé"
 
 text_ANDROID_DEVICE="Appareil : "
 text_ANDROID_MANUFACTURER="Fabriquant : "

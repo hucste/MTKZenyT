@@ -2,10 +2,11 @@
 
 if ! ${EXEC}; then exit; fi
 
-text_adb_backup_apk="Backup of the .apks themselves in the archive"
+text_adb_backup_all="Backup all installed applications - default: disactived"
+text_adb_backup_apk="Backup of the .apks themselves in the archive - default: disactived"
 text_adb_backup_options="Which options do you want enable?"
-text_adb_backup_shared="Backup of the device's shared storage / SD card contents"
-text_adb_backup_system="Backup all system apps"
+text_adb_backup_shared="Backup of the device's shared storage / SD card contents - default: disactived"
+text_adb_backup_system="Backup all system apps - default: enabled"
 
 text_ANDROID_DEVICE="Device: "
 text_ANDROID_MANUFACTURER="Manufacturer: "

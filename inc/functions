@@ -10,6 +10,7 @@ function MTKZenyTux() {
 
     control_system "$FUNCNAME"
 
+    build_vars
     display_menu
 
 }
@@ -271,16 +272,20 @@ function REBOOT() {
         done
 
         if [[ "${ZENITY}" -ne 0 ]]; then
-            reboot=$( echos_menu2 | zenity_list "${text_reboot}" "${title_reboot}" "$(count ${MENU_REBOOT[@]})")
 
-        elif  [[ "${DIALOG}" -ne 0 ]]; then
-            echos_menu2
+            reboot=$( echos_menu | zenity_list "${text_reboot}" "${title_reboot}" "$(count ${MENU_REBOOT[@]})")
+
+        elif [[ "${DIALOG}" -ne 0 ]]; then
+
+            echos_menu
 
             dialog_menu "${text_reboot}" "${title_reboot}" "$(count ${MENU_REBOOT[@]})" "reboot"
             reboot=$(<${SCRIPT_TMP_DIR}menu_reboot.tmp)
 
             unset menu
+
         else
+
             printf "\n${title_reboot}\n"
 
             PS3="${text_reboot} "
@@ -289,6 +294,7 @@ function REBOOT() {
                 break
             done
             unset menu
+
         fi
 
         case "${reboot}" in
@@ -447,14 +453,15 @@ function count() {
 function control_system() {
 
     manage_colors
+
     test_config_file "$1"
-    if [[ "$1" == "MTKZenyTux" ]]; then build_vars; fi
+    verify_installed
 
     write_file "log" "#################################################"
     write_file "log" "### ### ### ${title_welcome} ### ### ###"
     write_file "log" "#################################################"
 
-    verify_installed
+    #verify_installed
     detect_device
 
     adb_detect_abi
@@ -1350,35 +1357,34 @@ function verify_ssu_exists() {
 
 function verify_installed() {
 
-    mssg=$(printf "\n${text_verify_installed}\n")
+    mssg=$(printf "%s" "\n${text_verify_installed}\n")
     display_mssg "i" "${mssg}"
     sleep 1
 
-    if [[ "${GUI}" ]]; then
+    if [[ -n "${GUI}" ]]; then
 
         GUI=$(awk '{print tolower($0)}' <<< ${GUI});
         display_detected "GUI: ${GUI}"
 
     fi
 
-    in_array "${GUI}" "${GUIS[@]}"
-    if [[ $? -eq 0 ]]; then
+    if in_array "${GUI}" "${GUIS[@]}"; then
 
         # verify if dialog is installed
         if [[ (( "${GUI}" == "d" || "${GUI}" == "dialog" )) && -x $(which dialog) ]]; then
             DIALOG=1
-            ZENITY=0
 
             dialog=$(which dialog)
+            source "${INC}/dialog"
 
         fi
 
         # verify if zenity is installed.
         if [[ (( "${GUI}" == "z" || "${GUI}" == "zenity" )) && -x $(which zenity) ]]; then
-            DIALOG=0
             ZENITY=1
 
             zenity=$(which zenity)
+            source "${INC}/zenity"
 
         fi
 

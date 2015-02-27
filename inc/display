@@ -43,7 +43,6 @@ function display_error() {
 
         dialog_mssg "${text}" "${title_error}"
 
-
     elif [[ "${ZENITY}" -ne 0 ]]; then
 
         zenity_error "<span color=\"${red}\"><b>$1</b></span>" "$2"
@@ -154,11 +153,11 @@ function display_menu() {
             #info_product="$(printf "<span color=\"${green}\"><b>${text_device} - ${info_mode}</b></span>" "${info_device}" "${MODE}")"
             info_text="$(printf "%s" "${info_device}\n${text_menu_action}")"
 
-            choice=$( echos_menu2 | zenity_list "${info_text}" "${title_welcome}" "$(count ${MENU_NAME[@]})")
+            choice=$( echos_menu | zenity_list "${info_text}" "${title_welcome}" "$(count ${MENU_NAME[@]})")
 
         elif  [[ "${DIALOG}" -ne 0 ]]; then
 
-            echos_menu2
+            echos_menu
 
             #info_product="$(printf "${text_device} - ${text_device_mode}" "${info_device}" "${info_mode}")"
             info_text="$(printf "%s" "${info_device}\n${text_menu_action}")"
@@ -300,7 +299,9 @@ function echos_files() {
 
                 key="off"
                 if [[ "${name}" == "system" ]]; then key="on"; fi
-                items="${items} $j ${name} ${key}"
+                #local help="text_adb_backup_$name"
+                items="${items} ${name} $j ${key}"
+                #unset help
 
             else
                 items="${items} $j ${name} off"
@@ -314,7 +315,7 @@ function echos_files() {
 
         display_detected "items: ${items}"
 
-        dialog_list_files "${type}" "${text}" "${title}" "${items}" "$(count ${names[@]})"
+        dialog_list_files "${type}" "${text}" "${title}" "${items}" "$(count ${names[@]})";
 
         unset items type names
 
@@ -361,33 +362,6 @@ function echos_menu() {
 
     write_file "log" "${NOW} ### $FUNCNAME: Attempt ones echos to choose menu..."
 
-    if [[ "${DIALOG}" -eq 1 ]]; then
-
-        for name in "${MENU_NAME[@]}"; do
-
-            menu+=("${name}" "${MENU_TEXT[${name}]}")
-
-        done
-
-        #display_detected "menu: ${menu}"
-
-    else
-
-        for name in "${MENU_NAME[@]}"; do
-
-            echo "${name}";
-            echo "${MENU_TEXT[${name}]}";
-
-        done
-
-    fi
-
-}
-
-function echos_menu2() {
-
-    write_file "log" "${NOW} ### $FUNCNAME: Attempt ones echos to choose menu..."
-
     local -a NAMES
     local -A TEXTS
 
@@ -420,32 +394,5 @@ function echos_menu2() {
     fi
 
     unset NAMES TEXTS
-
-}
-
-function echos_menu_reboot() {
-
-    write_file "log" "${NOW} ### $FUNCNAME: Attempt ones echos to choose menu..."
-
-    if [[ "${DIALOG}" -eq 1 ]]; then
-
-        for name in "${MENU_REBOOT[@]}"; do
-
-            menu+=("${name}" "${MENU_TEXT_REBOOT[${name}]}")
-
-        done
-
-        #display_detected "menu: ${menu}"
-
-    else
-
-        for name in "${MENU_REBOOT[@]}"; do
-
-            echo "${name}";
-            echo "${MENU_TEXT_REBOOT[${name}]}";
-
-        done
-
-    fi
 
 }

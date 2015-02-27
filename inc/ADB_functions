@@ -8,22 +8,18 @@ function adb_backup() {
 
     for option in "${ADB_BACKUP_OPTIONS[@]}"; do
 
-        if [[ -n "${ADB_BACKUP_CHOOSED[@]}" ]]; then
-            key=$(array_search "${option}" "${ADB_BACKUP_OPTIONS[@]}")
-            let search=key+1
-            key=$(array_search "${search}" "${ADB_BACKUP_CHOOSED[@]}")
-            unset search
-        fi
+        if [[ -n "${ADB_BACKUP_CHOOSED[@]}" ]] && in_array "${option}" "${ADB_BACKUP_CHOOSED[@]}"; then
 
-        if [[ -n "${key}" ]]; then
             file="${file}_${option}"
             options="${options}-${option} "
-            unset key
+
         else
+
             if [[ "${option}" != "all" ]]; then
                 file="${file}_no${option}"
                 options="${options}-no${option} ";
             fi
+
         fi
 
     done

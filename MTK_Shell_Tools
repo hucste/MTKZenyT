@@ -19,7 +19,7 @@ PWD="$(pwd)"
 INC="${PWD}/inc"
 DIR_LANG="${PWD}/lang" #&& echo $DIR_LANG
 lang="${LANG:0:2}" #&& echo $LANG
-
+#lang="en"
 # link texts and titles variables
 if [[ -f "${DIR_LANG}/titles.${lang}" ]]; then source "${DIR_LANG}/titles.${lang}"; else source "${DIR_LANG}/titles.en"; fi
 if [[ -f "${DIR_LANG}/texts.${lang}" ]]; then source "${DIR_LANG}/texts.${lang}"; else source "${DIR_LANG}/texts.en"; fi
@@ -28,8 +28,8 @@ if [[ -f "${DIR_LANG}/texts.${lang}" ]]; then source "${DIR_LANG}/texts.${lang}"
 source "${INC}/config"
 
 # link functions needed
-source "${INC}/dialog"
-source "${INC}/zenity"
+#source "${INC}/dialog"
+#source "${INC}/zenity"
 source "${INC}/display"
 source "${INC}/ADB_functions"
 source "${INC}/functions"

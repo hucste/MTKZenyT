@@ -75,7 +75,7 @@ function dialog_menu() {
     esac
     unset info
 
-    ${dialog} --backtitle "${title}" --title "${title}" \
+    ${dialog} --clear --backtitle "${title}" --title "${title}" \
         --menu "${text}" 0 0 ${height} "${menu[@]}" 2> "${filename}"
         #--menu "${text}" 0 0 ${height} "${menu[@]}" 2>&1 1>&3
 
