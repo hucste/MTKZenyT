@@ -122,7 +122,7 @@ text_press_key="Press any key..."
 text_press_key_after_reboot="Press any key when your device has rebooted..."
 text_press_key_when_ready="Press any key, when your device is ready..."
 text_ProductID="ProductID: %s"
-text_progress_adb_backup="Wait during ADB backup file %s into your computer..."
+text_progress_adb_backup="Wait during ADB backup file into your computer: %s"
 text_progress_adb_dd="Wait during ADB write file %s into your device..."
 text_progress_adb_pull="Wait during ADB copy file %s into your device..."
 

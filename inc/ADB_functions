@@ -29,7 +29,7 @@ function adb_backup() {
 
     write_file "log" "$FUNCNAME: filename: ${file} ; options: ${options}"
 
-    mssg="$(printf "${text_progress_adb_backup}" "${ddif}")"
+    mssg="$(printf "${text_progress_adb_backup}" "${file}")"
     (
         adb backup -f "${file}" "${options}"
     ) | display_mssg "p" "${mssg}" "${title_adb_progress}"

@@ -123,7 +123,7 @@ text_press_key="Appuyez sur n'importe quelle touche ..."
 text_press_key_after_reboot="Appuyez sur n'importe quelle touche, quand l'appareil a redemarré ..."
 text_press_key_when_ready="Appuyez sur n'importe quelle touche, quand l'appareil est prêt ..."
 text_ProductID="ProductID: %s"
-text_progress_adb_backup="Patientez pendant que l'outil ADB sauvegarde vos données, nommées '%s', dans votre ordinateur..."
+text_progress_adb_backup="Patientez pendant que l'outil ADB sauvegarde vos données dans votre ordinateur : %s"
 text_progress_adb_dd="Patientez pendant que l'outil ADB écrit le fichier %s dans votre appareil ..."
 text_progress_adb_pull="Patientez pendant que l'outil ADB copie le fichier %s dans votre appareil ..."
 
