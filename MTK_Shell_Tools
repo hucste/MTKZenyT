@@ -20,6 +20,9 @@ INC="${PWD}/inc"
 DIR_LANG="${PWD}/lang" #&& echo $DIR_LANG
 lang="${LANG:0:2}" #&& echo $LANG
 #lang="en"
+MTK_NB_PARAMS=$#
+MTK_PARAMS=("$@")
+
 # link texts and titles variables
 if [[ -f "${DIR_LANG}/titles.${lang}" ]]; then source "${DIR_LANG}/titles.${lang}"; else source "${DIR_LANG}/titles.en"; fi
 if [[ -f "${DIR_LANG}/texts.${lang}" ]]; then source "${DIR_LANG}/texts.${lang}"; else source "${DIR_LANG}/texts.en"; fi
@@ -34,58 +37,99 @@ source "${INC}/display"
 source "${INC}/ADB_functions"
 source "${INC}/functions"
 
+###
+# MTK Functions
+###
+
+function MTK_General() {
+
+    manage_fonts
+    mssg=$(printf "${text_error_unknown_option}" "${MTK_PARAMS[0]}")
+    display_error "${mssg}\n"
+    press_any_key
+    display_help
+    press_any_key
+    exit 1
+
+}
+
+function MTK_Flasher() {
+
+    control_system
+    detect_args "FLASH" "${MTK_PARAMS[1]}"
+    FLASH "${MTK_PARAMS[1]}"
+
+}
+
 # Launcher
-if [[ $# -eq 0 ]]; then
+function MTK_Launcher() {
 
-    MTKZenyTux
+    if [[ ${MTK_NB_PARAMS} -eq 0 ]]; then
 
-else
+        MTKZenyTux
 
-    case "$1" in
+    else
 
-        -f|-F|-flash)
-            control_system
-            detect_args "FLASH" "$2"
-            FLASH "$2"
-        ;;
+        case "${MTK_PARAMS[0]}" in
 
-        -h|-H|-\?|-help)
-            display_help
-        ;;
+            -f|-F|-flash)
+                MTK_Flasher
+            ;;
 
-        -R|-reboot)
-            adb_reboot_system
-        ;;
+            -h|-H|-\?|-help)
+                display_help
+            ;;
 
-        -RR|-reboot_recovery)
-            adb_reboot_recovery
-        ;;
+            -R|-reboot)
+                adb_reboot_system
+            ;;
 
-        -root)
-            control_system
-            ROOT
-        ;;
+            -RR|-reboot_recovery)
+                adb_reboot_recovery
+            ;;
 
-        -s|-S|-save)
-            control_system
-            detect_args "BACKUP" "$2"
-            BACKUP "$2"
-        ;;
+            -root)
+                MTK_Rooter
+            ;;
 
-        -unroot)
-            control_system
-            UNROOT
-        ;;
+            -s|-S|-save)
+                MTK_Saver
+            ;;
 
-        *)
-            manage_fonts
-            mssg=$(printf "${text_error_unknown_option}" "$1")
-            display_error "${mssg}\n"
-            press_any_key
-            display_help
-            exit 1
-        ;;
+            -unroot)
+                MTK_Unrooter
+            ;;
 
-    esac
+            *)
+                MTK_General
+            ;;
 
-fi
+        esac
+
+    fi
+
+}
+
+function MTK_Rooter() {
+
+    control_system
+    ROOT
+
+}
+
+function MTK_Saver() {
+
+    control_system
+    detect_args "BACKUP" "${MTK_PARAMS[1]}"
+    BACKUP "${MTK_PARAMS[1]}"
+
+}
+
+function MTK_Unrooter() {
+
+    control_system
+    UNROOT
+
+}
+
+MTK_Launcher
