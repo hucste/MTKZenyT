@@ -69,6 +69,7 @@ function BACKUP() {
                 adb_read_partitions
                 mssg="$(printf "${text_verify_file}" "${FILE_DUMCHAR}" "${DIR_TOOLS}")"
                 display_mssg "i" "${mssg}"
+                press_any_key
                 EXIT
             ;;
             "name")
@@ -152,6 +153,7 @@ function EXIT() {
 
     adb kill-server
     display_mssg "n" "${text_goodbye}" "${title_goodbye}" "1"
+    sleep 1
     destruct
     clear
     exit 0
