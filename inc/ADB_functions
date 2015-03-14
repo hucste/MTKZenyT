@@ -216,16 +216,14 @@ function adb_flash_partitions() {
                     adb push "${FILES_CHOOSED[${index}]}" "${BCKP_PHONE}"
                 fi
 
-                local -i stat_ext=$(file_stat "${FILES_CHOOSED[${index}]}"); display_detected "stat_ext: ${stat_ext}"
-
                 local file="${BCKP_PHONE}$(basename ${FILES_CHOOSED[${index}]})"; display_detected "file: ${file}"
 
                 if $(adb_test "-f ${file}"); then
 
                     # test to verify size
-                    local -i stat_int=$(adb_stat_file "${file}"); display_detected "stat_int: ${stat_int}"
+                    adb_stat_diff "${file}" "${FILES_CHOOSED[${index}]}"
 
-                    if [[ ${stat_ext} -eq ${stat_int} ]]; then
+                    if [[ $? -eq 0 ]]; then
 
                         if [[ "${DIALOG}" -ne 0 ]]; then
                             local key="${FILES_CHOOSED[$x]}"; display_detected "key: ${key}"
@@ -592,6 +590,7 @@ function adb_save_partitions() {
             if [[ "${ddname}" == "nvram" ]]; then
 
                 local file="${BCKP_PHONE}nvram.tgz"
+                # bug with this: run correctly into shell, but not here!
                 adb shell "${adb_su}'busybox tar -czvf ${file} /data/nvram/'"
 
                 if $(adb_test "-f ${file}"); then
