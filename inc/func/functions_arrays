@@ -1,0 +1,90 @@
+#!/bin/bash
+
+if ! ${EXEC}; then exit; fi
+
+function array_key_exists() {
+
+    # equivalent to PHP array_key_exists
+    # call: if [[ $(array_key_exists key array) -eq 0 ]]; then echo "key exists!"; fi
+
+    local key="$1" IFS=" "; shift; read -a array <<< "$@"
+    if [[ "${array[$key]}" ]]; then return 0; return 1; fi
+
+    unset array key IFS
+
+}
+
+function array_search() {
+
+    # equivalent to PHP array_search
+    # call: array_search needle array
+
+    local needle="$1" IFS=" "; shift; read -a array <<< "$@"
+
+    for (( i=0; i < "${#array[*]}"; i++ )); do
+        if [[ "${array[$i]}" == "${needle}" ]]; then echo "$i"; fi
+    done
+
+    return 1
+
+    unset array needle IFS
+
+}
+
+function convert_str_to_array() {
+
+    write_file "log" "${NOW} ### $FUNCNAME: string: ${files}"
+
+    x=0
+    for file in $files; do files[$x]="$file"; let x=x+1; done
+    unset x
+
+    write_file "log" "${NOW} ### $FUNCNAME: array: ${files[*]}"
+
+}
+
+function count() {
+
+    # egual PHP count
+    # call: count array
+    local IFS=" "; read -a array <<< "$*"
+
+    if [[ -n "${#array[@]}" ]]; then echo "${#array[*]}"; else return 1; fi
+
+    unset IFS array
+
+}
+
+function explode() {
+
+    # call: array=("$(explode $delimiter $string)")
+    # equivalent PHP explode
+    local delimiter="$1" string="$2"
+
+    write_file "log" "${NOW} ### $FUNCNAME: string: ${string}"
+
+    local IFS="${delimiter}"; shift; read -a array <<< "${string}"
+
+    if [[ -z "${array[@]}" ]]; then return 1; fi
+    echo "${array[@]}"
+
+    write_file "log" "${NOW} ### $FUNCNAME: array: ${array[*]}"
+
+}
+
+function in_array() {
+
+    # equivalent to PHP in_array
+    # call: in_array needle array
+
+    local i=0 needle="$1" IFS=" "; shift; read -a array <<< "$@"
+
+    while [ $i -le ${#array[@]} ]; do
+        if [[ "${array[$i]}" == "${needle}" ]]; then return 0; fi # true
+        let i=i+1
+    done
+    return 1
+
+    unset i needle IFS array
+
+}

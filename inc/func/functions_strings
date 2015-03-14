@@ -1,0 +1,10 @@
+#!/bin/bash
+
+if ! ${EXEC}; then exit; fi
+
+function chr() {
+
+    [ "$1" -lt 256 ] || return 1
+    printf "%s" "\\$(printf '%03o' "$1")"
+
+}

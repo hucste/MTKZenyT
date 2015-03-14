@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if ! ${EXEC}; then exit; fi
+
+function hexdec() {
+
+    echo "$(($1))"
+
+}

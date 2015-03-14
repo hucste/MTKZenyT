@@ -1,0 +1,98 @@
+#!/bin/bash
+
+if ! ${EXEC}; then exit; fi
+
+function choose_directory() {
+
+    local index="$1" name="$2"
+
+    if [[ "${DIALOG}" -ne 0 ]]; then
+
+        case "${index}" in
+            "d") DIR_CHOOSED=$(dialog_select_dir "${name}") ;;
+            "f")
+                FILE_CHOOSED=$(dialog_select_file "${name}")
+
+                if [[ -z "${FILE_CHOOSED}" ]]; then
+                    display_error "${text_error_not_files} : ${name}"
+                    choose_directory "${index}" "${name}"
+                fi
+            ;;
+        esac
+
+    elif [[ "${ZENITY}" -ne 0 ]]; then
+
+        if [[ "${index}" == "d" ]]; then
+            DIR_CHOOSED=$(zenity_directory "${index}" "${name}");
+        else
+
+            FILE_CHOOSED=$(zenity_directory "${index}" "${name}");
+
+            if [[ -z "${FILE_CHOOSED}" ]]; then
+                display_error "${text_error_not_files} : ${name}"
+                choose_directory "${index}" "${name}"
+            fi
+        fi
+
+    else
+
+        read -p "${name}" DIR_CHOOSED
+
+    fi
+
+    unset index name
+
+    write_file "log" "${NOW} ### $FUNCNAME: ${DIR_CHOOSED}${FILE_CHOOSED}"
+
+}
+
+function file_stat() {
+
+    local file="$1"
+    local -i int=0
+
+    if [[ -f "${file}" ]]; then int=$(stat -c "%s" ${file} | sed 's/\r$//'); fi
+
+    echo ${int}
+    unset int file
+
+}
+
+function make_dir_dated() {
+
+    if [[ -d "${DIR_SVG}" ]]; then
+
+        DIR_SVG_DATED="${DIR_SVG}${vid}:${pid}_${NOW_DIR}"
+
+        if [[ ! -d "${DIR_SVG_DATED}" ]]; then
+            mkdir "${DIR_SVG_DATED}" && display_detected "${text_dir_ok}" "${DIR_SVG_DATED}"
+        fi
+
+        write_file "log" "${NOW} ### $FUNCNAME: DIR_SVG_DATED: ${DIR_SVG_DATED}"
+
+    fi
+
+}
+
+function rm_dir() {
+
+    local dir="$1"
+
+    if [[ -d "${dir}" ]]; then rm -rf "${dir}"; fi
+
+    unset dir
+
+}
+
+function write_file() {
+
+    local index="$1" var="$2" value="$3"
+
+    case "${index}" in
+        "cfg") sed -i -e "s#${text}=.*#${var}=${value}#g" "${CONFIG}" ;;
+        "log") [[ "${LOG}" -eq 1 ]] && echo "${var}" >> "${PWD}/logs/${DAY_LOG}.log" ;;
+    esac
+
+    unset index text value var
+
+}

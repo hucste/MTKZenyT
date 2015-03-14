@@ -5,35 +5,10 @@ if ! ${EXEC}; then exit; fi
 source "${INC}/display"
 source "${INC}/ADB_functions"
 source "${INC}/MENU_functions"
-
-function array_key_exists() {
-
-    # equivalent to PHP array_key_exists
-    # call: if [[ $(array_key_exists key array) -eq 0 ]]; then echo "key exists!"; fi
-
-    local key="$1" IFS=" "; shift; read -a array <<< "$@"
-    if [[ "${array[$key]}" ]]; then return 0; return 1; fi
-
-    unset array key IFS
-
-}
-
-function array_search() {
-
-    # equivalent to PHP array_search
-    # call: array_search needle array
-
-    local needle="$1" IFS=" "; shift; read -a array <<< "$@"
-
-    for (( i=0; i < "${#array[*]}"; i++ )); do
-        if [[ "${array[$i]}" == "${needle}" ]]; then echo "$i"; fi
-    done
-
-    return 1
-
-    unset array needle IFS
-
-}
+source "${INC}/func/functions_arrays"
+source "${INC}/func/functions_filesystem"
+source "${INC}/func/functions_math"
+source "${INC}/func/functions_strings"
 
 function build_vars() {
 
@@ -48,81 +23,6 @@ function build_vars() {
         done
 
     fi
-
-}
-
-function choose_directory() {
-
-    local index="$1" name="$2"
-
-    if [[ "${DIALOG}" -ne 0 ]]; then
-
-        case "${index}" in
-            "d") DIR_CHOOSED=$(dialog_select_dir "${name}") ;;
-            "f")
-                FILE_CHOOSED=$(dialog_select_file "${name}")
-
-                if [[ -z "${FILE_CHOOSED}" ]]; then
-                    display_error "${text_error_not_files} : ${name}"
-                    choose_directory "${index}" "${name}"
-                fi
-            ;;
-        esac
-
-    elif [[ "${ZENITY}" -ne 0 ]]; then
-
-        if [[ "${index}" == "d" ]]; then
-            DIR_CHOOSED=$(zenity_directory "${index}" "${name}");
-        else
-
-            FILE_CHOOSED=$(zenity_directory "${index}" "${name}");
-
-            if [[ -z "${FILE_CHOOSED}" ]]; then
-                display_error "${text_error_not_files} : ${name}"
-                choose_directory "${index}" "${name}"
-            fi
-        fi
-
-    else
-
-        read -p "${name}" DIR_CHOOSED
-
-    fi
-
-    unset index name
-
-    write_file "log" "${NOW} ### $FUNCNAME: ${DIR_CHOOSED}${FILE_CHOOSED}"
-
-}
-
-function chr() {
-
-    [ "$1" -lt 256 ] || return 1
-    printf "%s" "\\$(printf '%03o' "$1")"
-
-}
-
-function convert_str_to_array() {
-
-    write_file "log" "${NOW} ### $FUNCNAME: string: ${files}"
-
-    x=0
-    for file in $files; do files[$x]="$file"; let x=x+1; done
-    unset x
-
-    write_file "log" "${NOW} ### $FUNCNAME: array: ${files[*]}"
-
-}
-
-function count() {
-
-    # egual PHP count
-    # call: count array
-    local IFS=" "; read -a array <<< "$*"
-
-    if [[ -n "${#array[@]}" ]]; then echo "${#array[*]}"; else return 1; fi
-
-    unset IFS array
 
 }
 
@@ -146,17 +46,11 @@ function control_system() {
 
 }
 
-function delete_dir() {
-
-    if [[ -d "$1" ]]; then rm -rf "$1"; fi
-
-}
-
 function destruct() {
 
     write_file "log" "${NOW} ### $FUNCNAME: Destruct variables"
 
-    if [[ -d "${SCRIPT_TMP_DIR}" ]]; then rm -rf "${SCRIPT_TMP_DIR}"; fi
+    rm_dir "${SCRIPT_TMP_DIR}"
 
     unset DIALOG ZENITY
     unset archive choice mssg
@@ -241,7 +135,7 @@ function detect_device() {
 
         #fi
 
-        if [[ "${mssg}" ]]; then unset mssg; fi
+        #if [[ "${mssg}" ]]; then unset mssg; fi
 
     fi
 
@@ -352,23 +246,6 @@ function dl_yourself() {
 
 }
 
-function explode() {
-
-    # call: array=("$(explode $delimiter $string)")
-    # equivalent PHP explode
-    local delimiter="$1" string="$2"
-
-    write_file "log" "${NOW} ### $FUNCNAME: string: ${string}"
-
-    local IFS="${delimiter}"; shift; read -a array <<< "${string}"
-
-    if [[ -z "${array[@]}" ]]; then return 1; fi
-    echo "${array[@]}"
-
-    write_file "log" "${NOW} ### $FUNCNAME: array: ${array[*]}"
-
-}
-
 function extract_archive_zip() {
 
     if [[ -d "${DIR_SSU}" ]]; then
@@ -389,7 +266,7 @@ function extract_archive_zip() {
             o|O|y|Y|0)
                 sleep 1 ;;
             n|N|1)
-                delete_dir "${DIR_SSU}"; sleep 3 ;;
+                rm_dir "${DIR_SSU}"; sleep 3 ;;
             *)
                 display_error "${text_choice_invalid}"
                 press_any_key
@@ -514,18 +391,6 @@ function file_to_array_mtd() {
 
 }
 
-function file_stat() {
-
-    local file="$1"
-    local -i int=0
-
-    if [[ -f "${file}" ]]; then int=$(stat -c "%s" ${file} | sed 's/\r$//'); fi
-
-    echo ${int}
-    unset int file
-
-}
-
 function get_dir_backup() {
 
     if [[ -z "${DIR_SVG}" ]]; then
@@ -548,29 +413,6 @@ function get_info_system() {
 
 }
 
-function hexdec() {
-
-    echo "$(($1))"
-
-}
-
-function in_array() {
-
-    # equivalent to PHP in_array
-    # call: in_array needle array
-
-    local i=0 needle="$1" IFS=" "; shift; read -a array <<< "$@"
-
-    while [ $i -le ${#array[@]} ]; do
-        if [[ "${array[$i]}" == "${needle}" ]]; then return 0; fi # true
-        let i=i+1
-    done
-    return 1
-
-    unset i needle IFS array
-
-}
-
 function make_backup() {
 
     # obtain dir to save
@@ -580,22 +422,6 @@ function make_backup() {
     if [[ -d "${DIR_SVG}" ]]; then make_dir_dated; fi
 
     if [[ -d "${DIR_SVG_DATED}" ]]; then adb_save_partitions; fi
-
-}
-
-function make_dir_dated() {
-
-    if [[ -d "${DIR_SVG}" ]]; then
-
-        DIR_SVG_DATED="${DIR_SVG}${vid}:${pid}_${NOW_DIR}"
-
-        if [[ ! -d "${DIR_SVG_DATED}" ]]; then
-            mkdir "${DIR_SVG_DATED}" && display_detected "${text_dir_ok}" "${DIR_SVG_DATED}"
-        fi
-
-        write_file "log" "${NOW} ### $FUNCNAME: DIR_SVG_DATED: ${DIR_SVG_DATED}"
-
-    fi
 
 }
 
@@ -897,7 +723,6 @@ function test_config_file() {
 
 }
 
-
 function unroot_to_recovery() {
 
     reboot_recovery
@@ -1106,15 +931,5 @@ function verify_installed() {
 
     # Make dir tmp
     if [[ ! -d "${SCRIPT_TMP_DIR}" ]]; then mkdir "${SCRIPT_TMP_DIR}"; fi
-
-}
-
-
-function write_file() {
-
-    case $1 in
-        "cfg") sed -i -e "s#$2=.*#$2=$3#g" "${CONFIG}" ;;
-        "log") [[ "${LOG}" -eq 1 ]] && echo "$2" >> "${PWD}/logs/${DAY_LOG}.log" ;;
-    esac
 
 }
