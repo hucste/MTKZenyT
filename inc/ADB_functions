@@ -38,6 +38,24 @@ function adb_backup() {
 
 }
 
+function adb_delete_file() {
+
+    local file="$1"
+
+    if $(adb_test "-f ${file}"); then
+
+        adb shell "busybox rm -f ${file}"
+
+        mssg="$(printf "${text_file_deleted}" "${file}")"
+        display_mssg "i" "${mssg}"
+        write_file "log" "$FUNCNAME: ${mssg}"
+
+    fi
+
+    unset file
+
+}
+
 function adb_delete_su_datas() {
 
     mssg=$(printf "${text_datas_remove}\n" "data")
@@ -228,7 +246,7 @@ function adb_flash_partitions() {
                             adb_write_img2 "${key}"
                         fi
 
-                        adb shell "rm -f ${file}"
+                        adb shell "busybox rm -f ${file}"
 
                         let x=x+1
 
@@ -342,7 +360,7 @@ function adb_mount_partition() {
 
 function adb_read_partitions() {
 
-    adb shell cat /proc/dumchar_info > "${FILE_PARAM}";
+    adb shell "cat /proc/dumchar_info > ${FILE_PARAM}";
 
 }
 
@@ -550,8 +568,6 @@ function adb_save_partitions() {
 
             if $(adb_test "-f ${ddof}"); then
 
-                local -i stat_int=$(adb_stat_file "${ddof}"); display_detected "stat_int: ${stat_int}"
-
                 mssg="$(printf "${text_progress_adb_pull}" "${ddof}")"
                 if [[ "${GUI}" != 0 ]]; then
                     ( adb pull "${ddof}" "${DIR_SVG_DATED}" ) | display_mssg "p" "${mssg}" "${title_adb_progress}"
@@ -560,24 +576,9 @@ function adb_save_partitions() {
                     adb pull "${ddof}" "${DIR_SVG_DATED}"
                 fi
 
-                local file="${DIR_SVG_DATED}/${MTD_NAME[${key}]}.img"; display_detected "file: ${file}"
-                local -i stat_ext=$(file_stat "${file}"); display_detected "stat_ext: ${stat_ext}"
+                adb_stat_diff "${ddof}" "${DIR_SVG_DATED}/${MTD_NAME[${key}]}.img"
 
-                if [[ ${stat_ext} -eq ${stat_int} ]]; then
-
-                    adb shell "busybox rm -f ${ddof}"
-
-                    display_mssg "n" "${text_bckp} ${file}"
-                    write_file "log" "### $FUNCNAME: Partition saved: ${file}"
-
-                else
-
-                    mssg="$(printf "${text_error_size_file}" "$FUNCNAME" "${stat_int}" "${stat_ext}")"
-                    display_error "${mssg}"
-
-                fi
-
-                unset file stat_ext stat_int
+                if [[ $? -eq 0 ]]; then adb_delete_file "${ddof}"; fi
 
             else
 
@@ -590,12 +591,20 @@ function adb_save_partitions() {
 
             if [[ "${ddname}" == "nvram" ]]; then
 
-                if $(adb_test "-f ${BCKP_PHONE}nvram.tgz"); then
+                local file="${BCKP_PHONE}nvram.tgz"
+                adb shell "${adb_su}'busybox tar -czvf ${file} /data/nvram/'"
 
-                    adb pull "${BCKP_PHONE}nvram.tgz" "${DIR_SVG_DATED}"
-                    adb shell rm -r "${BCKP_PHONE}nvram.tgz"
+                if $(adb_test "-f ${file}"); then
+
+                    adb pull "${file}" "${DIR_SVG_DATED}"
+
+                    adb_stat_diff "${file}" "${DIR_SVG_DATED}/nvram.tgz"
+
+                    if [[ $? -eq 0 ]]; then adb_delete_file "${file}"; fi
 
                 fi
+
+                unset file
 
             fi
 
@@ -614,6 +623,39 @@ function adb_save_partitions() {
     fi
 
     unset search
+
+}
+
+function adb_stat_diff() {
+
+    local file_int="$1" file_ext="$2"
+    local -i stat_int=0 stat_ext=0
+
+    display_detected "file intern: ${file_int}"
+    stat_int=$(adb_stat_file "${file_int}"); display_detected "stat file intern: ${stat_int}"
+
+    display_detected "file extern: ${file_ext}"
+    stat_ext=$(file_stat "${file_ext}"); display_detected "stat file extern: ${stat_ext}"
+
+    if [[ ${stat_ext} -eq ${stat_int} ]]; then
+
+        mssg="$(printf "%s" "${text_size_files_good}")"
+        display_mssg "n" "${mssg}"
+        write_file "log" "### $FUNCNAME: ${mssg}"
+
+        return 0
+
+    else
+
+        mssg="$(printf "${text_error_size_file}" "$FUNCNAME" "${stat_int}" "${stat_ext}")"
+        display_error "${mssg}"
+        write_file "log" "### $FUNCNAME: ERROR: ${mssg}"
+
+        return 1
+
+    fi
+
+    unset file_int file_ext stat_int stat_ext
 
 }
 

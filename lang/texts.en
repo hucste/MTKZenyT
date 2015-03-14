@@ -58,6 +58,7 @@ text_dl_file="URL to curl: %s"
 text_dl_yourself="Download yourself the app %s!"
 
 text_error_bckp="!!! ERROR: It seems Backup failed: %s not exists !!!"
+text_error_bckp_part_inexists="!!! ERROR:  It seems that the partitions you are trying to save does not exist!!!"
 text_error_device_offline="!!! ERROR: Your device is into 'offline' mode! \n Please disable option 'USB Debug' into your Android system; unplug USB cable, wait few secondes and plug again your device to your computer; after enable option 'USB Debug'..."
 text_error_device_no_perm="!!! ERROR: Your device is not recognized, because 'adb devices' has not permissions needed. \n The script will stop... After, launch adb server by 'adb kill-server', and 'adb start-server' with rights administrator, segun your distribution... \n Verify if your device is correctly recognized, if yes, relaunch this script!"
 text_error_dl="!!! Error during download %s !!!"
@@ -78,6 +79,7 @@ text_exit_reboot="The script exit... Relaunch after rebooting!"
 text_exit_relaunch="The script exit... Relaunch after!"
 
 text_feature_disable="%s: This feature is disable.\n"
+text_file_deleted="File %s deleted!"
 
 text_goodbye="Bye..."
 text_goodbye_info="When you are into Android session, please tap onto SuperSU app...\nand Install su binary when it's ask."
@@ -124,7 +126,7 @@ text_press_key_when_ready="Press any key, when your device is ready..."
 text_ProductID="ProductID: %s"
 text_progress_adb_backup="Wait during ADB backup file into your computer: %s"
 text_progress_adb_dd="Wait during ADB write file %s into your device..."
-text_progress_adb_pull="Wait during ADB copy file %s into your device..."
+text_progress_adb_pull="Wait during ADB copy file %s into your computer..."
 
 text_reboot="What reboot do you want?"
 text_reboot_now="Your device reboot... now!"
@@ -135,6 +137,8 @@ text_reboot_yourself="Reboot yourself the device!"
 text_remove="Remove %s"
 
 text_see_phone="Please, see your phone to accept ADB shell by SuperSU! (if need...)"
+
+text_size_files_good="Good, size files is egual!"
 
 text_sorry="Sorry, but we can't do anything more!"
 

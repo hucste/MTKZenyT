@@ -2,335 +2,9 @@
 
 if ! ${EXEC}; then exit; fi
 
-function MTKZenyTux() {
-
-    echo -e "#################################"
-    echo -e "### ${title_welcome} ###"
-    echo -e "#################################"
-
-    control_system "$FUNCNAME"
-
-    build_vars
-    display_menu
-
-}
-
-function ADB_BACKUP() {
-
-    # obtain dir to save
-    get_dir_backup
-
-    # mkdir dated into DIR_SVG !
-    if [[ -d "${DIR_SVG}" ]]; then
-
-        make_dir_dated
-
-        if [[ -d "${DIR_SVG_DATED}" ]]; then
-            display_files
-
-            if [[ "${FILES}" ]]; then ADB_BACKUP_CHOOSED=($(explode " " "${FILES}")); fi
-
-            adb_backup
-        fi
-
-    fi
-
-}
-
-function ADB_RESTORE() {
-
-    #display_feature_disable "${FUNCNAME}"
-
-    # need to chose an adb backup file and lauch adb_restore!
-    choose_directory "f" "${text_choose_adb_backup_file}"
-
-    if [[ -n "${FILE_CHOOSED}" ]]; then adb_restore "${FILE_CHOOSED}"; fi
-
-}
-
-function BACKUP() {
-
-    write_file "log" "${NOW} ### $FUNCNAME: Will try to backup your device!"
-
-    if [[ "$1" == "" ]]; then
-
-        in_array "${GUI}" "${GUIS[@]}";
-
-        if [[ $? -eq 1 ]]; then
-            display_feature_with_gui "${FUNCNAME}"
-            display_menu
-        fi
-
-    else
-
-        local option="${1:2:4}"
-        case "${option}" in
-            "info")
-                adb_read_partitions
-                mssg="$(printf "${text_verify_file}" "${FILE_DUMCHAR}" "${DIR_TOOLS}")"
-                display_mssg "i" "${mssg}"
-                press_any_key
-                EXIT
-            ;;
-            "name")
-                if [[ "${1:6:1}" != "=" ]]; then
-
-                    display_unknown_option "${1:6:1}"
-                    EXIT
-
-                else
-
-                    if grep "," <<< "${1#*=}"; then
-                        PART_CHOOSED=($(explode "," "${1#*=}"))
-                    else
-                        PART_CHOOSED[0]="${1#*=}"
-                    fi
-
-                    display_detected "PART_CHOOSED: ${PART_CHOOSED[@]}"
-                fi
-            ;;
-        esac
-        unset option
-
-    fi
-
-    sleep 1
-
-    #whoami="$(adb_whoami)"; echo "whoami: ${whoami}"; EXIT
-    if [[ "$(adb_whoami)" == "uid=0" ]]; then
-
-        # obtain dir to save
-        get_dir_backup
-
-        # mkdir dated into DIR_SVG !
-        if [[ -d "${DIR_SVG}" ]]; then
-
-            make_dir_dated
-
-            if [[ -d "${DIR_SVG_DATED}" ]]; then
-
-                adb_restart_server
-                adb_read_partitions
-
-                if [[ -f "${FILE_PARAM}" ]]; then
-
-                    file_to_array_mtd
-
-                    if [[ "$(count "${PART_CHOOSED}")" -eq 0 ]]; then
-                        display_files
-
-                        #convert_str_to_array
-                        if [[ "${FILES}" ]]; then
-                            PART_CHOOSED=($(explode " " "${FILES}"))
-                        fi
-
-                    fi
-
-                    if [[ "$(count "${PART_CHOOSED[@]}")" -gt 0 ]]; then adb_save_partitions; fi
-
-                fi
-
-            fi
-
-        fi
-
-    else
-
-        mssg=$(printf "${text_su_inactive}\n${text_step_stop}\n" "$FUNCNAME")
-        display_error "${mssg}\n"
-
-    fi
-
-}
-
-function CUSTOM() {
-
-    display_feature_disable "${FUNCNAME}"
-
-}
-
-function EXIT() {
-
-    adb kill-server
-    display_mssg "n" "${text_goodbye}" "${title_goodbye}" "1"
-    sleep 1
-    destruct
-    clear
-    exit 0
-
-}
-
-function FLASH() {
-
-    write_file "log" "${NOW} ### $FUNCNAME: Will try to flash your device!"
-
-    if [[ "$1" == "" ]]; then
-
-        in_array "${GUI}" "${GUIS[@]}";
-        if [[ $? -eq 1 ]]; then
-            display_feature_with_gui "${FUNCNAME}"
-            display_menu
-        fi
-
-    else
-
-        local option="${1:2:4}"
-        case "${option}" in
-            "name")
-
-            if [[ "${1:6:1}" != "=" ]]; then
-
-                display_unknown_option "${1:6:1}"
-                EXIT
-
-            else
-
-                if grep "," <<< "${1#*=}"; then
-                    PART_CHOOSED=($(explode "," "${1#*=}"))
-                else
-                    PART_CHOOSED[0]="${1#*=}"
-                fi
-
-                display_detected "PART_CHOOSED: ${PART_CHOOSED[@]}"
-
-                if [[ "$(count "${PART_CHOOSED[@]}")" -gt 0 ]]; then
-
-                    for part in "${PART_CHOOSED[@]}"; do
-                        local -i position=$(awk -v search=: '{print index($0,search)}' <<< "${part}")
-
-                        if [[ "${position}" -gt 0 ]]; then
-                            local name="${part:0:$position-1}"
-                            local file="${part:$position}"
-
-                            FILES_CHOOSED["${name}"]="${file}"
-                        fi
-
-                        unset position name file
-                    done
-                fi
-
-                unset PART_CHOOSED
-
-            fi
-
-            ;;
-        esac
-        unset option
-
-    fi
-
-    sleep 1; echo "$FUNCNAME: FILES CHOOSED: ${FILES_CHOOSED[@]}"; #EXIT
-
-    adb_restart_server
-    adb_read_partitions
-
-    if [[ -f "${FILE_PARAM}" ]]; then
-
-        file_to_array_mtd
-
-        if [[ "$(count "${!FILES_CHOOSED[@]}")" -eq 0 ]]; then
-
-            display_files
-
-            if [[ "${FILES}" ]]; then files=($(explode " " "${FILES}")); fi
-
-            if [[ -n "${files[@]}" ]]; then
-
-                for file in "${files[@]}"; do
-
-                    if [[ -n "${file}" ]]; then
-
-                        if [[ "${DIALOG}" -ne 0 ]]; then file="${MTD_NAME[${file}]}"; fi
-
-                        choose_directory "f" "${text_choose_file}${file}";
-
-                        if [[ -n "${FILE_CHOOSED}" ]]; then FILES_CHOOSED["${file}"]="${FILE_CHOOSED}"; fi
-
-                    fi
-                done
-            else
-                display_error "!!! ERROR: array files is empty !!!"
-            fi
-
-        fi
-
-        display_detected "files: ${!FILES_CHOOSED[@]} ${FILES_CHOOSED[@]}"
-
-        if [[ "$(count "${!FILES_CHOOSED[@]}")" -gt 0 ]]; then adb_flash_partitions; fi
-
-    fi
-
-}
-
-function REBOOT() {
-
-    #adb_reboot
-    if [[ -n "${MENU_REBOOT[@]}" ]]; then
-
-        for name in "${MENU_REBOOT[@]}"; do
-            var="text_menu_reboot_$name"
-            MENU_TEXT_REBOOT["${name}"]="${!var}"
-            unset var
-        done
-
-        if [[ "${ZENITY}" -ne 0 ]]; then
-
-            reboot=$( echos_menu | zenity_list "${text_reboot}" "${title_reboot}" "$(count ${MENU_REBOOT[@]})")
-
-        elif [[ "${DIALOG}" -ne 0 ]]; then
-
-            echos_menu
-
-            dialog_menu "${text_reboot}" "${title_reboot}" "$(count ${MENU_REBOOT[@]})" "reboot"
-            reboot=$(<${SCRIPT_TMP_DIR}menu_reboot.tmp)
-
-            unset menu
-
-        else
-
-            printf "\n${title_reboot}\n"
-
-            PS3="${text_reboot} "
-            select menu in "${MENU_REBOOT[@]}"; do
-                reboot="${menu}"
-                break
-            done
-            unset menu
-
-        fi
-
-        case "${reboot}" in
-            "RECOVERY") adb_reboot_recovery ;;
-            "SYSTEM") adb_reboot ;;
-        esac
-
-    fi
-
-}
-
-function ROOT() {
-
-    adb_restart_server
-
-    root_to_recovery
-
-}
-
-function UNROOT() {
-
-    adb_restart_server
-
-    if [[ "${vid}" == "${VID[0]}" ]]; then
-
-        unroot_to_recovery
-
-    else
-
-        unroot_to_system
-
-    fi
-
-}
+source "${INC}/display"
+source "${INC}/ADB_functions"
+source "${INC}/MENU_functions"
 
 function array_key_exists() {
 
@@ -843,7 +517,7 @@ function file_to_array_mtd() {
 function file_stat() {
 
     local file="$1"
-    local -i int
+    local -i int=0
 
     if [[ -f "${file}" ]]; then int=$(stat -c "%s" ${file} | sed 's/\r$//'); fi
 
@@ -894,6 +568,18 @@ function in_array() {
     return 1
 
     unset i needle IFS array
+
+}
+
+function make_backup() {
+
+    # obtain dir to save
+    get_dir_backup
+
+    # mkdir dated into DIR_SVG !
+    if [[ -d "${DIR_SVG}" ]]; then make_dir_dated; fi
+
+    if [[ -d "${DIR_SVG_DATED}" ]]; then adb_save_partitions; fi
 
 }
 

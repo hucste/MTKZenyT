@@ -3,7 +3,7 @@ Usage:  %s [OPTION] ... [PART_NAME] ...
 
 *** Options de Base ***
 
-Aide:   -h|-H|-?|--help
+Aide:   -h|-H|-?|-help
 
 *** Commandes Principales ***
 

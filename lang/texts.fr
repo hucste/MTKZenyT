@@ -58,6 +58,7 @@ text_dl_file="URL pour curl: %s"
 text_dl_yourself="Téléchargez vous-même l'application %s !"
 
 text_error_bckp="!!! Erreur : Il semble que la sauvegarde n'a pas eu lieu : %s n'existe pas !!!"
+text_error_bckp_part_inexists="!!! Erreur :  Il semble qu'une des partitions que vous cherchez à sauvegarder n'existe pas !!!"
 text_error_device_offline="!!! Erreur : Votre appareil est en mode 'offline' ! \n Veuillez désactiver l'option 'Deboguage USB' dans votre appareil ; déconnectez le câble USB, attendre trois secondes et reconnectez l'appareil à votre ordinateur ; puis réactivez l'option 'Deboguage USB' ..."
 text_error_device_no_perm="!!! Erreur : Votre appareil n'est pas reconnu, parce que la commande 'adb devices' n'a pas les permissions nécessaires. \n Le script va s'arrêter ... Ensuite, veuillez relancer le serveur adb par les commandes suivantes 'adb kill-server', puis 'adb start-server' avec des droits administrateurs, selon votre distribution ... \n Une fois fait, vérifiez le support correct de votre appareil, puis si c'est bon, relancez le programme !"
 text_error_dl="!!! Erreur pendant le téléchargement %s !!!"
@@ -79,6 +80,7 @@ text_exit_reboot="Le script va s'arrêter ... Relancez-le après le redémarrage
 text_exit_relaunch="Le script va s'arrêter ... Relancez-le après !"
 
 text_feature_disable="%s: Cette fonctionnalité est désactivée.\n"
+text_file_deleted="Le fichier %s a été supprimé !"
 
 text_goodbye="Au-revoir ..."
 text_goodbye_info="Quand vous serez dans la session Android, veuillez taper sur l'app SuperSU ...\net installer le binaire su quand cela vous sera demandé."
@@ -125,7 +127,7 @@ text_press_key_when_ready="Appuyez sur n'importe quelle touche, quand l'appareil
 text_ProductID="ProductID: %s"
 text_progress_adb_backup="Patientez pendant que l'outil ADB sauvegarde vos données dans votre ordinateur : %s"
 text_progress_adb_dd="Patientez pendant que l'outil ADB écrit le fichier %s dans votre appareil ..."
-text_progress_adb_pull="Patientez pendant que l'outil ADB copie le fichier %s dans votre appareil ..."
+text_progress_adb_pull="Patientez pendant que l'outil ADB copie le fichier %s sur votre ordinateur ..."
 
 text_reboot="Quel forme de redémarrage, voulez-vous faire ?"
 text_reboot_now="Votre appareil redémarre, maintenant !"
@@ -136,6 +138,8 @@ text_reboot_yourself="Redémarrez-vous-même l'appareil !"
 text_remove="Suppression de %s"
 
 text_see_phone="SVP, regardez votre téléphone pour accepter l'accès à ADB Shell par SuperSU ! (si besoin)"
+
+text_size_files_good="Les tailles des fichiers sont semblables !"
 
 text_sorry="Désolé, mais nous ne pouvons rien faire de plus !"
 
