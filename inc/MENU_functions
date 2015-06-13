@@ -150,7 +150,7 @@ function CUSTOM() {
 
 function EXIT() {
 
-    adb kill-server
+    if [[ -x $(which adb) ]]; then adb kill-server; fi
     display_mssg "n" "${text_goodbye}" "${title_goodbye}" "1"
     sleep 1
     destruct
